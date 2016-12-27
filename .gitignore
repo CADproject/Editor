@@ -3,6 +3,8 @@ Debug/
 Release/
 */Debug/
 */Release/
+*/bin/
+*/obj/
 *.suo
 *.sln
 *.sdf
