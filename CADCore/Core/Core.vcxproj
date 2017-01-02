@@ -135,11 +135,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="base.cpp" />
+    <ClCompile Include="document.cpp" />
+    <ClCompile Include="geometry.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="test.cpp" />
+    <ClCompile Include="session.cpp" />
+    <ClCompile Include="topology.cpp" />
+    <ClCompile Include="undo_redo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="test.h" />
+    <ClInclude Include="base.h" />
+    <ClInclude Include="definitious.h" />
+    <ClInclude Include="document.h" />
+    <ClInclude Include="geometry.h" />
+    <ClInclude Include="headers.h" />
+    <ClInclude Include="session.h" />
+    <ClInclude Include="topology.h" />
+    <ClInclude Include="undo_redo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
