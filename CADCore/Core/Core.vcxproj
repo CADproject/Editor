@@ -147,7 +147,7 @@
   <ItemGroup>
     <ClInclude Include="base.h" />
     <ClInclude Include="core_api.h" />
-    <ClInclude Include="definitious.h" />
+    <ClInclude Include="definitions.h" />
     <ClInclude Include="document.h" />
     <ClInclude Include="geometry.h" />
     <ClInclude Include="headers.h" />

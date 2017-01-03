@@ -1,7 +1,7 @@
 /*This file contains the document class*/
 
 #pragma once
-#include "definitious.h"
+#include "definitions.h"
 #include "undo_redo.h"
 #include "base.h"
 
@@ -28,7 +28,7 @@ public:
 class Document
 {
 private:
-	static DOCID _id;		//ids counter
+	//static DOCID _id;		//ids counter
 	Base _base;				//user data
 	Buffer _buffer;			//the objects that appear on the screen
 	UndoRedo _undoredo;		//undo/redo mechanism

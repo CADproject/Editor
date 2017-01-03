@@ -3,7 +3,7 @@
 #pragma once
 #include <map>
 #include "topology.h"
-#include "definitious.h"
+#include "definitions.h"
 
 class Generic	//generalized base object
 {
