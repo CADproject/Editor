@@ -1,6 +1,7 @@
 /*This file contains the base class*/
 
 #pragma once
+#include <map>
 #include "topology.h"
 #include "definitious.h"
 
@@ -12,7 +13,16 @@ class Generic	//generalized base object
 	Topology* _primitive;	//the type of the primitive
 };
 
-class Base
+class Base	//contains all objects which are drawn on the screen
 {
+private:
+	std::map<OBJID, Generic*> _base;
 
+public:
+	Base() {}
+	~Base() {}
+
+	OBJID attachToBase(Generic* object);
+	void detachFromBase(OBJID id);
+	Generic* getGeneric(OBJID id);
 };

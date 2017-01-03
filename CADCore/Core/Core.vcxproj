@@ -136,6 +136,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="base.cpp" />
+    <ClCompile Include="core_api.cpp" />
     <ClCompile Include="document.cpp" />
     <ClCompile Include="geometry.cpp" />
     <ClCompile Include="main.cpp" />
@@ -145,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h" />
+    <ClInclude Include="core_api.h" />
     <ClInclude Include="definitious.h" />
     <ClInclude Include="document.h" />
     <ClInclude Include="geometry.h" />

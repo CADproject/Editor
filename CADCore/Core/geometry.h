@@ -13,3 +13,7 @@ public:
 	void setX(double x) { _coord_X = x; }
 	void setY(double y) { _coord_Y = y; }
 };
+
+class Math {};	//todo
+class LineLaw: public Math {};	//todo
+class CircleLaw: public Math {};	//todo
