@@ -13,10 +13,20 @@ class Generic	//generalized base object
 	Topology* _primitive;	//the type of the primitive
 };
 
-class Base	//contains all objects which are drawn on the screen
+class Buffer	//contains all objects which are drawn on the screen
 {
 private:
-	std::map<OBJID, Generic*> _base;
+	std::vector<Generic*> _buffer;	//the objects that appear on the screen
+	std::vector<unsigned> _layers;	//the layers that appear on the screen
+
+public:
+	void attachToBuffer(Generic* object);
+};
+
+class Base
+{
+private:
+	std::map<OBJID, Generic*> _base;	//the objects are written to file
 
 public:
 	Base() {}
