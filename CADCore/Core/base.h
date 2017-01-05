@@ -1,4 +1,4 @@
-/*This file contains the base class, generic class, buffer class, undo/redo mechanism.
+/*This file contains the base class, generic class, undo/redo mechanism.
 The container undo/redo keeps a history of last N commands in order of execution.
 Used pattern Memento from GOF catalogue.*/
 
@@ -10,20 +10,27 @@ Used pattern Memento from GOF catalogue.*/
 
 class Generic	//generalized base object
 {
+private:
 	unsigned _layer;		//the number of layer in which the primitive is
 	COLOR _color;			//the color of the primitive
 	THICKNESS _thickness;	//the thickness of the primitive
 	Topology* _primitive;	//the type of the primitive
-};
-
-class Buffer	//contains all objects which are drawn on the screen
-{
-private:
-	std::vector<Generic*> _buffer;	//the objects that appear on the screen
-	std::vector<unsigned> _layers;	//the layers that appear on the screen
 
 public:
-	void attachToBuffer(Generic* object);
+	Generic(): _layer(0), _color(BLACK), _thickness(THREE), _primitive(nullptr) {}
+	Generic(Topology* primitive): _layer(0), _color(BLACK), _thickness(THREE), _primitive(primitive) {}
+	Generic(unsigned layer, COLOR color, THICKNESS thickness, Topology* primitive):
+		_layer(layer), _color(color), _thickness(thickness), _primitive(primitive) {}
+
+	unsigned getLayer(void) { return _layer; }
+	COLOR getColor(void) { return _color; }
+	THICKNESS getThickness(void) { return _thickness; }
+	Topology* getTopology(void) { return _primitive; }
+
+	void setLayer(unsigned newLayer) { _layer = newLayer; }
+	void setColor(COLOR newColor) { _color = newColor; }
+	void setThickness(THICKNESS newThickness) { _thickness = newThickness; }
+	void setTopology(Topology* newPrimitive) { _primitive = newPrimitive; }
 };
 
 class UndoRedo
