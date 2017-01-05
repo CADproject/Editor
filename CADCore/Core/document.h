@@ -2,7 +2,6 @@
 
 #pragma once
 #include "definitions.h"
-#include "undo_redo.h"
 #include "base.h"
 
 class Settings	//document settings
@@ -31,7 +30,6 @@ private:
 	//static DOCID _id;		//ids counter
 	Base _base;				//user data
 	Buffer _buffer;			//the objects that appear on the screen
-	UndoRedo _undoredo;		//undo/redo mechanism
 	Settings _settings;		//document settings
 
 public:

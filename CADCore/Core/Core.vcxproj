@@ -153,7 +153,6 @@
     <ClInclude Include="headers.h" />
     <ClInclude Include="session.h" />
     <ClInclude Include="topology.h" />
-    <ClInclude Include="undo_redo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
