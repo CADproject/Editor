@@ -7,14 +7,14 @@
 
 class Topology	//base class of all primitives
 {
+public:
+	virtual void drawing(void) const = 0;
 };
 
-class Edge: public Topology	//base class of all types of edges
+class Edge: public Topology		//base class of all types of edges
 {
 protected:
 	Math* _law;
-public:
-	virtual std::vector<Node> drawing(void) const = 0;
 };
 
 class Point: public Edge
@@ -30,16 +30,11 @@ public:
 		_law = nullptr;
 	}
 
-	Point(double x, double y)
-	{
-		_node.setX(x);
-		_node.setY(y);
-		_law = nullptr;
-	}
+	Point(const Node& node): _node(node) { _law = new PointLaw(); }
 
-	Point(const Node& node): _node(node) { _law = nullptr; }
+	~Point() { if(_law) delete _law; }
 	
-	/*virtual*/ std::vector<Node> drawing(void) const;
+	/*virtual*/ void drawing(void) const;
 };
 
 class Line: public Edge
@@ -63,13 +58,9 @@ public:
 		_law = new LineLaw();
 	}
 
-	~Line()
-	{
-		if(!_law)
-			delete _law;
-	}
+	~Line() { if(_law) delete _law; }
 
-	/*virtual*/ std::vector<Node> drawing(void) const;
+	/*virtual*/ void drawing(void) const;
 };
 
 class Circle: public Edge
@@ -90,16 +81,12 @@ public:
 
 	Circle(const Node& center, const Node& side): _center(center), _side(side)
 	{
-		_law = new LineLaw();
-	}
-	
-	~Circle()
-	{
-		if(!_law)
-			delete _law;
+		_law = new CircleLaw();
 	}
 
-	/*virtual*/ std::vector<Node> drawing(void) const;
+	~Circle() { if(_law) delete _law; }
+
+	/*virtual*/ void drawing(void) const;
 };
 
 class Contour: public Topology	//contour is a container of edges
@@ -108,5 +95,5 @@ private:
 	std::list<Edge*> _edges;
 
 public:
-	std::vector< std::vector<Node> > drawing(void) const;
+	/*virtual*/ void drawing(void) const;
 };
