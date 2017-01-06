@@ -37,5 +37,10 @@ private:
 public:
 	Document() { _base.attachObserver(&_buffer); }
 
-	//todo
+	OBJID attachToBase(Generic* object);
+	void detachFromBase(OBJID objID);
+	Generic* getGeneric(OBJID objID);
+
+	void undo(void);
+	void redo(void);
 };

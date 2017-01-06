@@ -10,6 +10,12 @@ private:
 	double _coord_Y;
 public:
 	Node(): _coord_X(0), _coord_Y(0) {}
+	
+	Node(double x, double y)
+	{
+		_coord_X = x;
+		_coord_Y = y;
+	}
 
 	double getX(void) const { return _coord_X; }
 	double getY(void) const { return _coord_Y; }
