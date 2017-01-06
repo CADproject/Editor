@@ -1,10 +1,12 @@
-/*This file contains the base class, generic class, undo/redo mechanism.
+/*This file contains the base class, generic class, undo/redo mechanism, buffer class.
 The container undo/redo keeps a history of last N commands in order of execution.
-Used pattern Memento from GOF catalogue.*/
+Used patterns Memento and Observer from GOF catalogue.*/
 
 #pragma once
 #include <map>
 #include <deque>
+#include <vector>
+#include <utility>
 #include "definitions.h"
 #include "topology.h"
 
@@ -52,19 +54,43 @@ public:
 	void clear(void);
 };
 
+class Buffer	//contains all objects which are drawn on the screen
+{
+private:
+	std::vector< std::pair<bool, Generic*> > _buffer;	//the objects that appear on the screen
+														//bool: true - from base, false - from conrtoller
+	std::vector<unsigned> _layers;						//the layers that appear on the screen
+
+public:
+	Buffer() { _layers.push_back(0); }
+
+	void update(const std::map<OBJID, Generic*>& baseState);
+
+	void setLayers(std::vector<unsigned>& newLayers) { _layers = newLayers; }
+	
+	void attachToBuffer(Generic* object, bool fromBase);		//to display generic on the screen
+	void detachFrombuffer(Generic* object, bool fromBase);		//to remove generic from the screen
+
+	void toScreen(void);
+};
+
 class Base
 {
 private:
+	static unsigned _counter;			//generics counter
 	std::map<OBJID, Generic*> _base;	//the objects are written to file
 	UndoRedo _undoredo;					//undo/redo mechanism
+	Buffer* _observer;					//pattern Observer from GOF catalogue
 
 public:
-	Base() {}
-	~Base() {}
+	Base(): _observer(nullptr) {}
+
+	void notify(void);
+	void attachObserver(Buffer* observer) { _observer = observer; }
 
 	OBJID attachToBase(Generic* object);
-	void detachFromBase(OBJID id);
-	Generic* getGeneric(OBJID id);
+	void detachFromBase(OBJID objID);
+	Generic* getGeneric(OBJID objID);
 
 	void commit(void);
 	void undo(void);

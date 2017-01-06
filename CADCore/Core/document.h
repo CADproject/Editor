@@ -27,30 +27,15 @@ public:
 	void setDefaultEdgeThickness(THICKNESS thickness) { _defaultEdgeThickness = thickness; }
 };
 
-class Buffer	//contains all objects which are drawn on the screen
-{
-private:
-	std::vector<Generic*> _buffer;	//the objects that appear on the screen
-	std::vector<unsigned> _layers;	//the layers that appear on the screen
-
-public:
-	Buffer() { _layers.push_back(0); }
-
-	void setLayers(std::vector<unsigned>& newLayers) { _layers = newLayers; }
-	
-	void attachToBuffer(Generic* object);		//to display generic on the screen
-	void detachFrombuffer(Generic* object);		//to remove generic from the screen
-
-	void toScreen(void);
-};
-
 class Document
 {
 private:
-	Base _base;				//user data
 	Buffer _buffer;			//the objects that appear on the screen
+	Base _base;				//user data
 	Settings _settings;		//document settings
 
 public:
+	Document() { _base.attachObserver(&_buffer); }
+
 	//todo
 };

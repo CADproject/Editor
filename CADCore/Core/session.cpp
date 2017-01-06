@@ -21,5 +21,9 @@ void Session::detachDocument(DOCID docID)
 
 Document* Session::getDocument(DOCID docID)
 {
-	return new Document();
+	auto iter = _session.find(docID);
+	if(iter != _session.end())
+		return iter->second;
+	else
+		return nullptr;
 }
