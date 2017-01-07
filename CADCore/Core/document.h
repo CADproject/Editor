@@ -38,9 +38,14 @@ public:
 	Document() { _base.attachObserver(&_buffer); }
 
 	OBJID attachToBase(Generic* object);
-	void detachFromBase(OBJID objID);
+	Generic* detachFromBase(OBJID objID);
 	Generic* getGeneric(OBJID objID);
 
+	void commit(void);
 	void undo(void);
 	void redo(void);
+
+	void setLayers(std::vector<unsigned>& newLayers);
+	void setBackgroundColor(COLOR color);
+	void toScreen(void);
 };

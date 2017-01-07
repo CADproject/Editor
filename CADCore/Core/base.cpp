@@ -17,7 +17,7 @@ OBJID Base::attachToBase(Generic* object)
 	return _counter;
 }
 
-void Base::detachFromBase(OBJID objID)
+Generic* Base::detachFromBase(OBJID objID)
 {
 	auto iter = _base.find(objID);
 	
@@ -25,10 +25,11 @@ void Base::detachFromBase(OBJID objID)
 	{
 		_base.erase(iter);
 		notify();
+		return getGeneric(objID);
 	}
 	else
 	{
-		return;
+		return nullptr;
 	}
 }
 

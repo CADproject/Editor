@@ -89,7 +89,7 @@ public:
 	void attachObserver(Buffer* observer) { _observer = observer; }
 
 	OBJID attachToBase(Generic* object);
-	void detachFromBase(OBJID objID);
+	Generic* detachFromBase(OBJID objID);
 	Generic* getGeneric(OBJID objID);
 
 	void commit(void);

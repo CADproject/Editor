@@ -38,10 +38,10 @@ void undo(Session& curSes, DOCID docID);
 void redo(Session& curSes, DOCID docID);
 
 //set layers to show
-void setLayers(Session& curSes, DOCID docID);
+void setLayers(Session& curSes, DOCID docID, std::vector<unsigned>& layersToShow);
 
 //set background color
-void setBackgroundColor(Session& curSes, DOCID docID);
+void setBackgroundColor(Session& curSes, DOCID docID, COLOR newColor);
 
 //show the 2d editior field
 void display(Session& curSes, DOCID docID);
