@@ -15,6 +15,11 @@ Generic* Document::getGeneric(OBJID objID)
 	return _base.getGeneric(objID);
 }
 
+Topology* Document::getGenericTopology(OBJID objID)
+{
+	return _base.getGeneric(objID)->getTopology();
+}
+
 void Document::commit(void)
 {
 	_base.commit();

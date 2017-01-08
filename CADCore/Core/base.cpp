@@ -2,8 +2,6 @@
 #include <iostream>
 #include "base.h"
 
-unsigned Base::_counter;
-
 void Base::notify(void)
 {
 	_observer->update(_base);
@@ -43,6 +41,11 @@ Generic* Base::getGeneric(OBJID objID)
 		return nullptr;
 }
 
+Topology* Base::getGenericTopology(OBJID objID)
+{
+	return getGeneric(objID)->getTopology();
+}
+
 void Base::commit(void)
 {
 	_undoredo.commit(_base);
@@ -72,12 +75,21 @@ void Buffer::update(const std::map<OBJID, Generic*>& baseState)
 	});
 
 	_buffer.erase(iter, _buffer.end());
-
+	
+	/*
 	std::for_each(baseState.begin(), baseState.end(), 
-		[=](std::pair<OBJID, Generic*> curPair)
+		[&](std::pair<OBJID, Generic*> curPair)
 	{
 		_buffer.push_back(std::make_pair(true, curPair.second));
 	});
+	*/
+
+	//test code//
+	for(auto iter = baseState.begin(); iter != baseState.end(); ++iter)
+	{
+		_buffer.push_back(std::make_pair(true, iter->second));
+	}
+	//test code//
 }
 
 void Buffer::attachToBuffer(Generic* object, bool fromBase)

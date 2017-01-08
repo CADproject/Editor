@@ -5,28 +5,19 @@
 #include "definitions.h"
 
 //create point
-void createPoint(Session& curSes, DOCID docID, double X, double Y);
+OBJID createPoint(Session& curSes, DOCID docID, double X, double Y);
 
 //create line: start point, end point
-void createLine(Session& curSes, DOCID docID, double X1, double Y1, double X2, double Y2);
+OBJID createLine(Session& curSes, DOCID docID, double X1, double Y1, double X2, double Y2);
 
 //create circle: center point, side point
-void createCircle(Session& curSes, DOCID docID, double X1, double Y1, double X2, double Y2);
+OBJID createCircle(Session& curSes, DOCID docID, double X1, double Y1, double X2, double Y2);
 
 //create contour by existing edges
-void createContour(Session& curSes, DOCID docID, std::vector<OBJID> objects);
+OBJID createContour(Session& curSes, DOCID docID, std::vector<OBJID> objects);
 
 //delete point by id
-void deletePoint(Session& curSes, DOCID docID, OBJID objID);
-
-//delete line by id
-void deleteLine(Session& curSes, DOCID docID, OBJID objID);
-
-//delete circle by id
-void deleteCircle(Session& curSes, DOCID docID, OBJID objID);
-
-//delete contour with all edges
-void deleteContour(Session& curSes, DOCID docID, OBJID objID);
+void deleteObject(Session& curSes, DOCID docID, OBJID objID);
 
 //destroy contour, all edges will be free
 void destroyContour(Session& curSes, DOCID docID, OBJID objID);

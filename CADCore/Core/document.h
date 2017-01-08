@@ -27,7 +27,7 @@ public:
 	void setDefaultEdgeThickness(THICKNESS thickness) { _defaultEdgeThickness = thickness; }
 };
 
-class Document
+class Document	//data are written to a file, document must be created using operator "new"
 {
 private:
 	Buffer _buffer;			//the objects that appear on the screen
@@ -40,6 +40,8 @@ public:
 	OBJID attachToBase(Generic* object);
 	Generic* detachFromBase(OBJID objID);
 	Generic* getGeneric(OBJID objID);
+
+	Topology* getGenericTopology(OBJID objID);
 
 	void commit(void);
 	void undo(void);

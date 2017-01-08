@@ -5,134 +5,121 @@
 #include "topology.h"
 #include "definitions.h"
 
-void createPoint(Session& curSes, DOCID docID, double X, double Y)
+OBJID createPoint(Session& curSes, DOCID docID, double X, double Y)
 {
 	Node node(X, Y);
-	Point* newPoint = new Point(node);
-	Generic newPointGen(newPoint);
-	curSes.getDocument(docID)->attachToBase(&newPointGen);
+	Point newPoint(node);
+
+	Point* pNewPoint = &newPoint;
+	Generic* newPointGen = new Generic(pNewPoint);
 	
-	curSes.getDocument(docID)->commit();
+	OBJID newPointID = curSes.attachToBase(docID, newPointGen);
+	curSes.commit(docID);
+
+	return newPointID;
 }
 
-void createLine(Session& curSes, DOCID docID, double X1, double Y1, double X2, double Y2)
+OBJID createLine(Session& curSes, DOCID docID, double X1, double Y1, double X2, double Y2)
 {
 	Node start(X1, Y1);
 	Node end(X2, Y2);
-	Line* newLine = new Line(start, end);
-	Generic newLineGen(newLine);
-	curSes.getDocument(docID)->attachToBase(&newLineGen);
+	Line newLine(start, end);
 	
-	curSes.getDocument(docID)->commit();
+	Line* pNewLine = &newLine;
+	Generic* newLineGen = new Generic(pNewLine);
+
+	OBJID newLineID = curSes.attachToBase(docID, newLineGen);
+	curSes.commit(docID);
+
+	return newLineID;
 }
 
-void createCircle(Session& curSes, DOCID docID, double X1, double Y1, double X2, double Y2)
+OBJID createCircle(Session& curSes, DOCID docID, double X1, double Y1, double X2, double Y2)
 {
 	Node center(X1, Y1);
 	Node side(X2, Y2);
-	Circle* newCircle = new Circle(center, side);
-	Generic newCircleGen(newCircle);
-	curSes.getDocument(docID)->attachToBase(&newCircleGen);
+	Circle newCircle(center, side);
 	
-	curSes.getDocument(docID)->commit();
+	Circle* pNewCircle = &newCircle;
+	Generic* newCircleGen = new Generic(pNewCircle);
+	
+	OBJID newCircleID = curSes.attachToBase(docID, newCircleGen);
+	curSes.commit(docID);
+
+	return newCircleID;
 }
 
-void createContour(Session& curSes, DOCID docID, std::vector<OBJID> objects)
+OBJID createContour(Session& curSes, DOCID docID, std::vector<OBJID> objects)
 {
 	std::vector<Edge*> edges;
 
 	std::for_each(objects.begin(), objects.end(),
 		[=, &curSes, &edges](OBJID objID)
 	{
-		Generic* temp = curSes.getDocument(docID)->getGeneric(objID);
-		curSes.getDocument(docID)->detachFromBase(objID);
-		edges.push_back(dynamic_cast<Edge*>(temp->getTopology()));
+		Edge* curEdge = dynamic_cast<Edge*>(curSes.getGenericTopology(docID, objID));
+		edges.push_back(curEdge);
+		Generic* temp = curSes.detachFromBase(docID, objID);
+		delete temp;
 	});
 
-	Contour* newContour = new Contour(edges);
-	Generic newContourGen(newContour);
-	curSes.getDocument(docID)->attachToBase(&newContourGen);
+	Contour newContour(edges);
 	
-	curSes.getDocument(docID)->commit();
+	Contour* pNewContour = &newContour;
+	Generic* newContourGen = new Generic(pNewContour);
+
+	OBJID newContourID = curSes.attachToBase(docID, newContourGen);
+	curSes.commit(docID);
+
+	return newContourID;
 }
 
-void deletePoint(Session& curSes, DOCID docID, OBJID objID)
+void deleteObject(Session& curSes, DOCID docID, OBJID objID)
 {
-	Generic* temp = curSes.getDocument(docID)->detachFromBase(objID);
-	delete temp->getTopology();
+	Generic* temp = curSes.detachFromBase(docID, objID);
+	delete temp;
 
-	curSes.getDocument(docID)->commit();
-}
-
-void deleteLine(Session& curSes, DOCID docID, OBJID objID)
-{
-	Generic* temp = curSes.getDocument(docID)->detachFromBase(objID);
-	delete temp->getTopology();
-
-	curSes.getDocument(docID)->commit();
-}
-
-void deleteCircle(Session& curSes, DOCID docID, OBJID objID)
-{
-	Generic* temp = curSes.getDocument(docID)->detachFromBase(objID);
-	delete temp->getTopology();
-
-	curSes.getDocument(docID)->commit();
-}
-
-void deleteContour(Session& curSes, DOCID docID, OBJID objID)
-{
-	Generic* temp = curSes.getDocument(docID)->detachFromBase(objID);
-	Contour* tempCon = dynamic_cast<Contour*>(temp->getTopology());
-	
-	std::list<Edge*> edges = tempCon->getEdges();
-	std::for_each(edges.begin(), edges.end(),
-		[](Edge* curEdge) { delete curEdge; });
-
-	delete tempCon;
-
-	curSes.getDocument(docID)->commit();
+	curSes.commit(docID);
 }
 
 void destroyContour(Session& curSes, DOCID docID, OBJID objID)
 {
-	Generic* temp = curSes.getDocument(docID)->detachFromBase(objID);
+	Generic* temp =curSes.detachFromBase(docID, objID);
 	Contour* tempCon = dynamic_cast<Contour*>(temp->getTopology());
 
 	std::list<Edge*> edges = tempCon->getEdges();
 	std::for_each(edges.begin(), edges.end(),
 		[=, &curSes](Edge* curEdge)
 	{
-		Generic newEdgeGen(curEdge);
-		curSes.getDocument(docID)->attachToBase(&newEdgeGen);
+		Generic* newEdgeGen = new Generic(curEdge);
+		curSes.attachToBase(docID, newEdgeGen);
 	});
 		
-	delete tempCon;
+	delete temp;
 
-	curSes.getDocument(docID)->commit();
+	curSes.commit(docID);
 }
 
 void undo(Session& curSes, DOCID docID)
 {
-	curSes.getDocument(docID)->undo();
+	curSes.undo(docID);
 }
 
 void redo(Session& curSes, DOCID docID)
 {
-	curSes.getDocument(docID)->redo();
+	curSes.redo(docID);
 }
 
 void setLayers(Session& curSes, DOCID docID, std::vector<unsigned>& layersToShow)
 {
-	curSes.getDocument(docID)->setLayers(layersToShow);
+	curSes.setLayers(docID, layersToShow);
 }
 
 void setBackgroundColor(Session& curSes, DOCID docID, COLOR newColor)
 {
-	curSes.getDocument(docID)->setBackgroundColor(newColor);
+	curSes.setBackgroundColor(docID, newColor);
 }
 
 void display(Session& curSes, DOCID docID)
 {
-	curSes.getDocument(docID)->toScreen();
+	curSes.toScreen(docID);
 }

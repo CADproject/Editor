@@ -10,7 +10,7 @@ Used patterns Memento and Observer from GOF catalogue.*/
 #include "definitions.h"
 #include "topology.h"
 
-class Generic	//generalized base object
+class Generic	//generalized base object, must be created using operator "new"
 {
 private:
 	unsigned _layer;		//the number of layer in which the primitive is
@@ -77,13 +77,13 @@ public:
 class Base
 {
 private:
-	static unsigned _counter;			//generics counter
+	unsigned _counter;					//generics counter
 	std::map<OBJID, Generic*> _base;	//the objects are written to file
 	UndoRedo _undoredo;					//undo/redo mechanism
 	Buffer* _observer;					//pattern Observer from GOF catalogue
 
 public:
-	Base(): _observer(nullptr) {}
+	Base(): _counter(0), _observer(nullptr) {}
 
 	void notify(void);
 	void attachObserver(Buffer* observer) { _observer = observer; }
@@ -91,6 +91,8 @@ public:
 	OBJID attachToBase(Generic* object);
 	Generic* detachFromBase(OBJID objID);
 	Generic* getGeneric(OBJID objID);
+
+	Topology* getGenericTopology(OBJID objID);
 
 	void commit(void);
 	void undo(void);
