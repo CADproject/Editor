@@ -28,23 +28,23 @@ class Math	//use Singleton in Future?
 protected:
 	std::string _type;
 public:
-	std::string getType(void) { return _type; }
+	std::string getType(void) const { return _type; }
 };
 
 class PointLaw: public Math
 {
 public:
-	PointLaw() { _type = "Point"; }
+	PointLaw() { _type = "POINT"; }
 };
 
 class LineLaw: public Math
 {
 public:
-	LineLaw() { _type = "Line";}
+	LineLaw() { _type = "LINE";}
 };
 
 class CircleLaw: public Math
 {
 public:
-	CircleLaw() { _type = "Circle"; }
+	CircleLaw() { _type = "CIRCLE"; }
 };

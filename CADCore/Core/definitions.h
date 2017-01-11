@@ -7,3 +7,5 @@ typedef unsigned OBJID;
 
 enum COLOR {BLACK, RED, GREEN, BLUE, YELLOW};
 enum THICKNESS {ONE, TWO, THREE, FOUR, FIVE};
+
+const OBJID NOT_FROM_BASE = 0;

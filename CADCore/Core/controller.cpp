@@ -8,11 +8,9 @@
 OBJID createPoint(Session& curSes, DOCID docID, double X, double Y)
 {
 	Node node(X, Y);
-	Point newPoint(node);
+	Point* newPoint = new Point(node);
+	Generic* newPointGen = new Generic(newPoint);
 
-	Point* pNewPoint = &newPoint;
-	Generic* newPointGen = new Generic(pNewPoint);
-	
 	OBJID newPointID = curSes.attachToBase(docID, newPointGen);
 	curSes.commit(docID);
 
@@ -23,10 +21,9 @@ OBJID createLine(Session& curSes, DOCID docID, double X1, double Y1, double X2, 
 {
 	Node start(X1, Y1);
 	Node end(X2, Y2);
-	Line newLine(start, end);
 	
-	Line* pNewLine = &newLine;
-	Generic* newLineGen = new Generic(pNewLine);
+	Line* newLine = new Line(start, end);
+	Generic* newLineGen = new Generic(newLine);
 
 	OBJID newLineID = curSes.attachToBase(docID, newLineGen);
 	curSes.commit(docID);
@@ -38,10 +35,9 @@ OBJID createCircle(Session& curSes, DOCID docID, double X1, double Y1, double X2
 {
 	Node center(X1, Y1);
 	Node side(X2, Y2);
-	Circle newCircle(center, side);
 	
-	Circle* pNewCircle = &newCircle;
-	Generic* newCircleGen = new Generic(pNewCircle);
+	Circle* newCircle = new Circle(center, side);
+	Generic* newCircleGen = new Generic(newCircle);
 	
 	OBJID newCircleID = curSes.attachToBase(docID, newCircleGen);
 	curSes.commit(docID);
@@ -62,10 +58,8 @@ OBJID createContour(Session& curSes, DOCID docID, std::vector<OBJID> objects)
 		delete temp;
 	});
 
-	Contour newContour(edges);
-	
-	Contour* pNewContour = &newContour;
-	Generic* newContourGen = new Generic(pNewContour);
+	Contour* newContour = new Contour(edges);
+	Generic* newContourGen = new Generic(newContour);
 
 	OBJID newContourID = curSes.attachToBase(docID, newContourGen);
 	curSes.commit(docID);
@@ -83,7 +77,7 @@ void deleteObject(Session& curSes, DOCID docID, OBJID objID)
 
 void destroyContour(Session& curSes, DOCID docID, OBJID objID)
 {
-	Generic* temp =curSes.detachFromBase(docID, objID);
+	Generic* temp = curSes.detachFromBase(docID, objID);
 	Contour* tempCon = dynamic_cast<Contour*>(temp->getTopology());
 
 	std::list<Edge*> edges = tempCon->getEdges();

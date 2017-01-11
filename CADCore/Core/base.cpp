@@ -21,9 +21,10 @@ Generic* Base::detachFromBase(OBJID objID)
 	
 	if(iter != _base.end())
 	{
+		Generic* temp = getGeneric(objID);
 		_base.erase(iter);
 		notify();
-		return getGeneric(objID);
+		return temp;
 	}
 	else
 	{
@@ -66,9 +67,9 @@ void Base::redo(void)
 void Buffer::update(const std::map<OBJID, Generic*>& baseState)
 {
 	auto iter = std::remove_if(_buffer.begin(), _buffer.end(),
-		[](std::pair<bool, Generic*> curPair)->bool
+		[](std::pair<OBJID, Generic*> curPair)->bool
 	{
-		if(curPair.first)
+		if(curPair.first != NOT_FROM_BASE)
 			return true;
 		else
 			return false;
@@ -76,31 +77,22 @@ void Buffer::update(const std::map<OBJID, Generic*>& baseState)
 
 	_buffer.erase(iter, _buffer.end());
 	
-	/*
 	std::for_each(baseState.begin(), baseState.end(), 
 		[&](std::pair<OBJID, Generic*> curPair)
 	{
-		_buffer.push_back(std::make_pair(true, curPair.second));
+		_buffer.push_back(curPair);
 	});
-	*/
-
-	//test code//
-	for(auto iter = baseState.begin(); iter != baseState.end(); ++iter)
-	{
-		_buffer.push_back(std::make_pair(true, iter->second));
-	}
-	//test code//
 }
 
-void Buffer::attachToBuffer(Generic* object, bool fromBase)
+void Buffer::attachToBuffer(Generic* object)
 {
-	_buffer.push_back(std::make_pair(fromBase, object)); 
+	_buffer.push_back(std::make_pair(NOT_FROM_BASE, object)); 
 }
 
-void Buffer::detachFrombuffer(Generic* object, bool fromBase)
+void Buffer::detachFrombuffer(Generic* object)
 {
-	auto iter = std::find(_buffer.begin(), _buffer.end(), std::make_pair(fromBase, object));
-
+	auto iter = std::find(_buffer.begin(), _buffer.end(), std::make_pair(NOT_FROM_BASE, object));
+	
 	if(iter != _buffer.end())
 		_buffer.erase(iter);
 	else
@@ -109,10 +101,10 @@ void Buffer::detachFrombuffer(Generic* object, bool fromBase)
 
 void Buffer::toScreen(void)
 {
-	std::cout << "ON THE SCREEN:" << std::endl;
-	
+	std::cout << "ON THE SCREEN:" << std::endl << std::endl;
+
 	std::for_each(_buffer.begin(), _buffer.end(),
-		[=](std::pair<bool, Generic*> curPair)
+		[=](std::pair<OBJID, Generic*> curPair)
 	{
 		auto iter = std::find(_layers.begin(), _layers.end(), curPair.second->getLayer());
 		
@@ -122,12 +114,18 @@ void Buffer::toScreen(void)
 		}
 		else
 		{
-			std::cout << "Topology: " << curPair.second->getTopology();
-			std::cout << ", Color: " << curPair.second->getColor();
+			std::cout << "ID: " << curPair.first << ". ";
+			curPair.second->getTopology()->drawing();
+			std::cout << "Color: " << curPair.second->getColor();
 			std::cout << ", Thickness: " << curPair.second->getThickness();
 			std::cout << ", Layer: " << curPair.second->getLayer();
-			std::cout << ", From controller (0) or from base (1): " << curPair.first;
-			std::cout << std::endl;
+			
+			bool whereObject = true;
+			if(curPair.first == NOT_FROM_BASE)
+				whereObject = false;
+			
+			std::cout << ", From operation (0) or base (1): " << whereObject << ".";
+			std::cout << std::endl << std::endl;
 		}
 	});
 

@@ -40,10 +40,10 @@ class UndoRedo
 private:
 	std::deque< std::map<OBJID, Generic*> > _snapshots;
 	unsigned _size;
-	unsigned _counter;
+	int _counter;
 
 public:
-	UndoRedo(): _size(10), _counter(0) {}
+	UndoRedo(): _size(10), _counter(-1) {}
 	~UndoRedo() {}
 
 	void setSize(unsigned newSize) { _size = newSize; }
@@ -57,8 +57,8 @@ public:
 class Buffer	//contains all objects which are drawn on the screen
 {
 private:
-	std::vector< std::pair<bool, Generic*> > _buffer;	//the objects that appear on the screen
-														//bool: true - from base, false - from conrtoller
+	std::vector< std::pair<OBJID, Generic*> > _buffer;	//the objects that appear on the screen
+														//if OBJID == 0 - object from controller, else from base
 	std::vector<unsigned> _layers;						//the layers that appear on the screen
 
 public:
@@ -68,8 +68,8 @@ public:
 
 	void setLayers(std::vector<unsigned>& newLayers) { _layers = newLayers; }
 	
-	void attachToBuffer(Generic* object, bool fromBase);		//to display generic on the screen
-	void detachFrombuffer(Generic* object, bool fromBase);		//to remove generic from the screen
+	void attachToBuffer(Generic* object);		//to display generic on the screen
+	void detachFrombuffer(Generic* object);		//to remove generic from the screen
 
 	void toScreen(void);
 };

@@ -23,6 +23,9 @@ public:
 	OBJID attachToBase(DOCID docID, Generic* object);
 	Generic* detachFromBase(DOCID docID, OBJID objID);
 
+	void attachToBuffer(DOCID docID, Generic* object);
+	void detachFrombuffer(DOCID docID, Generic* object);
+
 	Topology* getGenericTopology(DOCID docID, OBJID objID);
 
 	void commit(DOCID docID);

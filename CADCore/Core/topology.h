@@ -14,7 +14,7 @@ public:
 class Edge: public Topology		//base class of all types of edges
 {
 protected:
-	Math* _law;
+	Math _law;		//Math* _law;
 };
 
 class Point: public Edge
@@ -27,12 +27,11 @@ public:
 	{
 		_node.setX(0.0);
 		_node.setY(0.0);
-		_law = nullptr;
+		_law = PointLaw();
 	}
 
-	Point(const Node& node): _node(node) { _law = new PointLaw(); }
-
-	~Point() { if(_law) delete _law; }
+	Point(const Node& node): _node(node) { _law = PointLaw(); }
+	//~Point() { if(_law) delete _law; }
 	
 	/*virtual*/ void drawing(void) const;
 };
@@ -50,15 +49,15 @@ public:
 		_start.setY(0.0);
 		_end.setX(0.0);
 		_end.setY(0.0);
-		_law = nullptr;
+		_law = LineLaw();
 	}
 
 	Line(const Node& start, const Node& end): _start(start), _end(end)
 	{
-		_law = new LineLaw();
+		_law = LineLaw();
 	}
 
-	~Line() { if(_law) delete _law; }
+	//~Line() { if(_law) delete _law; }
 
 	/*virtual*/ void drawing(void) const;
 };
@@ -76,15 +75,15 @@ public:
 		_center.setY(0.0);
 		_side.setX(0.0);
 		_side.setY(0.0);
-		_law = nullptr;
+		_law = CircleLaw();
 	}
 
 	Circle(const Node& center, const Node& side): _center(center), _side(side)
 	{
-		_law = new CircleLaw();
+		_law = CircleLaw();
 	}
 
-	~Circle() { if(_law) delete _law; }
+	//~Circle() { if(_law) delete _law; }
 
 	/*virtual*/ void drawing(void) const;
 };

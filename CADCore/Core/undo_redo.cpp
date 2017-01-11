@@ -5,7 +5,7 @@ void UndoRedo::commit(const std::map<OBJID, Generic*>& curBase)
 {
 	if( !_snapshots.empty() && _counter != _snapshots.size()-1 )
 	{
-		while(_counter < _snapshots.size()-1)
+		while(static_cast<size_t>(_counter) < _snapshots.size()-1)
 			_snapshots.pop_back();
 		
 		assert(_counter == _snapshots.size()-1);
@@ -48,5 +48,5 @@ void UndoRedo::redo(std::map<OBJID, Generic*>& curBase)
 void UndoRedo::clear(void)
 {
 	_snapshots.clear();
-	_counter = 0;
+	_counter = -1;
 }

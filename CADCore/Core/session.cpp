@@ -1,3 +1,4 @@
+#include <iostream>
 #include "session.h"
 
 unsigned Session::_counter;
@@ -38,6 +39,16 @@ Generic* Session::detachFromBase(DOCID docID, OBJID objID)
 	return getDocument(docID)->detachFromBase(objID);
 }
 
+void Session::attachToBuffer(DOCID docID, Generic* object)
+{
+	getDocument(docID)->attachToBuffer(object);
+}
+
+void Session::detachFrombuffer(DOCID docID, Generic* object)
+{
+	getDocument(docID)->detachFrombuffer(object);
+}
+
 Generic* Session::getGeneric(DOCID docID, OBJID objID)
 {
 	return getDocument(docID)->getGeneric(objID);
@@ -75,5 +86,6 @@ void Session::setBackgroundColor(DOCID docID, COLOR color)
 
 void Session::toScreen(DOCID docID)
 {
+	std::cout << "DOCUMENT: " << docID << ". ";
 	getDocument(docID)->toScreen();
 }

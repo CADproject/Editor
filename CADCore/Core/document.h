@@ -41,6 +41,9 @@ public:
 	Generic* detachFromBase(OBJID objID);
 	Generic* getGeneric(OBJID objID);
 
+	void attachToBuffer(Generic* object);
+	void detachFrombuffer(Generic* object);
+
 	Topology* getGenericTopology(OBJID objID);
 
 	void commit(void);

@@ -15,6 +15,16 @@ Generic* Document::getGeneric(OBJID objID)
 	return _base.getGeneric(objID);
 }
 
+void Document::attachToBuffer(Generic* object)
+{
+	_buffer.attachToBuffer(object);
+}
+
+void Document::detachFrombuffer(Generic* object)
+{
+	_buffer.detachFrombuffer(object);
+}
+
 Topology* Document::getGenericTopology(OBJID objID)
 {
 	return _base.getGeneric(objID)->getTopology();
