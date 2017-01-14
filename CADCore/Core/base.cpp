@@ -49,18 +49,18 @@ Topology* Base::getGenericTopology(OBJID objID)
 
 void Base::commit(void)
 {
-	_undoredo.commit(_base);
+	_history.commit(_base);
 }
 
 void Base::undo(void)
 {
-	_undoredo.undo(_base);
+	_history.undo(_base);
 	notify();
 }
 
 void Base::redo(void)
 {
-	_undoredo.redo(_base);
+	_history.redo(_base);
 	notify();
 }
 

@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "base.h"
 
-void UndoRedo::commit(const std::map<OBJID, Generic*>& curBase)
+void History::commit(const std::map<OBJID, Generic*>& curBase)
 {
 	if( !_snapshots.empty() && _counter != _snapshots.size()-1 )
 	{
@@ -49,7 +49,7 @@ void UndoRedo::commit(const std::map<OBJID, Generic*>& curBase)
 	assert(_snapshots.size() <= _size);
 }
 
-void UndoRedo::undo(std::map<OBJID, Generic*>& curBase)
+void History::undo(std::map<OBJID, Generic*>& curBase)
 {
 	if(_counter == 0)
 		return;
@@ -59,7 +59,7 @@ void UndoRedo::undo(std::map<OBJID, Generic*>& curBase)
 	curBase = _snapshots.at(_counter);
 }
 
-void UndoRedo::redo(std::map<OBJID, Generic*>& curBase)
+void History::redo(std::map<OBJID, Generic*>& curBase)
 {
 	if(_counter == _snapshots.size()-1)
 		return;
@@ -69,7 +69,7 @@ void UndoRedo::redo(std::map<OBJID, Generic*>& curBase)
 	curBase = _snapshots.at(_counter);
 }
 
-void UndoRedo::clear(void)
+void History::clear(void)
 {
 	_snapshots.erase(_snapshots.begin()+1, _snapshots.end());
 	_counter = 0;

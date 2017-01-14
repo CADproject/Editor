@@ -36,7 +36,7 @@ public:
 	void setTopology(Topology* newPrimitive) { _primitive = newPrimitive; }
 };
 
-class UndoRedo
+class History
 {
 private:
 	std::deque< std::map<OBJID, Generic*> > _snapshots;
@@ -44,8 +44,8 @@ private:
 	unsigned _counter;
 
 public:
-	UndoRedo(): _size(10), _counter(0) { _snapshots.push_back(std::map<OBJID, Generic*>()); }
-	~UndoRedo() {}
+	History(): _size(10), _counter(0) { _snapshots.push_back(std::map<OBJID, Generic*>()); }
+	~History() {}
 
 	void setSize(unsigned newSize) { _size = newSize; }
 
@@ -59,7 +59,7 @@ class Buffer	//contains all objects which are drawn on the screen
 {
 private:
 	std::vector< std::pair<OBJID, Generic*> > _buffer;	//the objects that appear on the screen
-														//if OBJID == 0 - object from controller, else from base
+														//if OBJID == 0 then object from controller, else from base
 	std::vector<unsigned> _layers;						//the layers that appear on the screen
 
 public:
@@ -81,7 +81,7 @@ class Base
 private:
 	unsigned _counter;					//generics counter
 	std::map<OBJID, Generic*> _base;	//the objects are written to file
-	UndoRedo _undoredo;					//undo/redo mechanism
+	History _history;					//undo/redo mechanism
 	Buffer* _observer;					//pattern Observer from GOF catalogue
 
 public:
