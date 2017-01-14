@@ -6,11 +6,7 @@ void UndoRedo::commit(const std::map<OBJID, Generic*>& curBase)
 {
 	if( !_snapshots.empty() && _counter != _snapshots.size()-1 )
 	{
-<<<<<<< HEAD
-		while(static_cast<size_t>(_counter) < _snapshots.size()-1)
-=======
 		while(_counter < _snapshots.size()-1)
->>>>>>> fixed undo/redo bug
 		{
 			std::map<OBJID, Generic*> candidates = _snapshots.back();
 			_snapshots.pop_back();
@@ -55,7 +51,7 @@ void UndoRedo::commit(const std::map<OBJID, Generic*>& curBase)
 
 void UndoRedo::undo(std::map<OBJID, Generic*>& curBase)
 {
-	if(_counter == 0)	//-1
+	if(_counter == 0)
 		return;
 
 	--_counter;
