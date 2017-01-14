@@ -55,6 +55,16 @@ void Document::setBackgroundColor(COLOR color)
 	_settings.setBackgroundColor(color);
 }
 
+std::vector<unsigned> Document::getLayers(void)
+{
+	return _buffer.getLayers();
+}
+
+COLOR Document::getBackgroundColor(void)
+{
+	return _settings.getBackgroundColor();
+}
+
 void Document::toScreen(void)
 {
 	_buffer.toScreen();

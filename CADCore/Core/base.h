@@ -21,6 +21,7 @@ private:
 public:
 	Generic(): _layer(0), _color(BLACK), _thickness(THREE), _primitive(nullptr) {}
 	Generic(Topology* primitive): _layer(0), _color(BLACK), _thickness(THREE), _primitive(primitive) {}
+	Generic(unsigned layer, Topology* primitive): _layer(layer), _color(BLACK), _thickness(THREE), _primitive(primitive) {}
 	Generic(unsigned layer, COLOR color, THICKNESS thickness, Topology* primitive):
 		_layer(layer), _color(color), _thickness(thickness), _primitive(primitive) {}
 
@@ -67,6 +68,7 @@ public:
 	void update(const std::map<OBJID, Generic*>& baseState);
 
 	void setLayers(std::vector<unsigned>& newLayers) { _layers = newLayers; }
+	std::vector<unsigned> getLayers(void) { return _layers; }
 	
 	void attachToBuffer(Generic* object);		//to display generic on the screen
 	void detachFrombuffer(Generic* object);		//to remove generic from the screen

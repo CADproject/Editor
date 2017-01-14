@@ -8,7 +8,7 @@ int main()
 	Session curSession;
 	Document* pDoc1 = new Document();
 	DOCID docID1 = curSession.attachDocument(pDoc1);
-
+	
 	OBJID p1 = createPoint(curSession, docID1, 5, 10);
 	OBJID l1 = createLine(curSession, docID1, 1, 2, 5, 12);
 	OBJID c1 = createCircle(curSession, docID1, 7, 7, 10, 7);
@@ -37,7 +37,7 @@ int main()
 	destroyContour(curSession, docID1, con1);
 
 	display(curSession, docID1);
-
+	
 	system("pause");
 	return 0;
 }

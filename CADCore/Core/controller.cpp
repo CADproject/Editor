@@ -48,18 +48,18 @@ OBJID createCircle(Session& curSes, DOCID docID, double X1, double Y1, double X2
 OBJID createContour(Session& curSes, DOCID docID, std::vector<OBJID> objects)
 {
 	std::vector<Edge*> edges;
+	unsigned currentLayer = curSes.getGenericLayer(docID, objects.at(0));
 
 	std::for_each(objects.begin(), objects.end(),
 		[=, &curSes, &edges](OBJID objID)
 	{
 		Edge* curEdge = dynamic_cast<Edge*>(curSes.getGenericTopology(docID, objID));
 		edges.push_back(curEdge);
-		Generic* temp = curSes.detachFromBase(docID, objID);
-		delete temp;
+		curSes.detachFromBase(docID, objID);
 	});
-
+	
 	Contour* newContour = new Contour(edges);
-	Generic* newContourGen = new Generic(newContour);
+	Generic* newContourGen = new Generic(currentLayer, newContour);
 
 	OBJID newContourID = curSes.attachToBase(docID, newContourGen);
 	curSes.commit(docID);
@@ -69,27 +69,24 @@ OBJID createContour(Session& curSes, DOCID docID, std::vector<OBJID> objects)
 
 void deleteObject(Session& curSes, DOCID docID, OBJID objID)
 {
-	Generic* temp = curSes.detachFromBase(docID, objID);
-	delete temp;
-
+	curSes.detachFromBase(docID, objID);
 	curSes.commit(docID);
 }
 
 void destroyContour(Session& curSes, DOCID docID, OBJID objID)
 {
 	Generic* temp = curSes.detachFromBase(docID, objID);
+	unsigned currentLayer = temp->getLayer();
 	Contour* tempCon = dynamic_cast<Contour*>(temp->getTopology());
 
 	std::list<Edge*> edges = tempCon->getEdges();
 	std::for_each(edges.begin(), edges.end(),
 		[=, &curSes](Edge* curEdge)
 	{
-		Generic* newEdgeGen = new Generic(curEdge);
+		Generic* newEdgeGen = new Generic(currentLayer, curEdge);
 		curSes.attachToBase(docID, newEdgeGen);
 	});
-		
-	delete temp;
-
+	
 	curSes.commit(docID);
 }
 
@@ -103,7 +100,7 @@ void redo(Session& curSes, DOCID docID)
 	curSes.redo(docID);
 }
 
-void setLayers(Session& curSes, DOCID docID, std::vector<unsigned>& layersToShow)
+void setLayersToShow(Session& curSes, DOCID docID, std::vector<unsigned>& layersToShow)
 {
 	curSes.setLayers(docID, layersToShow);
 }
@@ -116,4 +113,12 @@ void setBackgroundColor(Session& curSes, DOCID docID, COLOR newColor)
 void display(Session& curSes, DOCID docID)
 {
 	curSes.toScreen(docID);
+}
+
+void showAndRemoveFreeGeneric(Session& curSes, DOCID docID)
+{
+	Node node(33, 33);
+	Point* newPoint = new Point(node);
+	Generic* newPointGen = new Generic(newPoint);
+	curSes.attachToBuffer(docID, newPointGen);
 }

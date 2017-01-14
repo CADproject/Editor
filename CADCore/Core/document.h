@@ -52,5 +52,9 @@ public:
 
 	void setLayers(std::vector<unsigned>& newLayers);
 	void setBackgroundColor(COLOR color);
+
+	std::vector<unsigned> getLayers(void);
+	COLOR getBackgroundColor(void);
+
 	void toScreen(void);
 };

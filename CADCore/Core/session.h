@@ -27,6 +27,7 @@ public:
 	void detachFrombuffer(DOCID docID, Generic* object);
 
 	Topology* getGenericTopology(DOCID docID, OBJID objID);
+	unsigned getGenericLayer(DOCID docID, OBJID objID);
 
 	void commit(DOCID docID);
 	void undo(DOCID docID);

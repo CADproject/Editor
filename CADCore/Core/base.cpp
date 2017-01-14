@@ -124,7 +124,7 @@ void Buffer::toScreen(void)
 			if(curPair.first == NOT_FROM_BASE)
 				whereObject = false;
 			
-			std::cout << ", From operation (0) or base (1): " << whereObject << ".";
+			std::cout << ", From controller (0) or base (1): " << whereObject << ".";
 			std::cout << std::endl << std::endl;
 		}
 	});

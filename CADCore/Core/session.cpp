@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include "session.h"
 
 unsigned Session::_counter;
@@ -59,6 +60,11 @@ Topology* Session::getGenericTopology(DOCID docID, OBJID objID)
 	return getDocument(docID)->getGeneric(objID)->getTopology();
 }
 
+unsigned Session::getGenericLayer(DOCID docID, OBJID objID)
+{
+	return getDocument(docID)->getGeneric(objID)->getLayer();
+}
+
 void Session::commit(DOCID docID)
 {
 	getDocument(docID)->commit();
@@ -87,5 +93,17 @@ void Session::setBackgroundColor(DOCID docID, COLOR color)
 void Session::toScreen(DOCID docID)
 {
 	std::cout << "DOCUMENT: " << docID << ". ";
+	std::cout << "Layers (on screen):";
+	
+	std::vector<unsigned> layers = getDocument(docID)->getLayers();
+	std::for_each(layers.begin(), layers.end(),
+		[](unsigned number)
+	{
+		std::cout << " " << number;
+	});
+
+	std::cout << ". Background color: ";
+	std::cout << getDocument(docID)->getBackgroundColor() << "." << std::endl;
+	
 	getDocument(docID)->toScreen();
 }
