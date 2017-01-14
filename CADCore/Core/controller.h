@@ -37,5 +37,5 @@ void setBackgroundColor(Session& curSes, DOCID docID, COLOR newColor);
 //show the 2d editior field
 void display(Session& curSes, DOCID docID);
 
-//test operation - show and/or remove objects not from base
+//test operation - show and/or remove objects from controller
 void showAndRemoveFreeGeneric(Session& curSes, DOCID docID);
