@@ -39,33 +39,33 @@ public:
 class History
 {
 private:
-	std::deque< std::map<OBJID, Generic*> > _snapshots;
+	std::deque< std::map<ObjectId, Generic*> > _snapshots;
 	unsigned _size;
 	unsigned _counter;
 
 public:
-	History(): _size(10), _counter(0) { _snapshots.push_back(std::map<OBJID, Generic*>()); }
+	History(): _size(10), _counter(0) { _snapshots.push_back(std::map<ObjectId, Generic*>()); }
 	~History() {}
 
 	void setSize(unsigned newSize) { _size = newSize; }
 
-	void commit(const std::map<OBJID, Generic*>& curBase);
-	void undo(std::map<OBJID, Generic*>& curBase);
-	void redo(std::map<OBJID, Generic*>& curBase);
+	void commit(const std::map<ObjectId, Generic*>& curBase);
+	void undo(std::map<ObjectId, Generic*>& curBase);
+	void redo(std::map<ObjectId, Generic*>& curBase);
 	void clear(void);
 };
 
 class Buffer	//contains all objects which are drawn on the screen
 {
 private:
-	std::vector< std::pair<OBJID, Generic*> > _buffer;	//the objects that appear on the screen
+	std::vector< std::pair<ObjectId, Generic*> > _buffer;	//the objects that appear on the screen
 														//if OBJID == 0 then object from controller, else from base
 	std::vector<unsigned> _layers;						//the layers that appear on the screen
 
 public:
 	Buffer() { _layers.push_back(0); }
 
-	void update(const std::map<OBJID, Generic*>& baseState);
+	void update(const std::map<ObjectId, Generic*>& baseState);
 
 	void setLayers(std::vector<unsigned>& newLayers) { _layers = newLayers; }
 	std::vector<unsigned> getLayers(void) { return _layers; }
@@ -80,7 +80,7 @@ class Base
 {
 private:
 	unsigned _counter;					//generics counter
-	std::map<OBJID, Generic*> _base;	//the objects are written to file
+	std::map<ObjectId, Generic*> _base;	//the objects are written to file
 	History _history;					//undo/redo mechanism
 	Buffer* _observer;					//pattern Observer from GOF catalogue
 
@@ -90,11 +90,11 @@ public:
 	void notify(void);
 	void attachObserver(Buffer* observer) { _observer = observer; }
 
-	OBJID attachToBase(Generic* object);
-	Generic* detachFromBase(OBJID objID);
-	Generic* getGeneric(OBJID objID);
+	ObjectId attachToBase(Generic* object);
+	Generic* detachFromBase(ObjectId objID);
+	Generic* getGeneric(ObjectId objID);
 
-	Topology* getGenericTopology(OBJID objID);
+	Topology* getGenericTopology(ObjectId objID);
 
 	void commit(void);
 	void undo(void);

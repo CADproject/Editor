@@ -4,14 +4,14 @@
 
 unsigned Session::_counter;
 
-DOCID Session::attachDocument(Document* doc)
+DocumentId Session::attachDocument(Document* doc)
 {
 	++_counter;
 	_session[_counter] = doc;
 	return _counter;
 }
 
-void Session::detachDocument(DOCID docID)
+void Session::detachDocument(DocumentId docID)
 {
 	auto iter = _session.find(docID);
 
@@ -21,7 +21,7 @@ void Session::detachDocument(DOCID docID)
 		return;
 }
 
-Document* Session::getDocument(DOCID docID)
+Document* Session::getDocument(DocumentId docID)
 {
 	auto iter = _session.find(docID);
 	if(iter != _session.end())
@@ -30,67 +30,67 @@ Document* Session::getDocument(DOCID docID)
 		return nullptr;
 }
 
-OBJID Session::attachToBase(DOCID docID, Generic* object)
+ObjectId Session::attachToBase(DocumentId docID, Generic* object)
 {
 	return getDocument(docID)->attachToBase(object);
 }
 
-Generic* Session::detachFromBase(DOCID docID, OBJID objID)
+Generic* Session::detachFromBase(DocumentId docID, ObjectId objID)
 {
 	return getDocument(docID)->detachFromBase(objID);
 }
 
-void Session::attachToBuffer(DOCID docID, Generic* object)
+void Session::attachToBuffer(DocumentId docID, Generic* object)
 {
 	getDocument(docID)->attachToBuffer(object);
 }
 
-void Session::detachFrombuffer(DOCID docID, Generic* object)
+void Session::detachFrombuffer(DocumentId docID, Generic* object)
 {
 	getDocument(docID)->detachFrombuffer(object);
 }
 
-Generic* Session::getGeneric(DOCID docID, OBJID objID)
+Generic* Session::getGeneric(DocumentId docID, ObjectId objID)
 {
 	return getDocument(docID)->getGeneric(objID);
 }
 
-Topology* Session::getGenericTopology(DOCID docID, OBJID objID)
+Topology* Session::getGenericTopology(DocumentId docID, ObjectId objID)
 {
 	return getDocument(docID)->getGeneric(objID)->getTopology();
 }
 
-unsigned Session::getGenericLayer(DOCID docID, OBJID objID)
+unsigned Session::getGenericLayer(DocumentId docID, ObjectId objID)
 {
 	return getDocument(docID)->getGeneric(objID)->getLayer();
 }
 
-void Session::commit(DOCID docID)
+void Session::commit(DocumentId docID)
 {
 	getDocument(docID)->commit();
 }
 
-void Session::undo(DOCID docID)
+void Session::undo(DocumentId docID)
 {
 	getDocument(docID)->undo();
 }
 
-void Session::redo(DOCID docID)
+void Session::redo(DocumentId docID)
 {
 	getDocument(docID)->redo();
 }
 
-void Session::setLayers(DOCID docID, std::vector<unsigned>& newLayers)
+void Session::setLayers(DocumentId docID, std::vector<unsigned>& newLayers)
 {
 	getDocument(docID)->setLayers(newLayers);
 }
 
-void Session::setBackgroundColor(DOCID docID, COLOR color)
+void Session::setBackgroundColor(DocumentId docID, COLOR color)
 {
 	getDocument(docID)->setBackgroundColor(color);
 }
 
-void Session::toScreen(DOCID docID)
+void Session::toScreen(DocumentId docID)
 {
 	std::cout << "DOCUMENT: " << docID << ". ";
 	std::cout << "Layers (on screen):";

@@ -1,16 +1,16 @@
 #include "document.h"
 
-OBJID Document::attachToBase(Generic* object)
+ObjectId Document::attachToBase(Generic* object)
 {
 	return _base.attachToBase(object);
 }
 
-Generic* Document::detachFromBase(OBJID objID)
+Generic* Document::detachFromBase(ObjectId objID)
 {
 	return _base.detachFromBase(objID);
 }
 
-Generic* Document::getGeneric(OBJID objID)
+Generic* Document::getGeneric(ObjectId objID)
 {
 	return _base.getGeneric(objID);
 }
@@ -25,7 +25,7 @@ void Document::detachFrombuffer(Generic* object)
 	_buffer.detachFrombuffer(object);
 }
 
-Topology* Document::getGenericTopology(OBJID objID)
+Topology* Document::getGenericTopology(ObjectId objID)
 {
 	return _base.getGeneric(objID)->getTopology();
 }

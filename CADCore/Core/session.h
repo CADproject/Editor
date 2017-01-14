@@ -11,33 +11,33 @@ class Session
 {
 private:
 	static unsigned _counter;				//documents counter
-	std::map<DOCID, Document*> _session;	//all open documents
+	std::map<DocumentId, Document*> _session;	//all open documents
 
 public:
 	Session() {}
 	~Session() {}
 
-	DOCID attachDocument(Document* doc);
-	void detachDocument(DOCID docID);
+	DocumentId attachDocument(Document* doc);
+	void detachDocument(DocumentId docID);
 	
-	OBJID attachToBase(DOCID docID, Generic* object);
-	Generic* detachFromBase(DOCID docID, OBJID objID);
+	ObjectId attachToBase(DocumentId docID, Generic* object);
+	Generic* detachFromBase(DocumentId docID, ObjectId objID);
 
-	void attachToBuffer(DOCID docID, Generic* object);
-	void detachFrombuffer(DOCID docID, Generic* object);
+	void attachToBuffer(DocumentId docID, Generic* object);
+	void detachFrombuffer(DocumentId docID, Generic* object);
 
-	Topology* getGenericTopology(DOCID docID, OBJID objID);
-	unsigned getGenericLayer(DOCID docID, OBJID objID);
+	Topology* getGenericTopology(DocumentId docID, ObjectId objID);
+	unsigned getGenericLayer(DocumentId docID, ObjectId objID);
 
-	void commit(DOCID docID);
-	void undo(DOCID docID);
-	void redo(DOCID docID);
+	void commit(DocumentId docID);
+	void undo(DocumentId docID);
+	void redo(DocumentId docID);
 
-	void setLayers(DOCID docID, std::vector<unsigned>& newLayers);
-	void setBackgroundColor(DOCID docID, COLOR color);
-	void toScreen(DOCID docID);
+	void setLayers(DocumentId docID, std::vector<unsigned>& newLayers);
+	void setBackgroundColor(DocumentId docID, COLOR color);
+	void toScreen(DocumentId docID);
 
 private:
-	Document* getDocument(DOCID docID);
-	Generic* getGeneric(DOCID docID, OBJID objID);
+	Document* getDocument(DocumentId docID);
+	Generic* getGeneric(DocumentId docID, ObjectId objID);
 };

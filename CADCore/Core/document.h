@@ -37,14 +37,14 @@ private:
 public:
 	Document() { _base.attachObserver(&_buffer); }
 
-	OBJID attachToBase(Generic* object);
-	Generic* detachFromBase(OBJID objID);
-	Generic* getGeneric(OBJID objID);
+	ObjectId attachToBase(Generic* object);
+	Generic* detachFromBase(ObjectId objID);
+	Generic* getGeneric(ObjectId objID);
 
 	void attachToBuffer(Generic* object);
 	void detachFrombuffer(Generic* object);
 
-	Topology* getGenericTopology(OBJID objID);
+	Topology* getGenericTopology(ObjectId objID);
 
 	void commit(void);
 	void undo(void);

@@ -7,7 +7,7 @@ void Base::notify(void)
 	_observer->update(_base);
 }
 
-OBJID Base::attachToBase(Generic* object)
+ObjectId Base::attachToBase(Generic* object)
 {
 	++_counter;
 	_base[_counter] = object;
@@ -15,7 +15,7 @@ OBJID Base::attachToBase(Generic* object)
 	return _counter;
 }
 
-Generic* Base::detachFromBase(OBJID objID)
+Generic* Base::detachFromBase(ObjectId objID)
 {
 	auto iter = _base.find(objID);
 	
@@ -32,7 +32,7 @@ Generic* Base::detachFromBase(OBJID objID)
 	}
 }
 
-Generic* Base::getGeneric(OBJID objID)
+Generic* Base::getGeneric(ObjectId objID)
 {
 	auto iter = _base.find(objID);
 	
@@ -42,7 +42,7 @@ Generic* Base::getGeneric(OBJID objID)
 		return nullptr;
 }
 
-Topology* Base::getGenericTopology(OBJID objID)
+Topology* Base::getGenericTopology(ObjectId objID)
 {
 	return getGeneric(objID)->getTopology();
 }
@@ -64,10 +64,10 @@ void Base::redo(void)
 	notify();
 }
 
-void Buffer::update(const std::map<OBJID, Generic*>& baseState)
+void Buffer::update(const std::map<ObjectId, Generic*>& baseState)
 {
 	auto iter = std::remove_if(_buffer.begin(), _buffer.end(),
-		[](std::pair<OBJID, Generic*> curPair)->bool
+		[](std::pair<ObjectId, Generic*> curPair)->bool
 	{
 		if(curPair.first != NOT_FROM_BASE)
 			return true;
@@ -78,7 +78,7 @@ void Buffer::update(const std::map<OBJID, Generic*>& baseState)
 	_buffer.erase(iter, _buffer.end());
 	
 	std::for_each(baseState.begin(), baseState.end(), 
-		[&](std::pair<OBJID, Generic*> curPair)
+		[&](std::pair<ObjectId, Generic*> curPair)
 	{
 		_buffer.push_back(curPair);
 	});
@@ -104,7 +104,7 @@ void Buffer::toScreen(void)
 	std::cout << "ON THE SCREEN:" << std::endl << std::endl;
 
 	std::for_each(_buffer.begin(), _buffer.end(),
-		[=](std::pair<OBJID, Generic*> curPair)
+		[=](std::pair<ObjectId, Generic*> curPair)
 	{
 		auto iter = std::find(_layers.begin(), _layers.end(), curPair.second->getLayer());
 		

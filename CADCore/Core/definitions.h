@@ -2,10 +2,10 @@
 
 #pragma once
 
-typedef unsigned DOCID;
-typedef unsigned OBJID;
+typedef unsigned DocumentId;
+typedef unsigned ObjectId;
 
 enum COLOR {BLACK, RED, GREEN, BLUE, YELLOW};
 enum THICKNESS {ONE, TWO, THREE, FOUR, FIVE};
 
-const OBJID NOT_FROM_BASE = 0;
+const ObjectId NOT_FROM_BASE = 0;
