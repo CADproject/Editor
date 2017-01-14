@@ -41,10 +41,10 @@ class UndoRedo
 private:
 	std::deque< std::map<OBJID, Generic*> > _snapshots;
 	unsigned _size;
-	int _counter;
+	unsigned _counter;
 
 public:
-	UndoRedo(): _size(10), _counter(-1) {}
+	UndoRedo(): _size(10), _counter(0) { _snapshots.push_back(std::map<OBJID, Generic*>()); }
 	~UndoRedo() {}
 
 	void setSize(unsigned newSize) { _size = newSize; }

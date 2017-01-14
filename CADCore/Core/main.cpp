@@ -10,9 +10,14 @@ int main()
 	DOCID docID1 = curSession.attachDocument(pDoc1);
 	
 	OBJID p1 = createPoint(curSession, docID1, 5, 10);
-	OBJID l1 = createLine(curSession, docID1, 1, 2, 5, 12);
-	OBJID c1 = createCircle(curSession, docID1, 7, 7, 10, 7);
+	display(curSession, docID1);
 
+	undo(curSession, docID1);
+	undo(curSession, docID1);
+	undo(curSession, docID1);
+	display(curSession, docID1);
+	
+	/*
 	OBJID cl1 = createLine(curSession, docID1, 0, 0, 5, 0);
 	OBJID cl2 = createLine(curSession, docID1, 5, 0, 5, 8);
 	OBJID cl3 = createLine(curSession, docID1, 5, 8, 0, 8);
@@ -37,7 +42,11 @@ int main()
 	destroyContour(curSession, docID1, con1);
 
 	display(curSession, docID1);
+<<<<<<< HEAD
 	
+=======
+	*/
+>>>>>>> fixed undo/redo bug
 	system("pause");
 	return 0;
 }
