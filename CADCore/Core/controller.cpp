@@ -4,13 +4,14 @@
 #include "geometry.h"
 #include "topology.h"
 #include "definitions.h"
+#include "core_api.h"
 
 ObjectId createPoint(Session& curSes, DocumentId docID, double X, double Y)
 {
-	Node node(X, Y);
-	Point* newPoint = new Point(node);
-	Generic* newPointGen = new Generic(newPoint);
-
+	Node* newNode = nodeFactory(X, Y);
+	Point* newPoint = pointFactory(*newNode);
+	Generic* newPointGen = genericFactory(newPoint);
+	
 	ObjectId newPointID = curSes.attachToBase(docID, newPointGen);
 	curSes.commit(docID);
 
@@ -19,11 +20,11 @@ ObjectId createPoint(Session& curSes, DocumentId docID, double X, double Y)
 
 ObjectId createLine(Session& curSes, DocumentId docID, double X1, double Y1, double X2, double Y2)
 {
-	Node start(X1, Y1);
-	Node end(X2, Y2);
+	Node* start = nodeFactory(X1, Y1);
+	Node* end = nodeFactory(X2, Y2);
 	
-	Line* newLine = new Line(start, end);
-	Generic* newLineGen = new Generic(newLine);
+	Line* newLine = lineFactory(*start, *end);
+	Generic* newLineGen = genericFactory(newLine);
 
 	ObjectId newLineID = curSes.attachToBase(docID, newLineGen);
 	curSes.commit(docID);
@@ -33,11 +34,11 @@ ObjectId createLine(Session& curSes, DocumentId docID, double X1, double Y1, dou
 
 ObjectId createCircle(Session& curSes, DocumentId docID, double X1, double Y1, double X2, double Y2)
 {
-	Node center(X1, Y1);
-	Node side(X2, Y2);
+	Node* center = nodeFactory(X1, Y1);
+	Node* side = nodeFactory(X2, Y2);
 	
-	Circle* newCircle = new Circle(center, side);
-	Generic* newCircleGen = new Generic(newCircle);
+	Circle* newCircle = circleFactory(*center, *side);
+	Generic* newCircleGen = genericFactory(newCircle);
 	
 	ObjectId newCircleID = curSes.attachToBase(docID, newCircleGen);
 	curSes.commit(docID);
@@ -46,7 +47,7 @@ ObjectId createCircle(Session& curSes, DocumentId docID, double X1, double Y1, d
 }
 
 ObjectId createContour(Session& curSes, DocumentId docID, std::vector<ObjectId> objects)
-{
+{	
 	std::vector<Edge*> edges;
 	unsigned currentLayer = curSes.getGenericLayer(docID, objects.at(0));
 
@@ -58,9 +59,9 @@ ObjectId createContour(Session& curSes, DocumentId docID, std::vector<ObjectId> 
 		curSes.detachFromBase(docID, objID);
 	});
 	
-	Contour* newContour = new Contour(edges);
-	Generic* newContourGen = new Generic(currentLayer, newContour);
-
+	Contour* newContour = contourFactory(edges);
+	Generic* newContourGen = genericFactory(currentLayer, newContour);
+	
 	ObjectId newContourID = curSes.attachToBase(docID, newContourGen);
 	curSes.commit(docID);
 
@@ -83,7 +84,7 @@ void destroyContour(Session& curSes, DocumentId docID, ObjectId objID)
 	std::for_each(edges.begin(), edges.end(),
 		[=, &curSes](Edge* curEdge)
 	{
-		Generic* newEdgeGen = new Generic(currentLayer, curEdge);
+		Generic* newEdgeGen = genericFactory(currentLayer, curEdge);
 		curSes.attachToBase(docID, newEdgeGen);
 	});
 	
@@ -117,8 +118,8 @@ void display(Session& curSes, DocumentId docID)
 
 void showAndRemoveFreeGeneric(Session& curSes, DocumentId docID)
 {
-	Node node(33, 33);
-	Point* newPoint = new Point(node);
-	Generic* newPointGen = new Generic(newPoint);
+	Node* node = nodeFactory(33, 33);
+	Point* newPoint = pointFactory(*node);
+	Generic* newPointGen = genericFactory(newPoint);
 	curSes.attachToBuffer(docID, newPointGen);
 }

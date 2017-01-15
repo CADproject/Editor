@@ -10,7 +10,7 @@
 class Session
 {
 private:
-	static unsigned _counter;				//documents counter
+	static unsigned _counter;			//documents counter
 	std::map<DocumentId, Document*> _session;	//all open documents
 
 public:
