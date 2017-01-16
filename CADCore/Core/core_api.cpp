@@ -35,17 +35,18 @@ Contour* contourFactory(const std::vector<Edge*>& edges)
 	return new Contour(edges);
 }
 
-Generic* genericFactory(Topology* primitive)
+Generic* genericFactory(Topology* primitive, unsigned layer, COLOR color, THICKNESS thickness)
 {
-	return new Generic(primitive);
-}
-
-Generic* genericFactory(unsigned layer, Topology* primitive)
-{
-	return new Generic(layer, primitive);
-}
-
-Generic* genericFactory(unsigned layer, COLOR color, THICKNESS thickness, Topology* primitive)
-{
-	return new Generic(layer, color, thickness, primitive);
+	if(layer == 0 && color == BLACK && thickness == THREE)
+	{
+		return new Generic(primitive);
+	}
+	else if(color == BLACK && thickness == THREE)
+	{
+		return new Generic(layer, primitive);
+	}
+	else
+	{
+		return new Generic(layer, color, thickness, primitive);
+	}
 }

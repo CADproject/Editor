@@ -1,28 +1,32 @@
 #pragma once
 #include "session.h"
+#include "dll.h"
+
+#ifdef COREDLL_EXPORT
+	#define COREDLL_API __declspec(dllexport)
+#else
+	#define COREDLL_API __declspec(dllimport)
+#endif
 
 //session factory method
-Session* sessionFactory(void);
+extern "C" COREDLL_API Session* sessionFactory(void);
 
 //document factory method
-Document* documentFactory(void);
+extern "C" COREDLL_API Document* documentFactory(void);
 
 //node factory method
-Node* nodeFactory(double x, double y);
+extern "C" COREDLL_API Node* nodeFactory(double x, double y);
 
 //point factory method
-Point* pointFactory(const Node& node);
+extern "C" COREDLL_API Point* pointFactory(const Node& node);
 
-//line factory method
-Line* lineFactory(const Node& start, const Node& end);
+extern "C" COREDLL_API Line* lineFactory(const Node& start, const Node& end);
 
 //circle factory method
-Circle* circleFactory(const Node& center, const Node& side);
+extern "C" COREDLL_API Circle* circleFactory(const Node& center, const Node& side);
 
 //contour factory method
-Contour* contourFactory(const std::vector<Edge*>& edges);
+extern "C" COREDLL_API Contour* contourFactory(const std::vector<Edge*>& edges);
 
-//generic factory methods
-Generic* genericFactory(Topology* primitive);
-Generic* genericFactory(unsigned layer, Topology* primitive);
-Generic* genericFactory(unsigned layer, COLOR color, THICKNESS thickness, Topology* primitive);
+//generic factory method
+extern "C" COREDLL_API Generic* genericFactory(Topology* primitive, unsigned layer = 0, COLOR color = BLACK, THICKNESS thickness = THREE);
