@@ -1,3 +1,4 @@
+#pragma once
 #include "session.h"
 
 //session factory method

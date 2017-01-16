@@ -1,7 +1,7 @@
 /*This file contains the document class*/
 
 #pragma once
-#include "definitions.h"
+#include "headers.h"
 #include "base.h"
 
 class Settings	//document settings

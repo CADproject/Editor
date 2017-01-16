@@ -1,5 +1,3 @@
-#include <cassert>
-#include <algorithm>
 #include "base.h"
 
 void History::commit(const std::map<ObjectId, Generic*>& curBase)

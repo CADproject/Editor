@@ -1,10 +1,4 @@
-#include <vector>
-#include <algorithm>
 #include "controller.h"
-#include "geometry.h"
-#include "topology.h"
-#include "definitions.h"
-#include "core_api.h"
 
 ObjectId createPoint(Session& curSes, DocumentId docID, double X, double Y)
 {

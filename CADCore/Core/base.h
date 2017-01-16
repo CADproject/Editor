@@ -3,12 +3,7 @@ The container undo/redo keeps a history of last N commands in order of execution
 Used patterns Memento and Observer from GOF catalogue.*/
 
 #pragma once
-#include <map>
-#include <deque>
-#include <vector>
-#include <utility>
-#include "definitions.h"
-#include "topology.h"
+#include "headers.h"
 
 class Generic	//generalized base object, must be created using operator "new"
 {

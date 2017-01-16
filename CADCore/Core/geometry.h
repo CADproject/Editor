@@ -1,7 +1,7 @@
 /*This file contains all the math of this project*/
 
 #pragma once
-#include <string>
+#include "headers.h"
 
 class Node	//additional node
 {

@@ -1,8 +1,8 @@
 /*This temporary file contains controller sketch.*/
 
-#include <vector>
-#include "session.h"
-#include "definitions.h"
+#pragma once
+#include "headers.h"
+#include "core_api.h"
 
 //create point
 ObjectId createPoint(Session& curSes, DocumentId docID, double X, double Y);

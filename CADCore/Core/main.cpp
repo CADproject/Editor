@@ -1,8 +1,6 @@
-#include <iostream>
-#include "session.h"
-#include "document.h"
-#include "controller.h"
+#include "headers.h"
 #include "core_api.h"
+#include "controller.h"
 
 int main()
 {

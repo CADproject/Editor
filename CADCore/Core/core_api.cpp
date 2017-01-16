@@ -1,5 +1,3 @@
-#include <algorithm>
-#include "topology.h"
 #include "core_api.h"
 
 Session* sessionFactory(void)

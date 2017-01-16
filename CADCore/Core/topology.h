@@ -1,9 +1,7 @@
 /*This file contains a hierarchy of geometric primitives*/
 
 #pragma once
-#include <list>
-#include <vector>
-#include "geometry.h"
+#include "headers.h"
 
 class Topology	//base class of all primitives
 {

@@ -1,5 +1,3 @@
-#include <algorithm>
-#include <iostream>
 #include "base.h"
 
 void Base::notify(void)

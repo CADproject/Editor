@@ -1,5 +1,3 @@
-#include <iostream>
-#include <algorithm>
 #include "session.h"
 
 unsigned Session::_counter;

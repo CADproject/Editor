@@ -1,8 +1,7 @@
 /*This file contains the session class*/
 
 #pragma once
-#include <map>
-#include "definitions.h"
+#include "headers.h"
 #include "document.h"
 
 //use Singleton from GOF catalogue (?)
