@@ -1,6 +1,6 @@
 #pragma once
+#include "headers.h"
 #include "session.h"
-#include "dll.h"
 
 #ifdef COREDLL_EXPORT
 	#define COREDLL_API __declspec(dllexport)

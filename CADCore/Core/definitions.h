@@ -1,7 +1,5 @@
 /*This file contains all definitious of this project*/
 
-#pragma once
-
 typedef unsigned DocumentId;
 typedef unsigned ObjectId;
 
