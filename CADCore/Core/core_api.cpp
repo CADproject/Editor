@@ -1,52 +1,137 @@
 #include "core_api.h"
 
-Session* sessionFactory(void)
+void* sessionFactory(void)
 {
-	return new Session();
+	return static_cast<void*>(new Session());
 }
 
-Document* documentFactory(void)
+DocumentId attachDocument(void* pObject, Document* doc)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	return ses->attachDocument(doc);
+}
+
+ObjectId attachToBase(void* pObject, DocumentId docID, Generic* object)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	return ses->attachToBase(docID, object);
+}
+
+void* detachFromBase(void* pObject, DocumentId docID, ObjectId objID)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	return static_cast<void*>(ses->detachFromBase(docID, objID));
+}
+
+void attachToBuffer(void* pObject, DocumentId docID, Generic* object)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	ses->attachToBuffer(docID, object);
+}
+
+void* getGenericTopology(void* pObject, DocumentId docID, ObjectId objID)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	return static_cast<void*>(ses->getGenericTopology(docID, objID));
+}
+
+void setLayers(void* pObject, DocumentId docID, void* pNewLayers)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	auto pNL = static_cast<std::vector<unsigned>*>(pNewLayers); 
+	ses->setLayers(docID, *pNL);
+}
+
+void setBackgroundColor(void* pObject, DocumentId docID, COLOR color)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	ses->setBackgroundColor(docID, color);
+}
+
+void toScreen(void* pObject, DocumentId docID)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	ses->toScreen(docID);
+}
+
+void commit(void* pObject, DocumentId docID)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	ses->commit(docID);
+}
+
+void undo(void* pObject, DocumentId docID)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	ses->undo(docID);
+}
+
+void redo(void* pObject, DocumentId docID)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	ses->redo(docID);
+}
+
+void* documentFactory(void)
 {
 	return new Document();
 }
 
-Node* nodeFactory(double x, double y)
+void* nodeFactory(double x, double y)
 {
-	return new Node(x, y);
+	return static_cast<void*>(new Node(x, y));
 }
 
-Point* pointFactory(const Node& node)
+void* pointFactory(const Node& node)
 {
-	return new Point(node);
+	return static_cast<void*>(new Point(node));
 }
 
-Line* lineFactory(const Node& start, const Node& end)
+void* lineFactory(const Node& start, const Node& end)
 {
-	return new Line(start, end);
+	return static_cast<void*>(new Line(start, end));
 }
 
-Circle* circleFactory(const Node& center, const Node& side)
+void* circleFactory(const Node& center, const Node& side)
 {
-	return new Circle(center, side);
+	return static_cast<void*>(new Circle(center, side));
 }
 
-Contour* contourFactory(const std::vector<Edge*>& edges)
+void* contourFactory(const std::vector<Edge*>& edges)
 {
-	return new Contour(edges);
+	return static_cast<void*>(new Contour(edges));
 }
 
-Generic* genericFactory(Topology* primitive, unsigned layer, COLOR color, THICKNESS thickness)
+void* getEdges(void* pObject)
+{
+	Contour* cont = static_cast<Contour*>(pObject);
+	return static_cast<void*>(&(cont->getEdges()));
+}
+
+void* genericFactory(Topology* primitive, unsigned layer, COLOR color, THICKNESS thickness)
 {
 	if(layer == 0 && color == BLACK && thickness == THREE)
 	{
-		return new Generic(primitive);
+		return static_cast<void*>(new Generic(primitive));
 	}
 	else if(color == BLACK && thickness == THREE)
 	{
-		return new Generic(layer, primitive);
+		return static_cast<void*>(new Generic(layer, primitive));
 	}
 	else
 	{
-		return new Generic(layer, color, thickness, primitive);
+		return static_cast<void*>(new Generic(layer, color, thickness, primitive));
 	}
+}
+
+unsigned getLayer(void* pObject)
+{
+	Generic* gen = static_cast<Generic*>(pObject);
+	return gen->getLayer();
+}
+
+void* getTopology(void* pObject)
+{
+	Generic* gen = static_cast<Generic*>(pObject);
+	return static_cast<void*>(gen->getTopology());
 }

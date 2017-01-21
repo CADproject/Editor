@@ -136,22 +136,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="base.cpp" />
-    <ClCompile Include="controller.cpp" />
     <ClCompile Include="core_api.cpp" />
     <ClCompile Include="document.cpp" />
     <ClCompile Include="geometry.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="session.cpp" />
     <ClCompile Include="topology.cpp" />
     <ClCompile Include="history.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h" />
-    <ClInclude Include="controller.h" />
     <ClInclude Include="core_api.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="document.h" />
-    <ClInclude Include="export.h" />
     <ClInclude Include="geometry.h" />
     <ClInclude Include="headers.h" />
     <ClInclude Include="session.h" />
