@@ -53,12 +53,12 @@ Generic* Session::getGeneric(DocumentId docID, ObjectId objID)
 	return getDocument(docID)->getGeneric(objID);
 }
 
-Topology* Session::getGenericTopology(DocumentId docID, ObjectId objID)
+Topology* Session::getGenTopology(DocumentId docID, ObjectId objID)
 {
 	return getDocument(docID)->getGeneric(objID)->getTopology();
 }
 
-unsigned Session::getGenericLayer(DocumentId docID, ObjectId objID)
+unsigned Session::getGenLayer(DocumentId docID, ObjectId objID)
 {
 	return getDocument(docID)->getGeneric(objID)->getLayer();
 }

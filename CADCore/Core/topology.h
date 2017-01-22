@@ -95,6 +95,6 @@ public:
 	Contour() {}
 	Contour(const std::vector<Edge*>& edges) { _edges.assign(edges.begin(), edges.end()); }
 
-	std::list<Edge*> getEdges(void) { return _edges; }
+	std::list<Edge*>* getEdges(void) { return &_edges; }
 	/*virtual*/ void drawing(void) const;
 };

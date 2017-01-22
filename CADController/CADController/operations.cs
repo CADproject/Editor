@@ -1,161 +1,147 @@
-﻿///*This temporary file contains controller sketch.*/
-//
-//#pragma once
-//#include "headers.h"
-//#include "core_api.h"
-//
-////create point
-//ObjectId createPoint(Session& curSes, DocumentId docID, double X, double Y);
-//
-////create line: start point, end point
-//ObjectId createLine(Session& curSes, DocumentId docID, double X1, double Y1, double X2, double Y2);
-//
-////create circle: center point, side point
-//ObjectId createCircle(Session& curSes, DocumentId docID, double X1, double Y1, double X2, double Y2);
-//
-////create contour by existing edges
-//ObjectId createContour(Session& curSes, DocumentId docID, std::vector<ObjectId> objects);
-//
-////delete point by id
-//void deleteObject(Session& curSes, DocumentId docID, ObjectId objID);
-//
-////destroy contour, all edges will be free
-//void destroyContour(Session& curSes, DocumentId docID, ObjectId objID);
-//
-////undo command
-//void undo(Session& curSes, DocumentId docID);
-//
-////redo command
-//void redo(Session& curSes, DocumentId docID);
-//
-////set layers to show
-//void setLayersToShow(Session& curSes, DocumentId docID, std::vector<unsigned>& layersToShow);
-//
-////set background color
-//void setBackgroundColor(Session& curSes, DocumentId docID, COLOR newColor);
-//
-////show the 2d editior field
-//void display(Session& curSes, DocumentId docID);
-//
-////test operation - show and/or remove objects from controller
-//void showAndRemoveFreeGeneric(Session& curSes, DocumentId docID);
+﻿//*This file contains controller sketch.*/
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Runtime.InteropServices;
 
-//#include "controller.h"
-//
-//ObjectId createPoint(Session& curSes, DocumentId docID, double X, double Y)
-//{
-//	Node* newNode = nodeFactory(X, Y);
-//	Point* newPoint = pointFactory(*newNode);
-//	Generic* newPointGen = genericFactory(newPoint);
-//	
-//	ObjectId newPointID = curSes.attachToBase(docID, newPointGen);
-//	curSes.commit(docID);
-//
-//	return newPointID;
-//}
-//
-//ObjectId createLine(Session& curSes, DocumentId docID, double X1, double Y1, double X2, double Y2)
-//{
-//	Node* start = nodeFactory(X1, Y1);
-//	Node* end = nodeFactory(X2, Y2);
-//	
-//	Line* newLine = lineFactory(*start, *end);
-//	Generic* newLineGen = genericFactory(newLine);
-//
-//	ObjectId newLineID = curSes.attachToBase(docID, newLineGen);
-//	curSes.commit(docID);
-//
-//	return newLineID;
-//}
-//
-//ObjectId createCircle(Session& curSes, DocumentId docID, double X1, double Y1, double X2, double Y2)
-//{
-//	Node* center = nodeFactory(X1, Y1);
-//	Node* side = nodeFactory(X2, Y2);
-//	
-//	Circle* newCircle = circleFactory(*center, *side);
-//	Generic* newCircleGen = genericFactory(newCircle);
-//	
-//	ObjectId newCircleID = curSes.attachToBase(docID, newCircleGen);
-//	curSes.commit(docID);
-//
-//	return newCircleID;
-//}
-//
-//ObjectId createContour(Session& curSes, DocumentId docID, std::vector<ObjectId> objects)
-//{	
-//	std::vector<Edge*> edges;
-//	unsigned currentLayer = curSes.getGenericLayer(docID, objects.at(0));
-//
-//	std::for_each(objects.begin(), objects.end(),
-//		[=, &curSes, &edges](ObjectId objID)
-//	{
-//		Edge* curEdge = dynamic_cast<Edge*>(curSes.getGenericTopology(docID, objID));
-//		edges.push_back(curEdge);
-//		curSes.detachFromBase(docID, objID);
-//	});
-//	
-//	Contour* newContour = contourFactory(edges);
-//	Generic* newContourGen = genericFactory(currentLayer, newContour);
-//	
-//	ObjectId newContourID = curSes.attachToBase(docID, newContourGen);
-//	curSes.commit(docID);
-//
-//	return newContourID;
-//}
-//
-//void deleteObject(Session& curSes, DocumentId docID, ObjectId objID)
-//{
-//	curSes.detachFromBase(docID, objID);
-//	curSes.commit(docID);
-//}
-//
-//void destroyContour(Session& curSes, DocumentId docID, ObjectId objID)
-//{
-//	Generic* temp = curSes.detachFromBase(docID, objID);
-//	unsigned currentLayer = temp->getLayer();
-//	Contour* tempCon = dynamic_cast<Contour*>(temp->getTopology());
-//
-//	std::list<Edge*> edges = tempCon->getEdges();
-//	std::for_each(edges.begin(), edges.end(),
-//		[=, &curSes](Edge* curEdge)
-//	{
-//		Generic* newEdgeGen = genericFactory(currentLayer, curEdge);
-//		curSes.attachToBase(docID, newEdgeGen);
-//	});
-//	
-//	curSes.commit(docID);
-//}
-//
-//void undo(Session& curSes, DocumentId docID)
-//{
-//	curSes.undo(docID);
-//}
-//
-//void redo(Session& curSes, DocumentId docID)
-//{
-//	curSes.redo(docID);
-//}
-//
-//void setLayersToShow(Session& curSes, DocumentId docID, std::vector<unsigned>& layersToShow)
-//{
-//	curSes.setLayers(docID, layersToShow);
-//}
-//
-//void setBackgroundColor(Session& curSes, DocumentId docID, COLOR newColor)
-//{
-//	curSes.setBackgroundColor(docID, newColor);
-//}
-//
-//void display(Session& curSes, DocumentId docID)
-//{
-//	curSes.toScreen(docID);
-//}
-//
-//void showAndRemoveFreeGeneric(Session& curSes, DocumentId docID)
-//{
-//	Node* node = nodeFactory(33, 33);
-//	Point* newPoint = pointFactory(*node);
-//	Generic* newPointGen = genericFactory(newPoint);
-//	curSes.attachToBuffer(docID, newPointGen);
-//}
+namespace CADController
+{
+    using ObjectId = System.UInt32;
+    using DocumentId = System.UInt32;
+    
+    class Operations
+    {
+        //create point
+        public static ObjectId createPoint(IntPtr curSes, DocumentId docID, double X, double Y)
+        {
+        	IntPtr newNode = CoreWrapper.nodeFactory(X, Y);
+            IntPtr newPoint = CoreWrapper.pointFactory(newNode);
+        	IntPtr newPointGen = CoreWrapper.genericFactory(newPoint);
+        	
+        	ObjectId newPointID = CoreWrapper.attachToBase(curSes, docID, newPointGen);
+        	CoreWrapper.commit(curSes, docID);
+        
+        	return newPointID;
+        }
+
+        //create line: start point, end point
+        public static ObjectId createLine(IntPtr curSes, DocumentId docID, double X1, double Y1, double X2, double Y2)
+        {
+            IntPtr start = CoreWrapper.nodeFactory(X1, Y1);
+            IntPtr end = CoreWrapper.nodeFactory(X2, Y2);
+
+            IntPtr newLine = CoreWrapper.lineFactory(start, end);
+            IntPtr newLineGen = CoreWrapper.genericFactory(newLine);
+
+            ObjectId newLineID = CoreWrapper.attachToBase(curSes, docID, newLineGen);
+            CoreWrapper.commit(curSes, docID);
+        
+        	return newLineID;
+        }
+
+        //create circle: center point, side point
+        public static ObjectId createCircle(IntPtr curSes, DocumentId docID, double X1, double Y1, double X2, double Y2)
+        {
+        	IntPtr center = CoreWrapper.nodeFactory(X1, Y1);
+            IntPtr side = CoreWrapper.nodeFactory(X2, Y2);
+
+            IntPtr newCircle = CoreWrapper.circleFactory(center, side);
+            IntPtr newCircleGen = CoreWrapper.genericFactory(newCircle);
+
+            ObjectId newCircleID = CoreWrapper.attachToBase(curSes, docID, newCircleGen);
+            CoreWrapper.commit(curSes, docID);
+        
+        	return newCircleID;
+        }
+
+        //create contour by existing edges
+        /*
+        public static ObjectId createContour(IntPtr curSes, DocumentId docID, IntPtr objects)
+        {	
+        	std::vector<Edge*> edges;
+        	uint currentLayer = CoreWrapper.getGenericLayer(curSes, docID, objects.at(0));
+        
+        	std::for_each(objects.begin(), objects.end(),
+        		[=, &curSes, &edges](ObjectId objID)
+        	{
+        		IntPtr curEdge = CoreWrapper.getGenericTopology(curSes, docID, objID);
+        		edges.push_back(curEdge);
+        		CoreWrapper.detachFromBase(curSes, docID, objID);
+        	});
+
+            IntPtr newContour = CoreWrapper.contourFactory(edges);
+            IntPtr newContourGen = CoreWrapper.genericFactory(newContour, currentLayer);
+        
+        	ObjectId newContourID = CoreWrapper.attachToBase(curSes, docID, newContourGen);
+        	CoreWrapper.commit(curSes, docID);
+        
+        	return newContourID;
+        }
+        */
+        //delete point by id
+        public static void deleteObject(IntPtr curSes, DocumentId docID, ObjectId objID)
+        {
+            CoreWrapper.detachFromBase(curSes, docID, objID);
+            CoreWrapper.commit(curSes, docID);
+        }
+        
+        //destroy contour, all edges will be free
+        /*
+        public static void destroyContour(IntPtr curSes, DocumentId docID, ObjectId objID)
+        {
+        	IntPtr temp = CoreWrapper.detachFromBase(curSes, docID, objID);
+            uint currentLayer = CoreWrapper.getGenericLayer(temp);
+            IntPtr tempCon = CoreWrapper.getGenericTopology(temp);
+        
+        	IntPtr edges = CoreWrapper.getContourEdges(tempCon);
+            std::for_each(edges.begin(), edges.end(),
+        		[=, &curSes](Edge* curEdge)
+        	{
+        		IntPtr newEdgeGen = CoreWrapper.genericFactory(curEdge, currentLayer);
+        		CoreWrapper.attachToBase(curSes, docID, newEdgeGen);
+        	});
+        	
+        	CoreWrapper.commit(curSes, docID);
+        }
+        */
+        //undo command
+        public static void undo(IntPtr curSes, DocumentId docID)
+        {
+            CoreWrapper.undo(curSes, docID);
+        }
+        
+        //redo command
+        public static void redo(IntPtr curSes, DocumentId docID)
+        {
+            CoreWrapper.redo(curSes, docID);
+        }
+        
+        //set layers to show
+        public static void setLayersToShow(IntPtr curSes, DocumentId docID, IntPtr layersToShow)
+        {
+            CoreWrapper.setLayers(curSes, docID, layersToShow);
+        }
+
+        //set background color
+        public static void setBackgroundColor(IntPtr curSes, DocumentId docID, COLOR newColor)
+        {
+            CoreWrapper.setBackgroundColor(curSes, docID, newColor);
+        }
+
+        //show the 2d editior field
+        public static void display(IntPtr curSes, DocumentId docID)
+        {
+            CoreWrapper.toScreen(curSes, docID);
+        }
+
+        //test operation - show and/or remove objects from controller
+        public static void showAndRemoveFreeGeneric(IntPtr curSes, DocumentId docID)
+        {
+            IntPtr node = CoreWrapper.nodeFactory(33, 33);
+            IntPtr newPoint = CoreWrapper.pointFactory(node);
+            IntPtr newPointGen = CoreWrapper.genericFactory(newPoint);
+            CoreWrapper.attachToBuffer(curSes, docID, newPointGen);
+        }
+    }
+}

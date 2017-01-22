@@ -25,8 +25,8 @@ public:
 	void attachToBuffer(DocumentId docID, Generic* object);
 	void detachFrombuffer(DocumentId docID, Generic* object);
 
-	Topology* getGenericTopology(DocumentId docID, ObjectId objID);
-	unsigned getGenericLayer(DocumentId docID, ObjectId objID);
+	Topology* getGenTopology(DocumentId docID, ObjectId objID);
+	unsigned getGenLayer(DocumentId docID, ObjectId objID);
 
 	void commit(DocumentId docID);
 	void undo(DocumentId docID);
