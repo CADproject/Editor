@@ -155,3 +155,57 @@ void* getGenericTopology(void* pObject)
 	Generic* gen = static_cast<Generic*>(pObject);
 	return static_cast<void*>(gen->getTopology());
 }
+
+void* createVector(void)
+{
+	return static_cast<void*>(new std::vector<unsigned>()); 
+}
+
+void deleteVector(void* pObject)
+{
+	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	delete temp;
+}
+
+void push_back_unsigned(void* pObject, unsigned value)
+{
+	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	temp->push_back(value);
+}
+
+void push_back_edge(void* pObject, void* value)
+{
+	auto temp = static_cast<std::vector<Edge*>*>(pObject);
+	auto pEdge = static_cast<Edge*>(value);
+	temp->push_back(pEdge);
+}
+
+void pop_back(void* pObject)
+{
+	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	temp->pop_back();
+}
+
+void clear(void* pObject)
+{
+	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	temp->clear();
+}
+
+unsigned at_unsigned(void* pObject, unsigned index)
+{
+	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	return temp->at(index);
+}
+
+void* at_edge(void* pObject, unsigned index)
+{
+	auto temp = static_cast<std::vector<Edge*>*>(pObject);
+	return static_cast<void*>(temp->at(index));
+}
+
+unsigned size(void* pObject)
+{
+	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	return temp->size();
+}

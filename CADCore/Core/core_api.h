@@ -42,3 +42,14 @@ extern "C" COREDLL_API void* getEdges(void* pObject);
 extern "C" COREDLL_API void* genericFactory(void* primitive, unsigned layer = 0, COLOR color = BLACK, THICKNESS thickness = THREE);
 extern "C" COREDLL_API unsigned getGenericLayer(void* pObject);
 extern "C" COREDLL_API void* getGenericTopology(void* pObject);
+
+//STL vector for C#
+extern "C" COREDLL_API void* createVector(void);
+extern "C" COREDLL_API void deleteVector(void* pObject);
+extern "C" COREDLL_API void push_back_unsigned(void* pObject, unsigned value);
+extern "C" COREDLL_API void push_back_edge(void* pObject, void* value);
+extern "C" COREDLL_API void pop_back(void* pObject);
+extern "C" COREDLL_API void clear(void* pObject);
+extern "C" COREDLL_API unsigned at_unsigned(void* pObject, unsigned index);
+extern "C" COREDLL_API void* at_edge(void* pObject, unsigned index);
+extern "C" COREDLL_API unsigned size(void* pObject);

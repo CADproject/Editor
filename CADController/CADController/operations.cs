@@ -56,29 +56,29 @@ namespace CADController
         }
 
         //create contour by existing edges
-        /*
-        public static ObjectId createContour(IntPtr curSes, DocumentId docID, IntPtr objects)
+        public static ObjectId createContour(IntPtr curSes, DocumentId docID, STLVector objectIDs)
         {	
-        	std::vector<Edge*> edges;
-        	uint currentLayer = CoreWrapper.getGenericLayer(curSes, docID, objects.at(0));
-        
-        	std::for_each(objects.begin(), objects.end(),
-        		[=, &curSes, &edges](ObjectId objID)
-        	{
-        		IntPtr curEdge = CoreWrapper.getGenericTopology(curSes, docID, objID);
-        		edges.push_back(curEdge);
-        		CoreWrapper.detachFromBase(curSes, docID, objID);
-        	});
+        	STLVector edges = new STLVector(dataType.intptr);
+            uint currentLayer = CoreWrapper.getGenLayer(curSes, docID, objectIDs.at1(0));
 
-            IntPtr newContour = CoreWrapper.contourFactory(edges);
+            for (uint i = 0; i < objectIDs.size(); ++i)
+            {
+                IntPtr curEdge = CoreWrapper.getGenTopology(curSes, docID, objectIDs.at1(i));
+        		edges.push_back(curEdge);
+                CoreWrapper.detachFromBase(curSes, docID, objectIDs.at1(i));
+            }
+
+            IntPtr newContour = CoreWrapper.contourFactory(edges.getPointer());
             IntPtr newContourGen = CoreWrapper.genericFactory(newContour, currentLayer);
         
         	ObjectId newContourID = CoreWrapper.attachToBase(curSes, docID, newContourGen);
         	CoreWrapper.commit(curSes, docID);
+
+            edges.deleteVector();
         
         	return newContourID;
         }
-        */
+        
         //delete point by id
         public static void deleteObject(IntPtr curSes, DocumentId docID, ObjectId objID)
         {
