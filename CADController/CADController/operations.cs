@@ -59,13 +59,13 @@ namespace CADController
         public static ObjectId createContour(IntPtr curSes, DocumentId docID, STLVector objectIDs)
         {	
         	STLVector edges = new STLVector(dataType.intptr);
-            uint currentLayer = CoreWrapper.getGenLayer(curSes, docID, objectIDs.at1(0));
+            uint currentLayer = CoreWrapper.getGenLayer(curSes, docID, objectIDs.atU(0));
 
             for (uint i = 0; i < objectIDs.size(); ++i)
             {
-                IntPtr curEdge = CoreWrapper.getGenTopology(curSes, docID, objectIDs.at1(i));
+                IntPtr curEdge = CoreWrapper.getGenTopology(curSes, docID, objectIDs.atU(i));
         		edges.push_back(curEdge);
-                CoreWrapper.detachFromBase(curSes, docID, objectIDs.at1(i));
+                CoreWrapper.detachFromBase(curSes, docID, objectIDs.atU(i));
             }
 
             IntPtr newContour = CoreWrapper.contourFactory(edges.getPointer());
@@ -79,7 +79,7 @@ namespace CADController
         	return newContourID;
         }
         
-        //delete point by id
+        //delete object by id
         public static void deleteObject(IntPtr curSes, DocumentId docID, ObjectId objID)
         {
             CoreWrapper.detachFromBase(curSes, docID, objID);
@@ -87,24 +87,25 @@ namespace CADController
         }
         
         //destroy contour, all edges will be free
-        /*
         public static void destroyContour(IntPtr curSes, DocumentId docID, ObjectId objID)
         {
         	IntPtr temp = CoreWrapper.detachFromBase(curSes, docID, objID);
             uint currentLayer = CoreWrapper.getGenericLayer(temp);
             IntPtr tempCon = CoreWrapper.getGenericTopology(temp);
         
-        	IntPtr edges = CoreWrapper.getContourEdges(tempCon);
-            std::for_each(edges.begin(), edges.end(),
-        		[=, &curSes](Edge* curEdge)
-        	{
-        		IntPtr newEdgeGen = CoreWrapper.genericFactory(curEdge, currentLayer);
+        	STLVector edges = new STLVector(CoreWrapper.getContourEdges(tempCon), dataType.intptr);
+
+            uint edSize = edges.size();
+            
+            for(uint i = 0; i < edges.size(); ++i)
+            {
+                IntPtr newEdgeGen = CoreWrapper.genericFactory(edges.atE(i), currentLayer);
         		CoreWrapper.attachToBase(curSes, docID, newEdgeGen);
-        	});
+            }
         	
         	CoreWrapper.commit(curSes, docID);
         }
-        */
+        
         //undo command
         public static void undo(IntPtr curSes, DocumentId docID)
         {

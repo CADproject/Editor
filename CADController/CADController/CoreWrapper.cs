@@ -94,35 +94,60 @@ namespace CADController
         private dataType _type;
         
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr createVector();
+        private static extern IntPtr createVectorU();
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void deleteVector(IntPtr pObject);
+        private static extern void deleteVectorU(IntPtr pObject);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void push_back_unsigned(IntPtr pObject, uint value);
+        private static extern void push_backU(IntPtr pObject, uint value);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void push_back_edge(IntPtr pObject, IntPtr value);
+        private static extern void pop_backU(IntPtr pObject);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void pop_back(IntPtr pObject);
+        private static extern void clearU(IntPtr pObject);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void clear(IntPtr pObject);
+        private static extern uint atU(IntPtr pObject, uint index);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern uint at_unsigned(IntPtr pObject, uint index);
+        private static extern uint sizeU(IntPtr pObject);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr at_edge(IntPtr pObject, uint index);
-        
+        private static extern IntPtr createVectorE();
+
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern uint size(IntPtr pObject);
+        private static extern void deleteVectorE(IntPtr pObject);
+
+        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void push_backE(IntPtr pObject, IntPtr value);
+
+        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void pop_backE(IntPtr pObject);
+
+        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void clearE(IntPtr pObject);
+
+        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr atE(IntPtr pObject, uint index);
+
+        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern uint sizeE(IntPtr pObject);
 
         public STLVector(dataType type)
         {
-            _pointer = createVector();
+            _type = type;
+
+            if (type == dataType.unsigned)
+                _pointer = createVectorU();
+            else if (type == dataType.intptr)
+                _pointer = createVectorE();
+        }
+
+        public STLVector(IntPtr pointer, dataType type)
+        {
+            _pointer = pointer;
             _type = type;
         }
         
@@ -132,20 +157,42 @@ namespace CADController
         
         public void deleteVector()
         {
-            deleteVector(_pointer);
+            if (_type == dataType.unsigned)
+                deleteVectorU(_pointer);
+            else if (_type == dataType.intptr)
+                deleteVectorE(_pointer);
+
             _pointer = IntPtr.Zero;
         }
 
-        public void push_back(uint value) { push_back_unsigned(_pointer, value); }
-        public void push_back(IntPtr obj) { push_back_edge(_pointer, obj); }
+        public void push_back(uint value) { push_backU(_pointer, value); }
+        public void push_back(IntPtr obj) { push_backE(_pointer, obj); }
 
-        public void pop_back() { pop_back(_pointer); }
+        public void pop_back()
+        {
+            if (_type == dataType.unsigned)
+                pop_backU(_pointer);
+            else if (_type == dataType.intptr)
+                pop_backE(_pointer);
+        }
 
-        public void clear() { clear(_pointer); }
+        public void clear()
+        {
+            if (_type == dataType.unsigned)
+                clearU(_pointer);
+            else if (_type == dataType.intptr)
+                clearE(_pointer);
+        }
 
-        public uint at1(uint index) { return at_unsigned(_pointer, index); }
-        public IntPtr at2(uint index) { return at_edge(_pointer, index); }
+        public uint atU(uint index) { return atU(_pointer, index); }
+        public IntPtr atE(uint index) { return atE(_pointer, index); }
 
-        public uint size() { return size(_pointer); }
+        public uint size()
+        {
+            if (_type == dataType.unsigned)
+                return sizeU(_pointer);
+            else
+                return sizeE(_pointer);
+        }
     }
 } 

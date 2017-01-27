@@ -156,56 +156,87 @@ void* getGenericTopology(void* pObject)
 	return static_cast<void*>(gen->getTopology());
 }
 
-void* createVector(void)
+void* createVectorU(void)
 {
 	return static_cast<void*>(new std::vector<unsigned>()); 
 }
 
-void deleteVector(void* pObject)
+void deleteVectorU(void* pObject)
 {
 	auto temp = static_cast<std::vector<unsigned>*>(pObject);
 	delete temp;
 }
 
-void push_back_unsigned(void* pObject, unsigned value)
+void push_backU(void* pObject, unsigned value)
 {
 	auto temp = static_cast<std::vector<unsigned>*>(pObject);
 	temp->push_back(value);
 }
 
-void push_back_edge(void* pObject, void* value)
+void pop_backU(void* pObject)
+{
+	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	temp->pop_back();
+}
+
+void clearU(void* pObject)
+{
+	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	temp->clear();
+}
+
+unsigned atU(void* pObject, unsigned index)
+{
+	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	return temp->at(index);
+}
+
+unsigned sizeU(void* pObject)
+{
+	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	return temp->size();
+}
+
+///////
+
+void* createVectorE(void)
+{
+	return static_cast<void*>(new std::vector<Edge*>()); 
+}
+
+void deleteVectorE(void* pObject)
+{
+	auto temp = static_cast<std::vector<Edge*>*>(pObject);
+	delete temp;
+}
+
+void push_backE(void* pObject, void* value)
 {
 	auto temp = static_cast<std::vector<Edge*>*>(pObject);
 	auto pEdge = static_cast<Edge*>(value);
 	temp->push_back(pEdge);
 }
 
-void pop_back(void* pObject)
+void pop_backE(void* pObject)
 {
-	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	auto temp = static_cast<std::vector<Edge*>*>(pObject);
 	temp->pop_back();
 }
 
-void clear(void* pObject)
+void clearE(void* pObject)
 {
-	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	auto temp = static_cast<std::vector<Edge*>*>(pObject);
 	temp->clear();
 }
 
-unsigned at_unsigned(void* pObject, unsigned index)
-{
-	auto temp = static_cast<std::vector<unsigned>*>(pObject);
-	return temp->at(index);
-}
-
-void* at_edge(void* pObject, unsigned index)
+void* atE(void* pObject, unsigned index)
 {
 	auto temp = static_cast<std::vector<Edge*>*>(pObject);
 	return static_cast<void*>(temp->at(index));
 }
 
-unsigned size(void* pObject)
+unsigned sizeE(void* pObject)
 {
-	auto temp = static_cast<std::vector<unsigned>*>(pObject);
+	auto temp = static_cast<std::vector<Edge*>*>(pObject);
 	return temp->size();
 }

@@ -1,13 +1,13 @@
 ipch/
 Debug/
 Release/
-*/Debug/
-*/Release/
-*/bin/
-*/obj/
+bin/
+obj/
+Properties/
 *.suo
 *.sln
 *.sdf
 *.vcxproj.filters
 *.vcxproj.user
+*.csproj.user
 *.opensdf

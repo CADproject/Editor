@@ -40,6 +40,7 @@ namespace CADController
 
             Operations.deleteObject(curSession, docID1, p1);
             Operations.deleteObject(curSession, docID1, con1);
+            //Operations.destroyContour(curSession, docID1, con1);
             Operations.display(curSession, docID1);
 
             Operations.undo(curSession, docID1);
