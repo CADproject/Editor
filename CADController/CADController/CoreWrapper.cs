@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace CADController
@@ -9,13 +6,13 @@ namespace CADController
     using ObjectId = System.UInt32;
     using DocumentId = System.UInt32;
 
-    enum COLOR { BLACK, RED, GREEN, BLUE, YELLOW };
-    enum THICKNESS { ONE, TWO, THREE, FOUR, FIVE };
+    enum Color { black, red, green, blue, yellow };
+    enum Thickness { one, two, three, four, five };
     enum dataType { unsigned, intptr };
 
-    class CoreWrapper
+    internal unsafe struct CoreWrapper
     {
-        const ObjectId NOT_FROM_BASE = 0;
+        const ObjectId not_from_base = 0;
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr sessionFactory();
@@ -42,7 +39,7 @@ namespace CADController
         public static extern void setLayers(IntPtr pObject, DocumentId docID, IntPtr newLayers);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void setBackgroundColor(IntPtr pObject, DocumentId docID, COLOR color);
+        public static extern void setBackgroundColor(IntPtr pObject, DocumentId docID, Color color);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void toScreen(IntPtr pObject, DocumentId docID);
@@ -72,127 +69,45 @@ namespace CADController
         public static extern IntPtr circleFactory(IntPtr center, IntPtr side);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr contourFactory(IntPtr edges);
-        
+        public static extern IntPtr contourFactory(IntPtr edges, uint size);
+
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr getContourEdges(IntPtr pObject);
+        public static extern void getContourEdges(IntPtr pObject, IntPtr pEdges, ref uint size);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr genericFactory(IntPtr primitive, uint layer = 0,
-            COLOR color = COLOR.BLACK, THICKNESS thickness = THICKNESS.THREE);
-        
+            Color color = Color.black, Thickness thickness = Thickness.three);
+
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern uint getGenericLayer(IntPtr pObject);
-        
+
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr getGenericTopology(IntPtr pObject);
     }
 
-    class STLVector
+    public unsafe class UnmanagedArray
     {
-        private IntPtr _pointer;
-        private dataType _type;
-        
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr createVectorU();
+        public IntPtr _pointer;
+        public int _size;
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void deleteVectorU(IntPtr pObject);
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void push_backU(IntPtr pObject, uint value);
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void pop_backU(IntPtr pObject);
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void clearU(IntPtr pObject);
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern uint atU(IntPtr pObject, uint index);
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern uint sizeU(IntPtr pObject);
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr createVectorE();
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void deleteVectorE(IntPtr pObject);
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void push_backE(IntPtr pObject, IntPtr value);
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void pop_backE(IntPtr pObject);
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void clearE(IntPtr pObject);
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr atE(IntPtr pObject, uint index);
-
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern uint sizeE(IntPtr pObject);
-
-        public STLVector(dataType type)
+        public UnmanagedArray(IntPtr[] array)
         {
-            _type = type;
-
-            if (type == dataType.unsigned)
-                _pointer = createVectorU();
-            else if (type == dataType.intptr)
-                _pointer = createVectorE();
-        }
-
-        public STLVector(IntPtr pointer, dataType type)
-        {
-            _pointer = pointer;
-            _type = type;
+            _size = array.Length;
+            _pointer = Marshal.AllocHGlobal(_size * sizeof(IntPtr));
+            Marshal.Copy(array, 0, _pointer, _size);
         }
         
+        ~UnmanagedArray()
+        {
+            Marshal.FreeHGlobal(_pointer);
+        }
+
+        public static implicit operator IntPtr(UnmanagedArray ptr)
+        {
+            return ptr._pointer;
+        }
+
         public IntPtr getPointer() { return _pointer; }
-
-        public dataType getType() { return _type; }
-        
-        public void deleteVector()
-        {
-            if (_type == dataType.unsigned)
-                deleteVectorU(_pointer);
-            else if (_type == dataType.intptr)
-                deleteVectorE(_pointer);
-
-            _pointer = IntPtr.Zero;
-        }
-
-        public void push_back(uint value) { push_backU(_pointer, value); }
-        public void push_back(IntPtr obj) { push_backE(_pointer, obj); }
-
-        public void pop_back()
-        {
-            if (_type == dataType.unsigned)
-                pop_backU(_pointer);
-            else if (_type == dataType.intptr)
-                pop_backE(_pointer);
-        }
-
-        public void clear()
-        {
-            if (_type == dataType.unsigned)
-                clearU(_pointer);
-            else if (_type == dataType.intptr)
-                clearE(_pointer);
-        }
-
-        public uint atU(uint index) { return atU(_pointer, index); }
-        public IntPtr atE(uint index) { return atE(_pointer, index); }
-
-        public uint size()
-        {
-            if (_type == dataType.unsigned)
-                return sizeU(_pointer);
-            else
-                return sizeE(_pointer);
-        }
+        public int getSize() { return _size; }
     }
-} 
+}
