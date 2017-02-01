@@ -36,7 +36,7 @@ extern "C" COREDLL_API void* circleFactory(void* center, void* side);
 
 //contour factory method
 extern "C" COREDLL_API void* contourFactory(void** pEdges, unsigned size);
-extern "C" COREDLL_API void getContourEdges(void* pObject, void** pEdges, unsigned& size);
+extern "C" COREDLL_API void** getContourEdges(void* pObject, int& size);
 
 //generic factory method
 extern "C" COREDLL_API void* genericFactory(void* primitive, unsigned layer = 0, COLOR color = BLACK, THICKNESS thickness = THREE);

@@ -88,13 +88,13 @@ namespace CADController
         	IntPtr temp = CoreWrapper.detachFromBase(curSes, docID, objID);
             uint currentLayer = CoreWrapper.getGenericLayer(temp);
             IntPtr tempCon = CoreWrapper.getGenericTopology(temp);
-        
-            uint size = 0;
+                    
+            int size = 0;
             IntPtr pointer = IntPtr.Zero;
-            CoreWrapper.getContourEdges(tempCon, pointer, ref size);
+            pointer = CoreWrapper.getContourEdges(tempCon, ref size);
 
             IntPtr[] edges = new IntPtr[size];
-            //нужно заполнить массив edges с помощью pointer
+            Marshal.Copy(pointer, edges, 0, size);
                         
             for(uint i = 0; i < edges.Length; ++i)
             {

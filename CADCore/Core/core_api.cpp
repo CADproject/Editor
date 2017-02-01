@@ -121,12 +121,17 @@ void* contourFactory(void** pEdges, unsigned size)
 	return static_cast<void*>(new Contour(edges));
 }
 
-void getContourEdges(void* pObject, void** pEdges, unsigned& size)
+void** getContourEdges(void* pObject, int& size)
 {
 	Contour* cont = static_cast<Contour*>(pObject);
 	std::vector<Edge*> temp = cont->getEdges();
 	size = temp.size();
+
+	Edge** arr = new Edge*[temp.size()];
+	void** pEdges = reinterpret_cast<void**>(arr);
 	memcpy(pEdges, temp.data(), temp.size() * sizeof(Edge*));
+	
+	return pEdges;
 }
 
 void* genericFactory(void* primitive, unsigned layer, COLOR color, THICKNESS thickness)

@@ -72,7 +72,7 @@ namespace CADController
         public static extern IntPtr contourFactory(IntPtr edges, uint size);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void getContourEdges(IntPtr pObject, IntPtr pEdges, ref uint size);
+        public static extern IntPtr getContourEdges(IntPtr pObject, ref int size);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr genericFactory(IntPtr primitive, uint layer = 0,
