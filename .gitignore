@@ -11,3 +11,5 @@ Properties/
 *.vcxproj.user
 *.csproj.user
 *.opensdf
+CADEditor.VC.VC.opendb
+CADEditor.VC.db
