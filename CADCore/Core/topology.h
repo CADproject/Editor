@@ -89,12 +89,12 @@ public:
 class Contour: public Topology	//contour is a container of edges
 {
 private:
-	std::list<Edge*> _edges;
+	std::vector<Edge*> _edges;
 
 public:
 	Contour() {}
-	Contour(const std::vector<Edge*>& edges) { _edges.assign(edges.begin(), edges.end()); }
+	Contour(const std::vector<Edge*>& edges) { _edges = edges; }
 
-	std::list<Edge*>* getEdges(void) { return &_edges; }
+	std::vector<Edge*> getEdges(void) { return _edges; }
 	/*virtual*/ void drawing(void) const;
 };

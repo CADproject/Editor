@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
 
 namespace CADController
 {
@@ -29,18 +25,13 @@ namespace CADController
             ObjectId line2 = Operations.createLine(curSession, docID1, 5, 6, 7, 8);
             ObjectId line3 = Operations.createLine(curSession, docID1, 9, 10, 11, 12);
             
-            STLVector objects = new STLVector(dataType.unsigned);
-            objects.push_back(line1);
-            objects.push_back(line2);
-            objects.push_back(line3);
+            ObjectId[] objects = new[] { line1, line2, line3 };
             ObjectId con1 = Operations.createContour(curSession, docID1, objects);
-            objects.deleteVector();
             
             Operations.display(curSession, docID1);
 
             Operations.deleteObject(curSession, docID1, p1);
-            Operations.deleteObject(curSession, docID1, con1);
-            //Operations.destroyContour(curSession, docID1, con1);
+            Operations.destroyContour(curSession, docID1, con1);
             Operations.display(curSession, docID1);
 
             Operations.undo(curSession, docID1);
