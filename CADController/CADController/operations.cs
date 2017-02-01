@@ -1,8 +1,5 @@
 ﻿//*This file contains controller sketch.*/
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace CADController
@@ -56,26 +53,25 @@ namespace CADController
         }
 
         //create contour by existing edges
-        public static ObjectId createContour(IntPtr curSes, DocumentId docID, STLVector objectIDs)
-        {	
-        	STLVector edges = new STLVector(dataType.intptr);
-            uint currentLayer = CoreWrapper.getGenLayer(curSes, docID, objectIDs.atU(0));
+        public static unsafe ObjectId createContour(IntPtr curSes, DocumentId docID, ObjectId[] objectIDs)
+        {
+            IntPtr[] edges = new IntPtr[objectIDs.Length];
+            uint currentLayer = CoreWrapper.getGenLayer(curSes, docID, objectIDs[0]);
 
-            for (uint i = 0; i < objectIDs.size(); ++i)
+            for (uint i = 0; i < objectIDs.Length; ++i)
             {
-                IntPtr curEdge = CoreWrapper.getGenTopology(curSes, docID, objectIDs.atU(i));
-        		edges.push_back(curEdge);
-                CoreWrapper.detachFromBase(curSes, docID, objectIDs.atU(i));
+                IntPtr curEdge = CoreWrapper.getGenTopology(curSes, docID, objectIDs[i]);
+        		edges[i] = curEdge;
+                CoreWrapper.detachFromBase(curSes, docID, objectIDs[i]);
             }
 
-            IntPtr newContour = CoreWrapper.contourFactory(edges.getPointer());
+            UnmanagedArray edgesArray = new UnmanagedArray(edges);
+            IntPtr newContour = CoreWrapper.contourFactory(edgesArray.getPointer(), (uint)edgesArray.getSize());         
             IntPtr newContourGen = CoreWrapper.genericFactory(newContour, currentLayer);
         
         	ObjectId newContourID = CoreWrapper.attachToBase(curSes, docID, newContourGen);
         	CoreWrapper.commit(curSes, docID);
 
-            edges.deleteVector();
-        
         	return newContourID;
         }
         
@@ -92,14 +88,17 @@ namespace CADController
         	IntPtr temp = CoreWrapper.detachFromBase(curSes, docID, objID);
             uint currentLayer = CoreWrapper.getGenericLayer(temp);
             IntPtr tempCon = CoreWrapper.getGenericTopology(temp);
-        
-        	STLVector edges = new STLVector(CoreWrapper.getContourEdges(tempCon), dataType.intptr);
+                    
+            int size = 0;
+            IntPtr pointer = IntPtr.Zero;
+            pointer = CoreWrapper.getContourEdges(tempCon, ref size);
 
-            uint edSize = edges.size();
-            
-            for(uint i = 0; i < edges.size(); ++i)
+            IntPtr[] edges = new IntPtr[size];
+            Marshal.Copy(pointer, edges, 0, size);
+                        
+            for(uint i = 0; i < edges.Length; ++i)
             {
-                IntPtr newEdgeGen = CoreWrapper.genericFactory(edges.atE(i), currentLayer);
+                IntPtr newEdgeGen = CoreWrapper.genericFactory(edges[i], currentLayer);
         		CoreWrapper.attachToBase(curSes, docID, newEdgeGen);
             }
         	
@@ -125,7 +124,7 @@ namespace CADController
         }
 
         //set background color
-        public static void setBackgroundColor(IntPtr curSes, DocumentId docID, COLOR newColor)
+        public static void setBackgroundColor(IntPtr curSes, DocumentId docID, Color newColor)
         {
             CoreWrapper.setBackgroundColor(curSes, docID, newColor);
         }

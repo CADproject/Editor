@@ -114,16 +114,24 @@ void* circleFactory(void* center, void* side)
 	return static_cast<void*>(new Circle(*pCenter, *pSide));
 }
 
-void* contourFactory(void* pEdges)
+void* contourFactory(void** pEdges, unsigned size)
 {
-	auto pEd = static_cast<std::vector<Edge*>*>(pEdges); 
-	return static_cast<void*>(new Contour(*pEd));
+	std::vector<Edge*> edges(size);
+	memcpy(edges.data(), pEdges, size * sizeof(Edge*));
+	return static_cast<void*>(new Contour(edges));
 }
 
-void* getContourEdges(void* pObject)
+void** getContourEdges(void* pObject, int& size)
 {
 	Contour* cont = static_cast<Contour*>(pObject);
-	return static_cast<void*>(cont->getEdges());
+	std::vector<Edge*> temp = cont->getEdges();
+	size = temp.size();
+
+	Edge** arr = new Edge*[temp.size()];
+	void** pEdges = reinterpret_cast<void**>(arr);
+	memcpy(pEdges, temp.data(), temp.size() * sizeof(Edge*));
+	
+	return pEdges;
 }
 
 void* genericFactory(void* primitive, unsigned layer, COLOR color, THICKNESS thickness)
@@ -154,89 +162,4 @@ void* getGenericTopology(void* pObject)
 {
 	Generic* gen = static_cast<Generic*>(pObject);
 	return static_cast<void*>(gen->getTopology());
-}
-
-void* createVectorU(void)
-{
-	return static_cast<void*>(new std::vector<unsigned>()); 
-}
-
-void deleteVectorU(void* pObject)
-{
-	auto temp = static_cast<std::vector<unsigned>*>(pObject);
-	delete temp;
-}
-
-void push_backU(void* pObject, unsigned value)
-{
-	auto temp = static_cast<std::vector<unsigned>*>(pObject);
-	temp->push_back(value);
-}
-
-void pop_backU(void* pObject)
-{
-	auto temp = static_cast<std::vector<unsigned>*>(pObject);
-	temp->pop_back();
-}
-
-void clearU(void* pObject)
-{
-	auto temp = static_cast<std::vector<unsigned>*>(pObject);
-	temp->clear();
-}
-
-unsigned atU(void* pObject, unsigned index)
-{
-	auto temp = static_cast<std::vector<unsigned>*>(pObject);
-	return temp->at(index);
-}
-
-unsigned sizeU(void* pObject)
-{
-	auto temp = static_cast<std::vector<unsigned>*>(pObject);
-	return temp->size();
-}
-
-///////
-
-void* createVectorE(void)
-{
-	return static_cast<void*>(new std::vector<Edge*>()); 
-}
-
-void deleteVectorE(void* pObject)
-{
-	auto temp = static_cast<std::vector<Edge*>*>(pObject);
-	delete temp;
-}
-
-void push_backE(void* pObject, void* value)
-{
-	auto temp = static_cast<std::vector<Edge*>*>(pObject);
-	auto pEdge = static_cast<Edge*>(value);
-	temp->push_back(pEdge);
-}
-
-void pop_backE(void* pObject)
-{
-	auto temp = static_cast<std::vector<Edge*>*>(pObject);
-	temp->pop_back();
-}
-
-void clearE(void* pObject)
-{
-	auto temp = static_cast<std::vector<Edge*>*>(pObject);
-	temp->clear();
-}
-
-void* atE(void* pObject, unsigned index)
-{
-	auto temp = static_cast<std::vector<Edge*>*>(pObject);
-	return static_cast<void*>(temp->at(index));
-}
-
-unsigned sizeE(void* pObject)
-{
-	auto temp = static_cast<std::vector<Edge*>*>(pObject);
-	return temp->size();
 }
