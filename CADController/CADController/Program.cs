@@ -2,8 +2,10 @@
 
 namespace CADController
 {
-    using ObjectId = System.UInt32;
+    using SessionId = System.UInt32;
     using DocumentId = System.UInt32;
+    using OperationId = System.UInt32;
+    using ObjectId = System.UInt32;
        
     class Program
     {

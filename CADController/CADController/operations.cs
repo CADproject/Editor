@@ -4,8 +4,53 @@ using System.Runtime.InteropServices;
 
 namespace CADController
 {
-    using ObjectId = System.UInt32;
+    using SessionId = System.UInt32;
     using DocumentId = System.UInt32;
+    using OperationId = System.UInt32;
+    using ObjectId = System.UInt32;
+
+    class ApplicationController
+    {
+        private enum mouseEvents : byte { leftButton, rightButton };
+
+        private bool leftButton;
+        private bool rightButton;
+
+        private double currentMouseCoordX;
+        private double currentMouseCoordY;
+
+        private IntPtr curSession;  //temporary mock for View
+
+        public SessionId initSession()   //used when application running
+        {
+            curSession = CoreWrapper.sessionFactory();
+            SessionId sessionID = 0;
+            return sessionID;
+        }
+
+        public DocumentId initDocument(SessionId sessionID)  //used when creating new document
+        {
+            IntPtr pDoc = CoreWrapper.documentFactory();
+            DocumentId docID = CoreWrapper.attachDocument(curSession, pDoc);
+            return docID;
+        }
+
+        public void eventHendling()
+        {
+        }
+        
+        public void procOperation(DocumentId docID, OperationId opID, Object[] data)
+        {
+        }
+
+        public void finalDocument()
+        {
+        }
+
+        public void finalSession()
+        {
+        }
+    }
     
     class Operations
     {
