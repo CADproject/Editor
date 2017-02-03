@@ -1,6 +1,7 @@
-﻿//*This file contains controller sketch.*/
+﻿/*This file contains controller sketch.*/
 using System;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace CADController
 {
@@ -11,19 +12,19 @@ namespace CADController
 
     class ApplicationController
     {
-        private enum mouseEvents : byte { leftButton, rightButton };
+        public enum mouseEvents : byte { leftButton, rightButton, move };
 
-        private bool leftButton;
-        private bool rightButton;
+        private bool _leftButton;        //for active document
+        private bool _rightButton;       //for active document
 
-        private double currentMouseCoordX;
-        private double currentMouseCoordY;
+        private double _currentMouseCoordX;  //for active document
+        private double _currentMouseCoordY;  //for active document
 
-        private IntPtr curSession;  //temporary mock for View
+        private IntPtr _curSession;  //temporary mock for View
 
         public SessionId initSession()   //used when application running
         {
-            curSession = CoreWrapper.sessionFactory();
+            _curSession = CoreWrapper.sessionFactory();
             SessionId sessionID = 0;
             return sessionID;
         }
@@ -31,24 +32,44 @@ namespace CADController
         public DocumentId initDocument(SessionId sessionID)  //used when creating new document
         {
             IntPtr pDoc = CoreWrapper.documentFactory();
-            DocumentId docID = CoreWrapper.attachDocument(curSession, pDoc);
+            DocumentId docID = CoreWrapper.attachDocument(_curSession, pDoc);
             return docID;
         }
 
-        public void eventHendling()
+        public void eventHendling(mouseEvents action, double coordX = 0, double coordY = 0)
         {
+            switch (action)
+            {
+                case mouseEvents.leftButton:
+                    _leftButton = true;
+                    _rightButton = false;
+                    break;
+                case mouseEvents.rightButton:
+                    _rightButton = true;
+                    _leftButton = false;
+                    break;
+                case mouseEvents.move:
+                    _currentMouseCoordX = coordX;
+                    _currentMouseCoordY = coordY;
+                    break;
+                default:
+                    Debug.Assert(false , "unknown event");
+                    break;
+            }
         }
         
-        public void procOperation(DocumentId docID, OperationId opID, Object[] data)
+        public void procOperation(SessionId sessionID, DocumentId docID, OperationId opID, Object[] data)
         {
         }
 
-        public void finalDocument()
+        public void finalDocument(SessionId sessionID, DocumentId docID)    //closing the document
         {
+            CoreWrapper.detachDocument(_curSession, docID);
         }
 
-        public void finalSession()
+        public void finalSession(SessionId sessionID)   //closing the application
         {
+            //nothing yet
         }
     }
     

@@ -23,6 +23,9 @@ namespace CADController
         public static extern DocumentId attachDocument(IntPtr pObject, IntPtr doc);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void detachDocument(IntPtr pObject, DocumentId docID);
+
+        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern ObjectId attachToBase(IntPtr pObject, DocumentId docID, IntPtr genObj);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
