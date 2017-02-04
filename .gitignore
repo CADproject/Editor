@@ -3,7 +3,6 @@ Debug/
 Release/
 bin/
 obj/
-Properties/
 *.suo
 *.sln
 *.sdf
