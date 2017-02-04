@@ -7,12 +7,23 @@ namespace CADController
 {
     using SessionId = System.UInt32;
     using DocumentId = System.UInt32;
-    using OperationId = System.UInt32;
+    //using OperationId = System.UInt32;
     using ObjectId = System.UInt32;
 
-    class ApplicationController
+    public class ApplicationController
     {
         public enum mouseEvents : byte { leftButton, rightButton, move };
+
+        public enum operations : byte { OpPointCreate,
+                                        OpLineCreate,
+                                        OpCircleCreate,
+                                        OpContourCreate,
+                                        OpDestroyContour,
+                                        OpDeleteObject,
+                                        OpUndo,
+                                        OpRedo,
+                                        OpSetLayersToShow,
+                                        OpSetBackgroundColor };
 
         private bool _leftButton;        //for active document
         private bool _rightButton;       //for active document
@@ -22,6 +33,17 @@ namespace CADController
 
         private IntPtr _curSession;  //temporary mock for View
 
+        public ApplicationController()
+        {
+            _leftButton = false;
+            _rightButton = false;
+
+            _currentMouseCoordX = 0.0;
+            _currentMouseCoordY = 0.0;
+
+            _curSession = IntPtr.Zero;
+        }
+        
         public SessionId initSession()   //used when application running
         {
             _curSession = CoreWrapper.sessionFactory();
@@ -57,9 +79,41 @@ namespace CADController
                     break;
             }
         }
-        
-        public void procOperation(SessionId sessionID, DocumentId docID, OperationId opID, Object[] data)
+
+        private OperationController startOperation(operations opID)
         {
+            switch (opID)
+            {
+                case operations.OpPointCreate:
+                    return new OpPointCreate();
+                case operations.OpLineCreate:
+                    return new OpLineCreate();
+                case operations.OpCircleCreate:
+                    return new OpCircleCreate();
+                case operations.OpContourCreate:
+                    return new OpContourCreate();
+                case operations.OpDestroyContour:
+                    return new OpDestroyContour();
+                case operations.OpDeleteObject:
+                    return new OpDeleteObject();
+                case operations.OpUndo:
+                    return new OpUndo();
+                case operations.OpRedo:
+                    return new OpRedo();
+                case operations.OpSetLayersToShow:
+                    return new OpSetLayersToShow();
+                case operations.OpSetBackgroundColor:
+                    return new OpSetBackgroundColor();
+                default:
+                    Debug.Assert(false, "unknown operation");
+                    return new OperationController();
+            }
+        }
+
+        public void procOperation(SessionId sessionID, DocumentId docID, operations opID, Object[] data)
+        {
+            OperationController curOperation = startOperation(opID);
+            curOperation.operationProcess(_curSession, docID, data);
         }
 
         public void finalDocument(SessionId sessionID, DocumentId docID)    //closing the document
@@ -72,8 +126,169 @@ namespace CADController
             //nothing yet
         }
     }
-    
-    class Operations
+
+    class OperationController
+    {
+        public virtual void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
+        {
+            Debug.Assert(false, "This method without body");
+        }
+    }
+
+    class OpPointCreate : OperationController
+    {
+        public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
+        {
+            double X = (double)data[0];
+            double Y = (double)data[1];
+            
+            IntPtr newNode = CoreWrapper.nodeFactory(X, Y);
+            IntPtr newPoint = CoreWrapper.pointFactory(newNode);
+            IntPtr newPointGen = CoreWrapper.genericFactory(newPoint);
+
+            ObjectId newPointID = CoreWrapper.attachToBase(curSes, docID, newPointGen);
+            CoreWrapper.commit(curSes, docID);
+
+            //return newPointID;
+        }
+    }
+
+    class OpLineCreate : OperationController
+    {
+        public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
+        {
+            double X1 = (double)data[0];
+            double Y1 = (double)data[1];
+            double X2 = (double)data[2];
+            double Y2 = (double)data[3];
+            
+            IntPtr start = CoreWrapper.nodeFactory(X1, Y1);
+            IntPtr end = CoreWrapper.nodeFactory(X2, Y2);
+
+            IntPtr newLine = CoreWrapper.lineFactory(start, end);
+            IntPtr newLineGen = CoreWrapper.genericFactory(newLine);
+
+            ObjectId newLineID = CoreWrapper.attachToBase(curSes, docID, newLineGen);
+            CoreWrapper.commit(curSes, docID);
+
+            //return newLineID;
+        }
+    }
+
+    class OpCircleCreate : OperationController
+    {
+        public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
+        {
+            double X1 = (double)data[0];
+            double Y1 = (double)data[1];
+            double X2 = (double)data[2];
+            double Y2 = (double)data[3];
+            
+            IntPtr center = CoreWrapper.nodeFactory(X1, Y1);
+            IntPtr side = CoreWrapper.nodeFactory(X2, Y2);
+
+            IntPtr newCircle = CoreWrapper.circleFactory(center, side);
+            IntPtr newCircleGen = CoreWrapper.genericFactory(newCircle);
+
+            ObjectId newCircleID = CoreWrapper.attachToBase(curSes, docID, newCircleGen);
+            CoreWrapper.commit(curSes, docID);
+
+            //return newCircleID;
+        }
+    }
+
+    class OpContourCreate : OperationController
+    {
+        public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
+        {
+            IntPtr[] edges = new IntPtr[data.Length];
+            uint currentLayer = CoreWrapper.getGenLayer(curSes, docID, (ObjectId)data[0]);
+
+            for (uint i = 0; i < data.Length; ++i)
+            {
+                IntPtr curEdge = CoreWrapper.getGenTopology(curSes, docID, (ObjectId)data[i]);
+                edges[i] = curEdge;
+                CoreWrapper.detachFromBase(curSes, docID, (ObjectId)data[i]);
+            }
+
+            UnmanagedArray edgesArray = new UnmanagedArray(edges);
+            IntPtr newContour = CoreWrapper.contourFactory(edgesArray.getPointer(), (uint)edgesArray.getSize());
+            IntPtr newContourGen = CoreWrapper.genericFactory(newContour, currentLayer);
+
+            ObjectId newContourID = CoreWrapper.attachToBase(curSes, docID, newContourGen);
+            CoreWrapper.commit(curSes, docID);
+
+            //return newContourID;
+        }
+    }
+
+    class OpDestroyContour : OperationController
+    {
+        public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
+        {
+            IntPtr temp = CoreWrapper.detachFromBase(curSes, docID, (ObjectId)data[0]);
+            uint currentLayer = CoreWrapper.getGenericLayer(temp);
+            IntPtr tempCon = CoreWrapper.getGenericTopology(temp);
+
+            int size = 0;
+            IntPtr pointer = IntPtr.Zero;
+            pointer = CoreWrapper.getContourEdges(tempCon, ref size);
+
+            IntPtr[] edges = new IntPtr[size];
+            Marshal.Copy(pointer, edges, 0, size);
+
+            for (uint i = 0; i < edges.Length; ++i)
+            {
+                IntPtr newEdgeGen = CoreWrapper.genericFactory(edges[i], currentLayer);
+                CoreWrapper.attachToBase(curSes, docID, newEdgeGen);
+            }
+
+            CoreWrapper.commit(curSes, docID);
+        }
+    }
+
+    class OpDeleteObject : OperationController
+    {
+        public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
+        {
+            CoreWrapper.detachFromBase(curSes, docID, (ObjectId)data[0]);
+            CoreWrapper.commit(curSes, docID);
+        }
+    }
+
+    class OpUndo : OperationController
+    {
+        public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
+        {
+            CoreWrapper.undo(curSes, docID);
+        }
+    }
+
+    class OpRedo : OperationController
+    {
+        public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
+        {
+            CoreWrapper.redo(curSes, docID);
+        }
+    }
+
+    class OpSetLayersToShow : OperationController
+    {
+        public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
+        {
+            CoreWrapper.setLayers(curSes, docID, (IntPtr)data[0]);
+        }
+    }
+
+    class OpSetBackgroundColor : OperationController
+    {
+        public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
+        {
+            CoreWrapper.setBackgroundColor(curSes, docID, (Color)data[0]);
+        }
+    }
+
+    class Operations    //temporary class (old code)
     {
         //create point
         public static ObjectId createPoint(IntPtr curSes, DocumentId docID, double X, double Y)
