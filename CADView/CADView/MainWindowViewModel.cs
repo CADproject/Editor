@@ -113,12 +113,15 @@ namespace CADView
             {
                 bool start = true;
 
-                if (((Window) dialog)?.ShowDialog() == true)
+                if (dialog != null)
                 {
-                    data = dialog.Data.ToArray();
+                    if (((Window) dialog).ShowDialog() == true)
+                    {
+                        data = dialog.Data.ToArray();
+                    }
+                    else
+                        start = false;
                 }
-                else
-                    start = false;
 
                 if (start)
                     await Task.Run(delegate
