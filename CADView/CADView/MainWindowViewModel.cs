@@ -111,14 +111,20 @@ namespace CADView
 
             try
             {
+                bool start = true;
+
                 if (((Window) dialog)?.ShowDialog() == true)
                 {
                     data = dialog.Data.ToArray();
+                }
+                else
+                    start = false;
+
+                if (start)
                     await Task.Run(delegate
                     {
-                        Controller.procOperation(Session, _activeDocument, (ApplicationController.operations)obj, data);
+                        Controller.procOperation(Session, _activeDocument, (ApplicationController.operations) obj, data);
                     });
-                }
             }
             catch (Exception e)
             {
