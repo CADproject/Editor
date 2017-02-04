@@ -5,6 +5,7 @@ using CADController;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
+using CADView.Dialogs;
 
 namespace CADView
 {
@@ -88,13 +89,21 @@ namespace CADView
 
             object [] data= new object[0];
 
+            IDataDialog dialog = null;
+
             switch (type)
             {
                 case ApplicationController.operations.OpPointCreate:
+                    dialog = new OnePointDialog();
+                    ((Window) dialog).Title = "Create Point";
                     break;
                 case ApplicationController.operations.OpLineCreate:
+                    dialog = new TwoPointDialog();
+                    ((Window)dialog).Title = "Create Line";
                     break;
                 case ApplicationController.operations.OpCircleCreate:
+                    dialog = new TwoPointDialog();
+                    ((Window)dialog).Title = "Create Circle";
                     break;
                 case ApplicationController.operations.OpContourCreate:
                     break;
@@ -102,11 +111,14 @@ namespace CADView
 
             try
             {
-                await Task.Run(delegate
+                if (((Window) dialog)?.ShowDialog() == true)
                 {
-                    Task.Delay(4000).Wait();
-                    Controller.procOperation(Session, _activeDocument, (ApplicationController.operations) obj, data);
-                });
+                    data = dialog.Data.ToArray();
+                    await Task.Run(delegate
+                    {
+                        Controller.procOperation(Session, _activeDocument, (ApplicationController.operations)obj, data);
+                    });
+                }
             }
             catch (Exception e)
             {
