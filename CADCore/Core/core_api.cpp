@@ -12,6 +12,12 @@ DocumentId attachDocument(void* pObject, void* doc)
 	return ses->attachDocument(pDoc);
 }
 
+extern "C" COREDLL_API void detachDocument(void* pObject, DocumentId docID)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	ses->detachDocument(docID);
+}
+
 ObjectId attachToBase(void* pObject, DocumentId docID, void* gen)
 {
 	Session* ses = static_cast<Session*>(pObject);

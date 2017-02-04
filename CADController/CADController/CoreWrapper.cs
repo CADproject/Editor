@@ -3,8 +3,10 @@ using System.Runtime.InteropServices;
 
 namespace CADController
 {
-    using ObjectId = System.UInt32;
+    using SessionId = System.UInt32;
     using DocumentId = System.UInt32;
+    using OperationId = System.UInt32;
+    using ObjectId = System.UInt32;
 
     enum Color { black, red, green, blue, yellow };
     enum Thickness { one, two, three, four, five };
@@ -19,6 +21,9 @@ namespace CADController
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern DocumentId attachDocument(IntPtr pObject, IntPtr doc);
+
+        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void detachDocument(IntPtr pObject, DocumentId docID);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern ObjectId attachToBase(IntPtr pObject, DocumentId docID, IntPtr genObj);

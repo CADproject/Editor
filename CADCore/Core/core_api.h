@@ -7,6 +7,7 @@
 //session factory and all methods
 extern "C" COREDLL_API void* sessionFactory(void);
 extern "C" COREDLL_API DocumentId attachDocument(void* pObject, void* doc);
+extern "C" COREDLL_API void detachDocument(void* pObject, DocumentId docID);
 extern "C" COREDLL_API ObjectId attachToBase(void* pObject, DocumentId docID, void* gen);
 extern "C" COREDLL_API void* detachFromBase(void* pObject, DocumentId docID, ObjectId objID);
 extern "C" COREDLL_API void attachToBuffer(void* pObject, DocumentId docID, void* gen);
