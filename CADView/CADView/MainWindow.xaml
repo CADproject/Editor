@@ -4,8 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView"
+        xmlns:cadController="clr-namespace:CADController;assembly=CADController"
         mc:Ignorable="d"
-        Title="Cloud CAD system" BorderThickness="2" Height="350" Width="500" MinHeight="350" MinWidth="500" WindowStartupLocation="CenterScreen">
+        Title="Cloud CAD system" BorderThickness="2" Height="350" Width="500" MinHeight="350" MinWidth="500" WindowStartupLocation="CenterScreen"
+        d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Window.BorderBrush>
         <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
             <GradientStop Color="Black" Offset="1"/>
@@ -16,10 +18,21 @@
     </Window.BorderBrush>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="200*"/>
+            <RowDefinition MinHeight="40" Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <GridSplitter x:Name="gridSplitter" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5,5,5">
+            <Button Command="{Binding DocumentWorkCommand}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="New &#xD;&#xA;Document"></Button>
+            <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;point" Tag="{x:Static cadController:ApplicationController+operations.OpPointCreate}" ></Button>
+            <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;line" Tag="{x:Static cadController:ApplicationController+operations.OpLineCreate}"></Button>
+            <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;circle" Tag="{x:Static cadController:ApplicationController+operations.OpCircleCreate}"></Button>
+            <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;contour" Tag="{x:Static cadController:ApplicationController+operations.OpContourCreate}"></Button>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,5,5">
+            <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Undo" Tag="{x:Static cadController:ApplicationController+operations.OpUndo}"></Button>
+            <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Redo" Tag="{x:Static cadController:ApplicationController+operations.OpRedo}"></Button>
+        </StackPanel>
+        <GridSplitter Grid.Row="0" x:Name="gridSplitter" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
 
     </Grid>
 </Window>

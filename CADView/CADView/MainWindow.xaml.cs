@@ -15,6 +15,8 @@ namespace CADView
 
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
             Title += " " + version;
+
+            DataContext = new MainWindowViewModel();
         }
     }
 }

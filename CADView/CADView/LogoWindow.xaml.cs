@@ -14,22 +14,23 @@ namespace CADView
             InitializeComponent();
         }
 
-
         readonly Timer tickTimer = new Timer();
 
         private async void OnLoad(object sender, RoutedEventArgs e)
         {
-            tickTimer.Start();
+            //tickTimer.Start();
+            var main = new MainWindow();
+            MainWindowViewModel view = (MainWindowViewModel) main.DataContext;
 
             Task initTask = new Task(() =>
             {
-                Task.Delay(1000).Wait();
+                view.Init();
             });
 
             initTask.Start();
             await initTask;
 
-            new MainWindow().Show();
+            main.Show();
             Close();
         }
     }
