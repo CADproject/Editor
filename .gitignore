@@ -4,7 +4,6 @@ Release/
 bin/
 obj/
 *.suo
-*.sln
 *.sdf
 *.vcxproj.filters
 *.vcxproj.user
