@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CADCore\CADCore\CADCore.vcxproj">
-      <Project>{BBA4DF5F-0E3D-49D2-A412-12AC53C26486}</Project>
+      <Project>{bba4df5f-0e3d-49d2-a412-12ac53c26486}</Project>
       <Name>CADCore</Name>
     </ProjectReference>
   </ItemGroup>

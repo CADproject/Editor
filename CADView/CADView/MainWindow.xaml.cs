@@ -17,6 +17,8 @@ namespace CADView
             Title += " " + version;
 
             DataContext = new MainWindowViewModel();
+
+            Application.Current.MainWindow = this;
         }
     }
 }

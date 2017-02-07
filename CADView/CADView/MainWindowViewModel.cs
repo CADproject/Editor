@@ -18,6 +18,13 @@ namespace CADView
             Controller = new ApplicationController();
         }
 
+        ~MainWindowViewModel()
+        {
+            foreach (uint d in _documents)
+                Controller.finalDocument(Session, d);
+            Controller.finalSession(Session);
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public bool IsActive
@@ -26,7 +33,7 @@ namespace CADView
             set
             {
                 _isActive = value;
-                OnPropertyChanged();
+                OnPropertyChanged("IsActive");
             }
         }
 
@@ -47,7 +54,11 @@ namespace CADView
 
         #region Protected
 
+#if OLDDOTNET
+        protected virtual void OnPropertyChanged(string propertyName)
+#else
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+#endif
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -82,7 +93,11 @@ namespace CADView
             CreateDocument();
         }
 
+#if OLDDOTNET
+        private void ProcessControllerWork(object obj)
+#else
         private async void ProcessControllerWork(object obj)
+#endif
         {
             IsActive = false;
             ApplicationController.operations type = (ApplicationController.operations) obj;
@@ -106,7 +121,27 @@ namespace CADView
                     ((Window)dialog).Title = "Create Circle";
                     break;
                 case ApplicationController.operations.OpContourCreate:
+                    dialog = new ElementIdInputDialog();
+                    ((Window)dialog).Title = "Create Contour";
                     break;
+                case ApplicationController.operations.OpDeleteObject:
+                    dialog = new ElementIdInputDialog();
+                    ((Window)dialog).Title = "Create Contour";
+                    break;
+                case ApplicationController.operations.OpDestroyContour:
+                    dialog = new ElementIdInputDialog();
+                    ((Window)dialog).Title = "Create Contour";
+                    break;
+                case ApplicationController.operations.OpSetBackgroundColor:
+                    dialog = new ElementIdInputDialog();
+                    ((Window)dialog).Title = "Set color number";
+                    break;
+                case ApplicationController.operations.OpSetLayersToShow:
+                    dialog = new ElementIdInputDialog();
+                    ((Window)dialog).Title = "Set layer number";
+                    break;
+                default:
+                    throw new NotImplementedException(type.ToString("G"));
             }
 
             try
@@ -123,11 +158,16 @@ namespace CADView
                         start = false;
                 }
 
+#if OLDDOTNET
+                if (start)
+                    Controller.procOperation(Session, _activeDocument, (ApplicationController.operations)obj, data);
+#else
                 if (start)
                     await Task.Run(delegate
                     {
-                        Controller.procOperation(Session, _activeDocument, (ApplicationController.operations) obj, data);
+                        Controller.procOperation(Session, _activeDocument, (ApplicationController.operations)obj, data);
                     });
+#endif
             }
             catch (Exception e)
             {
@@ -139,14 +179,31 @@ namespace CADView
             }
         }
 
-        #endregion
+#endregion
 
-        #region Commands
+#region Commands
 
-        public RelayCommand DocumentWorkCommand => _documentWorkCommand ?? (_documentWorkCommand = new RelayCommand(ProcessDocumentWork,
-            o => (_documents.Count > 0 && IsActive) || _documents.Count == 0));
-        public RelayCommand ControllerWorkCommand => _controllerWorkCommand ?? (_controllerWorkCommand = new RelayCommand(ProcessControllerWork));
+        public RelayCommand DocumentWorkCommand
+        {
+            get
+            {
+                return _documentWorkCommand != null
+                    ? _documentWorkCommand
+                    : (_documentWorkCommand = new RelayCommand(ProcessDocumentWork,
+                        o => (_documents.Count > 0 && IsActive) || _documents.Count == 0));
+            }
+        }
 
-        #endregion
+        public RelayCommand ControllerWorkCommand
+        {
+            get
+            {
+                return _controllerWorkCommand != null
+                    ? _controllerWorkCommand
+                    : (_controllerWorkCommand = new RelayCommand(ProcessControllerWork));
+            }
+        }
+
+#endregion
     }
 }
