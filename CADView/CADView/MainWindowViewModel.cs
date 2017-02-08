@@ -171,6 +171,8 @@ namespace CADView
             }
             catch (Exception e)
             {
+                if(dialog is Window && ((Window)dialog).IsVisible)
+                    ((Window)dialog).Close();
                 MessageBox.Show("Exception: " + e.Message);
             }
             finally
