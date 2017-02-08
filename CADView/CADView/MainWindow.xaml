@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView"
         xmlns:cadController="clr-namespace:CADController;assembly=CADController"
+        xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
         Title="Cloud CAD system" BorderThickness="2" Height="350" Width="600" MinHeight="350" MinWidth="500" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}">
@@ -47,6 +48,10 @@
             </StackPanel>
         </StackPanel>
         <GridSplitter Grid.Row="0" x:Name="gridSplitter" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
-
+        <Grid Grid.Row="1">
+            <WindowsFormsHost>
+                <forms:Panel x:Name="RenderPanel"></forms:Panel>
+            </WindowsFormsHost>
+        </Grid>
     </Grid>
 </Window>

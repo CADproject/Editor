@@ -27,6 +27,8 @@ namespace CADView
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        internal ApplicationController Controller { get; set; }
+
         public bool IsActive
         {
             get { return _isActive; }
@@ -74,8 +76,6 @@ namespace CADView
         private bool _isActive;
         private RelayCommand _documentWorkCommand;
         private RelayCommand _controllerWorkCommand;
-
-        private ApplicationController Controller { get; set; }
 
         private uint Session
         {
