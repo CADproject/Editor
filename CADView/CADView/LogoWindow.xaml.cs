@@ -1,8 +1,8 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
-using Timer = System.Timers.Timer;
+#if OLDDOTNET
+using System.Threading;
+#endif
 
 namespace CADView
 {
@@ -20,8 +20,6 @@ namespace CADView
 #if OLDDOTNET
         private readonly EventWaitHandle _awaiter = new EventWaitHandle(false, EventResetMode.AutoReset);
 #endif
-        readonly Timer tickTimer = new Timer();
-        private bool awaitDone = false;
 
 #if OLDDOTNET
         private void OnLoad(object sender, RoutedEventArgs e)

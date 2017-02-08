@@ -1,17 +1,18 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using CADController;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Windows;
 using CADView.Dialogs;
+#if !OLDDOTNET
+using System.Threading.Tasks;
+#endif
 
 namespace CADView
 {
     class MainWindowViewModel : INotifyPropertyChanged
     {
-        #region Public
+#region Public
 
         public MainWindowViewModel()
         {
@@ -52,9 +53,9 @@ namespace CADView
             IsActive = true;
         }
 
-        #endregion
+#endregion
 
-        #region Protected
+#region Protected
 
 #if OLDDOTNET
         protected virtual void OnPropertyChanged(string propertyName)
@@ -65,9 +66,9 @@ namespace CADView
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion
+#endregion
 
-        #region Private
+#region Private
 
         private uint _session;
         bool _inited;
@@ -104,44 +105,42 @@ namespace CADView
 
             object [] data= new object[0];
 
-            IDataDialog dialog = null;
+            Window dialog = null;
 
             switch (type)
             {
                 case ApplicationController.operations.OpPointCreate:
                     dialog = new OnePointDialog();
-                    ((Window) dialog).Title = "Create Point";
+                    dialog.Title = "Create Point";
                     break;
                 case ApplicationController.operations.OpLineCreate:
                     dialog = new TwoPointDialog();
-                    ((Window)dialog).Title = "Create Line";
+                    dialog.Title = "Create Line";
                     break;
                 case ApplicationController.operations.OpCircleCreate:
                     dialog = new TwoPointDialog();
-                    ((Window)dialog).Title = "Create Circle";
+                    dialog.Title = "Create Circle";
                     break;
                 case ApplicationController.operations.OpContourCreate:
                     dialog = new ElementIdInputDialog();
-                    ((Window)dialog).Title = "Create Contour";
+                    dialog.Title = "Create Contour";
                     break;
                 case ApplicationController.operations.OpDeleteObject:
                     dialog = new ElementIdInputDialog();
-                    ((Window)dialog).Title = "Create Contour";
+                    dialog.Title = "Create Contour";
                     break;
                 case ApplicationController.operations.OpDestroyContour:
                     dialog = new ElementIdInputDialog();
-                    ((Window)dialog).Title = "Create Contour";
+                    dialog.Title = "Create Contour";
                     break;
                 case ApplicationController.operations.OpSetBackgroundColor:
                     dialog = new ElementIdInputDialog();
-                    ((Window)dialog).Title = "Set color number";
+                    dialog.Title = "Set color number";
                     break;
                 case ApplicationController.operations.OpSetLayersToShow:
                     dialog = new ElementIdInputDialog();
-                    ((Window)dialog).Title = "Set layer number";
+                    dialog.Title = "Set layer number";
                     break;
-                default:
-                    throw new NotImplementedException(type.ToString("G"));
             }
 
             try
@@ -150,9 +149,10 @@ namespace CADView
 
                 if (dialog != null)
                 {
-                    if (((Window) dialog).ShowDialog() == true)
+                    if (dialog.ShowDialog() == true)
                     {
-                        data = dialog.Data.ToArray();
+                        if(dialog is IDataDialog)
+                        data = ((IDataDialog)dialog).Data.ToArray();
                     }
                     else
                         start = false;
@@ -171,8 +171,8 @@ namespace CADView
             }
             catch (Exception e)
             {
-                if(dialog is Window && ((Window)dialog).IsVisible)
-                    ((Window)dialog).Close();
+                if(dialog != null && dialog.IsVisible)
+                    dialog.Close();
                 MessageBox.Show("Exception: " + e.Message);
             }
             finally
