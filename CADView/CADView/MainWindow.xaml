@@ -51,7 +51,7 @@
         </StackPanel>
         <GridSplitter Grid.Row="0" x:Name="gridSplitter" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
         <Grid Grid.Row="1">
-            <TabControl Name="DocumentTabs" ItemsSource="{Binding DocumentViewModels}">
+            <TabControl Name="DocumentTabs" ItemsSource="{Binding DocumentViewModels, Mode=TwoWay}" SelectedItem="{Binding SelectedDocument, Mode=TwoWay}">
                 <TabControl.Resources>
                     <DataTemplate DataType="{x:Type local:DocumentViewModel}">
                         <WindowsFormsHost>

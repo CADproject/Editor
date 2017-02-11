@@ -54,6 +54,16 @@ namespace CADView
             DocumentViewModels.Add(new DocumentViewModel());
         }
 
+        public DocumentViewModel SelectedDocument
+        {
+            get { return _selectedDocument; }
+            set
+            {
+                _selectedDocument = value;
+                OnPropertyChanged("SelectedDocument");
+            }
+        }
+
         public ObservableCollection<DocumentViewModel> DocumentViewModels
         {
             get { return _documentViewModels; }
@@ -89,6 +99,7 @@ namespace CADView
         private RelayCommand _documentWorkCommand;
         private RelayCommand _controllerWorkCommand;
         private ObservableCollection<DocumentViewModel> _documentViewModels = new ObservableCollection<DocumentViewModel>();
+        private DocumentViewModel _selectedDocument;
 
         private uint Session
         {
