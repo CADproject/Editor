@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Forms.Integration;
+using System.Windows.Threading;
 using CADView.Dialogs;
 #if !OLDDOTNET
 using System.Threading.Tasks;
@@ -47,24 +50,41 @@ namespace CADView
         {
             Session = Controller.initSession();
             _inited = true;
+
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 0, 0, 33);
+            _timer.Tick+= delegate
+            {
+                Controller.draw(Session, _activeDocument);
+            };
+            _timer.Start();
         }
 
         public void CreateDocument()
         {
-            DocumentViewModels.Add(new DocumentViewModel());
+            //DocumentViewModel doc = new DocumentViewModel();
+            //DocumentViewModels.Add(doc);
+
+            DocumentViewModels.Add(new TabItem()
+            {
+                Content = new WindowsFormsHost() {Child = new RenderPanel()},
+                DataContext = new DocumentViewModel()
+            });
+
+            SelectedDocumentIndex = DocumentViewModels.Count - 1;
         }
 
-        public DocumentViewModel SelectedDocument
+        public int SelectedDocumentIndex
         {
-            get { return _selectedDocument; }
+            get { return _selectedDocumentIndex; }
             set
             {
-                _selectedDocument = value;
-                OnPropertyChanged("SelectedDocument");
+                _selectedDocumentIndex = value;
+                OnPropertyChanged("SelectedDocumentIndex");
             }
         }
 
-        public ObservableCollection<DocumentViewModel> DocumentViewModels
+        public ObservableCollection<TabItem> DocumentViewModels
         {
             get { return _documentViewModels; }
             set
@@ -98,8 +118,9 @@ namespace CADView
         private bool _isActive;
         private RelayCommand _documentWorkCommand;
         private RelayCommand _controllerWorkCommand;
-        private ObservableCollection<DocumentViewModel> _documentViewModels = new ObservableCollection<DocumentViewModel>();
-        private DocumentViewModel _selectedDocument;
+        private ObservableCollection<TabItem> _documentViewModels = new ObservableCollection<TabItem>();
+        private int _selectedDocumentIndex;
+        private DispatcherTimer _timer;
 
         private uint Session
         {
@@ -121,7 +142,7 @@ namespace CADView
         {
             _activeDocument = Controller.initDocument(Session, hwnd);
             _documents.Add(_activeDocument);
-            DocumentViewModels.Last().Title = "Document # " + _activeDocument;
+            ((DocumentViewModel)DocumentViewModels.Last().DataContext).Title = "Document # " + _activeDocument;
             IsActive = true;
         }
 

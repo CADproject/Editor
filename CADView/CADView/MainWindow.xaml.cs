@@ -2,7 +2,8 @@
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Forms;
+using System.Windows.Controls;
+using System.Windows.Input;
 using CADController;
 using Application = System.Windows.Application;
 
@@ -25,14 +26,12 @@ namespace CADView
             MainWindowViewModel vm = new MainWindowViewModel();
             DataContext = vm;
             Application.Current.MainWindow = this;
-
-            //this.RenderPanel.MouseMove+=RenderPanelMouseEvent;
         }
 
         private void RenderPanelMouseEvent(object sender, MouseEventArgs mouseEventArgs)
         {
             ((MainWindowViewModel) DataContext).Controller.eventHendling(ApplicationController.mouseEvents.move,
-                mouseEventArgs.X, mouseEventArgs.Y);
+                mouseEventArgs.GetPosition(DocumentTabs).X, mouseEventArgs.GetPosition(DocumentTabs).Y);
         }
     }
 }
