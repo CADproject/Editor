@@ -24,7 +24,10 @@ namespace CADController
         public static extern DocumentId attachDocument(IntPtr pObject, IntPtr doc);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void detachDocument(IntPtr pObject, DocumentId docID);
+        public static extern IntPtr detachDocument(IntPtr pObject, DocumentId docID);
+
+        [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void destroyDocument(IntPtr pObject);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern ObjectId attachToBase(IntPtr pObject, DocumentId docID, IntPtr genObj);
@@ -60,7 +63,10 @@ namespace CADController
         public static extern void redo(IntPtr pObject, DocumentId docID);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr documentFactory();
+        public static extern void draw(IntPtr pObject, DocumentId docID);
+
+        [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr documentFactory(IntPtr hwnd);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr nodeFactory(double x, double y);

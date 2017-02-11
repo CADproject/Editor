@@ -7,7 +7,8 @@
 //session factory and all methods
 extern "C" COREDLL_API void* sessionFactory(void);
 extern "C" COREDLL_API DocumentId attachDocument(void* pObject, void* doc);
-extern "C" COREDLL_API void detachDocument(void* pObject, DocumentId docID);
+extern "C" COREDLL_API void* detachDocument(void* pObject, DocumentId docID);
+extern "C" COREDLL_API void destroyDocument(void* pObject);
 extern "C" COREDLL_API ObjectId attachToBase(void* pObject, DocumentId docID, void* gen);
 extern "C" COREDLL_API void* detachFromBase(void* pObject, DocumentId docID, ObjectId objID);
 extern "C" COREDLL_API void attachToBuffer(void* pObject, DocumentId docID, void* gen);
@@ -20,8 +21,10 @@ extern "C" COREDLL_API void commit(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void undo(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void redo(void* pObject, DocumentId docID);
 
+extern "C" COREDLL_API void draw(void* pObject, DocumentId docID);
+
 //document factory method
-extern "C" COREDLL_API void* documentFactory(void);
+extern "C" COREDLL_API void* documentFactory(void* hwnd);
 
 //node factory method
 extern "C" COREDLL_API void* nodeFactory(double x, double y);

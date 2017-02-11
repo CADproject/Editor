@@ -17,6 +17,8 @@
             <GradientStop Color="#FF676767" Offset="0.998"/>
         </LinearGradientBrush>
     </Window.BorderBrush>
+    <Window.Resources>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition MinHeight="40" Height="Auto"/>
@@ -49,9 +51,20 @@
         </StackPanel>
         <GridSplitter Grid.Row="0" x:Name="gridSplitter" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
         <Grid Grid.Row="1">
-            <WindowsFormsHost>
-                <forms:Panel x:Name="RenderPanel"></forms:Panel>
-            </WindowsFormsHost>
+            <TabControl Name="DocumentTabs" ItemsSource="{Binding DocumentViewModels}">
+                <TabControl.Resources>
+                    <DataTemplate DataType="{x:Type local:DocumentViewModel}">
+                        <WindowsFormsHost>
+                            <local:RenderPanel />
+                        </WindowsFormsHost>
+                    </DataTemplate>
+                </TabControl.Resources>
+                <TabControl.ItemContainerStyle>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Header" Value="{Binding Title}" />
+                    </Style>
+                </TabControl.ItemContainerStyle>
+            </TabControl>
         </Grid>
     </Grid>
 </Window>

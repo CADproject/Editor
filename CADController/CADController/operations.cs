@@ -51,9 +51,9 @@ namespace CADController
             return sessionID;
         }
 
-        public DocumentId initDocument(SessionId sessionID)  //used when creating new document
+        public uint initDocument(uint sessionID, IntPtr hwnd)  //used when creating new document
         {
-            IntPtr pDoc = CoreWrapper.documentFactory();
+            IntPtr pDoc = CoreWrapper.documentFactory(hwnd);
             DocumentId docID = CoreWrapper.attachDocument(_curSession, pDoc);
             return docID;
         }
@@ -116,14 +116,20 @@ namespace CADController
             curOperation.operationProcess(_curSession, docID, data);
         }
 
-        public void finalDocument(SessionId sessionID, DocumentId docID)    //closing the document
+        public void finalDocument(SessionId sessionID, DocumentId docID) //closing the document
         {
-            CoreWrapper.detachDocument(_curSession, docID);
+            IntPtr document = CoreWrapper.detachDocument(_curSession, docID);
+            CoreWrapper.destroyDocument(document);
         }
 
         public void finalSession(SessionId sessionID)   //closing the application
         {
             //nothing yet
+        }
+
+        public void draw(SessionId sessionID, DocumentId docID)
+        {
+            CoreWrapper.draw(_curSession, docID);
         }
     }
 

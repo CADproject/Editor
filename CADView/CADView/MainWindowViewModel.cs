@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using CADController;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using CADView.Dialogs;
 #if !OLDDOTNET
@@ -17,6 +19,7 @@ namespace CADView
         public MainWindowViewModel()
         {
             Controller = new ApplicationController();
+            RenderPanel.Loaded+=RenderPanelOnLoaded;
         }
 
         ~MainWindowViewModel()
@@ -48,12 +51,20 @@ namespace CADView
 
         public void CreateDocument()
         {
-            _activeDocument = Controller.initDocument(Session);
-            _documents.Add(_activeDocument);
-            IsActive = true;
+            DocumentViewModels.Add(new DocumentViewModel());
         }
 
-#endregion
+        public ObservableCollection<DocumentViewModel> DocumentViewModels
+        {
+            get { return _documentViewModels; }
+            set
+            {
+                _documentViewModels = value; 
+                OnPropertyChanged("DocumentViewModels");
+            }
+        }
+
+        #endregion
 
 #region Protected
 
@@ -77,6 +88,7 @@ namespace CADView
         private bool _isActive;
         private RelayCommand _documentWorkCommand;
         private RelayCommand _controllerWorkCommand;
+        private ObservableCollection<DocumentViewModel> _documentViewModels = new ObservableCollection<DocumentViewModel>();
 
         private uint Session
         {
@@ -92,6 +104,14 @@ namespace CADView
         private void ProcessDocumentWork(object obj)
         {
             CreateDocument();
+        }
+
+        private void RenderPanelOnLoaded(IntPtr hwnd)
+        {
+            _activeDocument = Controller.initDocument(Session, hwnd);
+            _documents.Add(_activeDocument);
+            DocumentViewModels.Last().Title = "Document # " + _activeDocument;
+            IsActive = true;
         }
 
 #if OLDDOTNET

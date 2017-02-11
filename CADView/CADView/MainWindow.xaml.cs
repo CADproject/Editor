@@ -26,7 +26,7 @@ namespace CADView
             DataContext = vm;
             Application.Current.MainWindow = this;
 
-            this.RenderPanel.MouseMove+=RenderPanelMouseEvent;
+            //this.RenderPanel.MouseMove+=RenderPanelMouseEvent;
         }
 
         private void RenderPanelMouseEvent(object sender, MouseEventArgs mouseEventArgs)

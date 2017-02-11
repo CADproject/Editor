@@ -12,10 +12,16 @@ DocumentId attachDocument(void* pObject, void* doc)
 	return ses->attachDocument(pDoc);
 }
 
-extern "C" COREDLL_API void detachDocument(void* pObject, DocumentId docID)
+extern "C" COREDLL_API void* detachDocument(void* pObject, DocumentId docID)
 {
 	Session* ses = static_cast<Session*>(pObject);
-	ses->detachDocument(docID);
+	return ses->detachDocument(docID);
+}
+
+extern "C" COREDLL_API void destroyDocument(void* pObject)
+{
+	Document* pDoc = static_cast<Document*>(pObject);
+	delete pDoc;
 }
 
 ObjectId attachToBase(void* pObject, DocumentId docID, void* gen)
@@ -87,9 +93,15 @@ void redo(void* pObject, DocumentId docID)
 	ses->redo(docID);
 }
 
-void* documentFactory(void)
+void draw(void* pObject, DocumentId docID)
 {
-	return static_cast<void*>(new Document());
+	Session* ses = static_cast<Session*>(pObject);
+	ses->toScreen(docID);
+}
+
+void* documentFactory(void* hwnd)
+{
+	return static_cast<void*>(new Document(hwnd));
 }
 
 void* nodeFactory(double x, double y)

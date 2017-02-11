@@ -11,7 +11,7 @@ namespace CADController
     {
         static void Main()
         {
-            IntPtr curSession = CoreWrapper.sessionFactory();
+            /*IntPtr curSession = CoreWrapper.sessionFactory();
 
             IntPtr pDoc1 = CoreWrapper.documentFactory();
             DocumentId docID1 = CoreWrapper.attachDocument(curSession, pDoc1);
@@ -45,7 +45,7 @@ namespace CADController
             Operations.redo(curSession, docID1);
             Operations.display(curSession, docID1);
 
-            Console.ReadKey();
+            Console.ReadKey();*/
         }
     }
 }
