@@ -99,8 +99,9 @@ void Buffer::detachFrombuffer(Generic* object)
 
 void Buffer::toScreen(void)
 {
+#ifdef TRACE_DEBUG
 	std::cout << "ON THE SCREEN:" << std::endl << std::endl;
-
+#endif
 	std::for_each(_buffer.begin(), _buffer.end(),
 		[=](std::pair<ObjectId, Generic*> curPair)
 	{
@@ -112,20 +113,27 @@ void Buffer::toScreen(void)
 		}
 		else
 		{
+#ifdef TRACE_DEBUG
 			std::cout << "ID: " << curPair.first << ". ";
-			curPair.second->getTopology()->drawing();
+#endif			curPair.second->getTopology()->drawing();
+#ifdef TRACE_DEBUG
 			std::cout << "Color: " << curPair.second->getColor();
 			std::cout << ", Thickness: " << curPair.second->getThickness();
 			std::cout << ", Layer: " << curPair.second->getLayer();
+#endif
 			
 			bool whereObject = true;
 			if(curPair.first == NOT_FROM_BASE)
 				whereObject = false;
 			
+#ifdef TRACE_DEBUG
 			std::cout << ", From controller (0) or base (1): " << whereObject << ".";
 			std::cout << std::endl << std::endl;
+#endif
 		}
 	});
 
+#ifdef TRACE_DEBUG
 	std::cout << std::endl;
+#endif
 }

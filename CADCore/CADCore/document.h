@@ -33,9 +33,13 @@ private:
 	Buffer _buffer;			//the objects that appear on the screen
 	Base _base;				//user data
 	Settings _settings;		//document settings
-
+	HWND _hwnd;
+	HGLRC _hrc;
+	HDC _dc;
+	Document() { }
 public:
-	Document() { _base.attachObserver(&_buffer); }
+	Document(void* hwnd);
+	~Document();
 
 	ObjectId attachToBase(Generic* object);
 	Generic* detachFromBase(ObjectId objID);

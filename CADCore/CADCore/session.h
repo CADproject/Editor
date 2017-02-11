@@ -17,7 +17,7 @@ public:
 	~Session() {}
 
 	DocumentId attachDocument(Document* doc);
-	void detachDocument(DocumentId docID);
+	void* detachDocument(DocumentId docID);
 	
 	ObjectId attachToBase(DocumentId docID, Generic* object);
 	Generic* detachFromBase(DocumentId docID, ObjectId objID);
