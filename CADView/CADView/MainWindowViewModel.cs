@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using CADController;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Forms.Integration;
 using System.Windows.Threading;
 using CADView.Dialogs;
@@ -36,7 +38,7 @@ namespace CADView
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        internal ApplicationController Controller { get; set; }
+        internal ApplicationController Controller { get; private set; }
 
         public bool IsActive
         {
@@ -58,20 +60,45 @@ namespace CADView
             _timer.Tick+= delegate
             {
                 if(DocumentViewModels.Count == 0) return;
-                Controller.draw(Session, ((DocumentViewModel)DocumentViewModels[SelectedDocumentIndex].DataContext).DocumentID);
+                Controller.draw(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID);
             };
             _timer.Start();
         }
 
         public void CreateDocument()
         {
-            DocumentViewModels.Add(new TabItem()
+            var host = new WindowsFormsHost()
             {
-                Content = new WindowsFormsHost() {Child = new RenderPanel()},
-                DataContext = new DocumentViewModel()
+                Child = new RenderPanel(),
+                VerticalAlignment = VerticalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            };
+            Grid grid = new Grid();
+            grid.Children.Add(host);
+            Binding binding = new Binding()
+            {
+                Source = this,
+                Path = new PropertyPath("WindowWidth"),
+                Mode = BindingMode.OneWayToSource,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
+            var r = BindingOperations.SetBinding(grid, FrameworkElement.WidthProperty, binding);
+            binding = new Binding()
+            {
+                Source = this,
+                Path = new PropertyPath("WindowHeight"),
+                Mode = BindingMode.OneWayToSource,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
+            BindingOperations.SetBinding(grid, FrameworkElement.HeightProperty, binding);
+            var model = new DocumentViewModel();
+            DocumentViewModelsTabs.Add(new TabItem()
+            {
+                Content = grid,
+                DataContext = model
             });
-
-            _selectedDocumentIndex = DocumentViewModels.Count - 1;
+            DocumentViewModels.Add(model);
+            _selectedDocumentIndex = DocumentViewModelsTabs.Count - 1;
             OnPropertyChanged("SelectedDocumentIndex");
         }
 
@@ -83,23 +110,50 @@ namespace CADView
                 _selectedDocumentIndex = value;
                 OnPropertyChanged("SelectedDocumentIndex");
 
-                var size = ((WindowsFormsHost) DocumentViewModels[SelectedDocumentIndex].Content).Child.Size;
-                Controller.activateDocement(Session,
-                    ((DocumentViewModel) DocumentViewModels[SelectedDocumentIndex].DataContext).DocumentID, size.Width, size.Height);
+                var size =
+                    ((WindowsFormsHost) ((Grid) DocumentViewModelsTabs[SelectedDocumentIndex].Content).Children[0])
+                        .Child.Size;
+                Controller.activateDocement(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, size.Width,
+                    size.Height);
             }
         }
 
-        public ObservableCollection<TabItem> DocumentViewModels
+        public ObservableCollection<TabItem> DocumentViewModelsTabs
         {
-            get { return _documentViewModels; }
+            get { return _documentViewModelsTabs; }
             set
             {
-                _documentViewModels = value; 
+                _documentViewModelsTabs = value; 
                 OnPropertyChanged("DocumentViewModels");
             }
         }
 
-        #endregion
+        public List<DocumentViewModel> DocumentViewModels
+        {
+            get { return _documentViewModels; }
+        }
+
+        public double WindowWidth
+        {
+            get { return _windowWidth; }
+            set
+            {
+                _windowWidth = value;
+                OnPropertyChanged("WindowWidth");
+            }
+        }
+
+        public double WindowHeight
+        {
+            get { return _windowHeight; }
+            set
+            {
+                _windowHeight = value;
+                OnPropertyChanged("WindowHeight");
+            }
+        }
+
+#endregion
 
 #region Protected
 
@@ -121,9 +175,12 @@ namespace CADView
         private bool _isActive;
         private RelayCommand _documentWorkCommand;
         private RelayCommand _controllerWorkCommand;
-        private ObservableCollection<TabItem> _documentViewModels = new ObservableCollection<TabItem>();
+        private ObservableCollection<TabItem> _documentViewModelsTabs = new ObservableCollection<TabItem>();
         private int _selectedDocumentIndex;
         private DispatcherTimer _timer;
+        private double _windowWidth;
+        private double _windowHeight;
+        private readonly List<DocumentViewModel> _documentViewModels = new List<DocumentViewModel>();
 
         private uint Session
         {
@@ -145,15 +202,14 @@ namespace CADView
         {
             var activeDocument = Controller.initDocument(Session, hwnd);
             Controller.activateDocement(Session, activeDocument, w, h);
-            ((DocumentViewModel)DocumentViewModels.Last().DataContext).Title = "Document # " + activeDocument;
-            ((DocumentViewModel)DocumentViewModels.Last().DataContext).DocumentID = activeDocument;
+            DocumentViewModels[SelectedDocumentIndex].Title = "Document # " + activeDocument;
+            DocumentViewModels[SelectedDocumentIndex].DocumentID = activeDocument;
             IsActive = true;
         }
 
         private void RenderPanelOnResize(int w, int h)
         {
-            Controller.resizeDocument(Session,
-                ((DocumentViewModel) DocumentViewModels[SelectedDocumentIndex].DataContext).DocumentID, w, h);
+            Controller.resizeDocument(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, w, h);
         }
 
 #if OLDDOTNET
@@ -213,8 +269,8 @@ namespace CADView
                 {
                     if (dialog.ShowDialog() == true)
                     {
-                        if(dialog is IDataDialog)
-                        data = ((IDataDialog)dialog).Data.ToArray();
+                        if (dialog is IDataDialog)
+                            data = ((IDataDialog) dialog).Data.ToArray();
                     }
                     else
                         start = false;
@@ -222,8 +278,7 @@ namespace CADView
 
 #if OLDDOTNET
                 if (start)
-                    Controller.procOperation(Session,
-                        ((DocumentViewModel) DocumentViewModels[SelectedDocumentIndex].DataContext).DocumentID,
+                    Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
                         (ApplicationController.operations) obj, data);
 #else
                 if (start)
@@ -235,7 +290,7 @@ namespace CADView
             }
             catch (Exception e)
             {
-                if(dialog != null && dialog.IsVisible)
+                if (dialog != null && dialog.IsVisible)
                     dialog.Close();
                 MessageBox.Show("Exception: " + e.Message);
             }

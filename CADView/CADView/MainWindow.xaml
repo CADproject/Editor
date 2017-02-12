@@ -51,22 +51,8 @@
         </StackPanel>
         <GridSplitter Grid.Row="0" x:Name="gridSplitter" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
         <Grid Grid.Row="1">
-            <TabControl Name="DocumentTabs" ItemsSource="{Binding DocumentViewModels, Mode=TwoWay}"
-                        SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        
-                        >
-                <TabControl.ItemTemplate>
-                    <DataTemplate >
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Header}"/>
-                            <Button Content="X" Cursor="Hand" DockPanel.Dock="Right" Focusable="False"
-            FontFamily="Courier" FontSize="9" FontWeight="Bold"  Margin="0,1,0,0" Padding="0" 
-            VerticalContentAlignment="Bottom" Width="16" Height="16" />
-                        </StackPanel>
-                    </DataTemplate>
-                </TabControl.ItemTemplate>
-
-
+            <TabControl Name="DocumentTabs" ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
+                        SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <TabControl.ItemContainerStyle>
                     <Style TargetType="TabItem">
                         <Setter Property="Header" Value="{Binding Title}" />
