@@ -3,6 +3,7 @@
 Document::Document(void* hwnd)
 {
 	_base.attachObserver(&_buffer);
+	_active = false;
 	if (hwnd == nullptr) return;
 
 	_hwnd = (HWND)hwnd;
@@ -31,25 +32,12 @@ Document::Document(void* hwnd)
 
 	int pfc = ChoosePixelFormat(_dc, &pfd);
 	SetPixelFormat(_dc, pfc, &pfd);
-
-	_hrc = wglCreateContext(_dc);
-
-	wglMakeCurrent(_dc, _hrc);
-
-	int w = 200, h = 200;
-	int aspectratio = w / h;
-	glViewport(0, 0, w, h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0f, aspectratio, 0.0001f, 500.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 }
 
 Document::~Document()
 {
-	wglMakeCurrent(nullptr, nullptr);
-	wglDeleteContext(_hrc);
+	RenderDeactivateContext();
+	ReleaseDC(_hwnd, _dc);
 }
 
 ObjectId Document::attachToBase(Generic* object)
@@ -117,16 +105,46 @@ COLOR Document::getBackgroundColor(void)
 	return _settings.getBackgroundColor();
 }
 
-void Document::toScreen(void)
+void Document::RenderDraw()
 {
+	if (!_active) return;
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	glLoadIdentity();
-	gluLookAt(1.0, 1.0, 5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+	gluLookAt(0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+	glColor3f(1, 1, 1);
 
 	glPointSize(5);
 	_buffer.toScreen();
 
 	SwapBuffers(_dc);
+}
+
+void Document::RenderResize(int w, int h)
+{
+	float aspectratio = (float)w / (float)h;
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0f, aspectratio, 0.0001f, 500.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+
+void Document::RenderDeactivateContext()
+{
+	_active = false;
+	wglMakeCurrent(nullptr, nullptr);
+	wglDeleteContext(_hrc);
+}
+
+void Document::RenderActivateContext(int w, int h)
+{
+	_hrc = wglCreateContext(_dc);
+	wglMakeCurrent(_dc, _hrc);
+	RenderResize(w, h);
+	_active = true;
 }

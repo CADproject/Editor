@@ -96,7 +96,7 @@ void Session::toScreen(DocumentId docID)
 	std::cout << "DOCUMENT: " << docID << ". ";
 	std::cout << "Layers (on screen):";
 
-	
+
 	std::vector<unsigned> layers = getDocument(docID)->getLayers();
 	std::for_each(layers.begin(), layers.end(),
 		[](unsigned number)
@@ -108,5 +108,25 @@ void Session::toScreen(DocumentId docID)
 	std::cout << getDocument(docID)->getBackgroundColor() << "." << std::endl;
 #endif
 
-	getDocument(docID)->toScreen();
+	auto doc = getDocument(docID);
+	if (doc != nullptr)
+		doc->RenderDraw();
+}
+
+void Session::SetDocumentActive(DocumentId docID, int w, int h)
+{
+	auto doc = getDocument(_activeDocument);
+	if (doc != nullptr)
+		doc->RenderDeactivateContext();
+	_activeDocument = docID;
+	doc = getDocument(_activeDocument);
+	if (doc != nullptr)
+		doc->RenderActivateContext(w, h);
+}
+
+void Session::ResizeDocument(DocumentId docID, int w, int h)
+{
+	auto doc = getDocument(_activeDocument);
+	if (doc != nullptr)
+		doc->RenderResize(w, h);
 }

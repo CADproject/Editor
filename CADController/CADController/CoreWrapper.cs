@@ -51,9 +51,6 @@ namespace CADController
         public static extern void setBackgroundColor(IntPtr pObject, DocumentId docID, Color color);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void toScreen(IntPtr pObject, DocumentId docID);
-
-        [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void commit(IntPtr pObject, DocumentId docID);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
@@ -64,6 +61,12 @@ namespace CADController
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void draw(IntPtr pObject, DocumentId docID);
+
+        [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void activateDocument(IntPtr pObject, DocumentId docID, int w, int h);
+
+        [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void resizeDocument(IntPtr pObject, DocumentId docID, int w, int h);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr documentFactory(IntPtr hwnd);

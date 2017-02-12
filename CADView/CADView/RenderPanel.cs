@@ -9,10 +9,15 @@ namespace CADView
         {
             InitializeComponent();
 
-            this.Load+= (sender, args) => Loaded?.Invoke(this.Handle);
+            this.Load += (sender, args) => { if (Loaded != null) Loaded?.Invoke(this.Handle, this.Width, this.Height); };
+            this.SizeChanged+= (sender, args) => { if (Resized != null) Resized(this.Width, this.Height); };
         }
 
-        public delegate void LoadedEventDelegate(IntPtr hwnd);
+        public delegate void LoadedEventDelegate(IntPtr hwnd, int w, int h);
         public static event LoadedEventDelegate Loaded;
+
+        public delegate void ResizedEventDelegate(int w, int h);
+        public static event ResizedEventDelegate Resized;
+
     }
 }

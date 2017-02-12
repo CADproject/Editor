@@ -69,12 +69,6 @@ void setBackgroundColor(void* pObject, DocumentId docID, COLOR color)
 	ses->setBackgroundColor(docID, color);
 }
 
-void toScreen(void* pObject, DocumentId docID)
-{
-	Session* ses = static_cast<Session*>(pObject);
-	ses->toScreen(docID);
-}
-
 void commit(void* pObject, DocumentId docID)
 {
 	Session* ses = static_cast<Session*>(pObject);
@@ -97,6 +91,20 @@ void draw(void* pObject, DocumentId docID)
 {
 	Session* ses = static_cast<Session*>(pObject);
 	ses->toScreen(docID);
+}
+
+void activateDocument(void* pObject, DocumentId docID, int w, int h)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	ses->SetDocumentActive(docID, w, h);
+}
+
+void resizeDocument(void* pObject, DocumentId docID, int w, int h)
+{
+	if (w < 1) w = 1;
+	if (h < 1) h = 1;
+	Session* ses = static_cast<Session*>(pObject);
+	ses->ResizeDocument(docID, w, h);
 }
 
 void* documentFactory(void* hwnd)

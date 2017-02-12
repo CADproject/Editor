@@ -36,10 +36,16 @@ private:
 	HWND _hwnd;
 	HGLRC _hrc;
 	HDC _dc;
+	volatile bool _active;
 	Document() { }
 public:
 	Document(void* hwnd);
 	~Document();
+
+	void RenderActivateContext(int w, int h);
+	void RenderDeactivateContext();
+	void RenderResize(int w, int h);
+	void RenderDraw();
 
 	ObjectId attachToBase(Generic* object);
 	Generic* detachFromBase(ObjectId objID);
@@ -59,6 +65,4 @@ public:
 
 	std::vector<unsigned> getLayers(void);
 	COLOR getBackgroundColor(void);
-
-	void toScreen(void);
 };

@@ -115,7 +115,8 @@ void Buffer::toScreen(void)
 		{
 #ifdef TRACE_DEBUG
 			std::cout << "ID: " << curPair.first << ". ";
-#endif			curPair.second->getTopology()->drawing();
+#endif
+			curPair.second->getTopology()->drawing();
 #ifdef TRACE_DEBUG
 			std::cout << "Color: " << curPair.second->getColor();
 			std::cout << ", Thickness: " << curPair.second->getThickness();

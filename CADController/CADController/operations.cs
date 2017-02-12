@@ -131,6 +131,16 @@ namespace CADController
         {
             CoreWrapper.draw(_curSession, docID);
         }
+
+        public void activateDocement(SessionId sessionID, DocumentId docID, int w, int h)
+        {
+            CoreWrapper.activateDocument(_curSession, docID, w, h);
+        }
+
+        public void resizeDocument(SessionId sessionID, DocumentId docID, int w, int h)
+        {
+            CoreWrapper.resizeDocument(_curSession, docID, w, h);
+        }
     }
 
     class OperationController
@@ -414,12 +424,6 @@ namespace CADController
         public static void setBackgroundColor(IntPtr curSes, DocumentId docID, Color newColor)
         {
             CoreWrapper.setBackgroundColor(curSes, docID, newColor);
-        }
-
-        //show the 2d editior field
-        public static void display(IntPtr curSes, DocumentId docID)
-        {
-            CoreWrapper.toScreen(curSes, docID);
         }
 
         //test operation - show and/or remove objects from controller

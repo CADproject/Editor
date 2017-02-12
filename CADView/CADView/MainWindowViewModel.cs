@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using CADController;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -22,13 +21,16 @@ namespace CADView
         public MainWindowViewModel()
         {
             Controller = new ApplicationController();
-            RenderPanel.Loaded+=RenderPanelOnLoaded;
+            RenderPanel.Loaded += RenderPanelOnLoaded;
+            RenderPanel.Resized += RenderPanelOnResize;
         }
 
         ~MainWindowViewModel()
         {
-            foreach (uint d in _documents)
-                Controller.finalDocument(Session, d);
+            foreach (var documentViewModel in DocumentViewModels)
+            {
+                //Controller.finalDocument(Session, ((DocumentViewModel)documentViewModel.DataContext).DocumentID);
+            }
             Controller.finalSession(Session);
         }
 
@@ -51,27 +53,26 @@ namespace CADView
             Session = Controller.initSession();
             _inited = true;
 
-            _timer = new DispatcherTimer();
+            _timer = new DispatcherTimer(DispatcherPriority.Normal, Application.Current.Dispatcher);
             _timer.Interval = new TimeSpan(0, 0, 0, 0, 33);
             _timer.Tick+= delegate
             {
-                Controller.draw(Session, _activeDocument);
+                if(DocumentViewModels.Count == 0) return;
+                Controller.draw(Session, ((DocumentViewModel)DocumentViewModels[SelectedDocumentIndex].DataContext).DocumentID);
             };
             _timer.Start();
         }
 
         public void CreateDocument()
         {
-            //DocumentViewModel doc = new DocumentViewModel();
-            //DocumentViewModels.Add(doc);
-
             DocumentViewModels.Add(new TabItem()
             {
                 Content = new WindowsFormsHost() {Child = new RenderPanel()},
                 DataContext = new DocumentViewModel()
             });
 
-            SelectedDocumentIndex = DocumentViewModels.Count - 1;
+            _selectedDocumentIndex = DocumentViewModels.Count - 1;
+            OnPropertyChanged("SelectedDocumentIndex");
         }
 
         public int SelectedDocumentIndex
@@ -81,6 +82,10 @@ namespace CADView
             {
                 _selectedDocumentIndex = value;
                 OnPropertyChanged("SelectedDocumentIndex");
+
+                var size = ((WindowsFormsHost) DocumentViewModels[SelectedDocumentIndex].Content).Child.Size;
+                Controller.activateDocement(Session,
+                    ((DocumentViewModel) DocumentViewModels[SelectedDocumentIndex].DataContext).DocumentID, size.Width, size.Height);
             }
         }
 
@@ -113,8 +118,6 @@ namespace CADView
 
         private uint _session;
         bool _inited;
-        private uint _activeDocument;
-        readonly List<uint> _documents = new List<uint>();
         private bool _isActive;
         private RelayCommand _documentWorkCommand;
         private RelayCommand _controllerWorkCommand;
@@ -138,12 +141,19 @@ namespace CADView
             CreateDocument();
         }
 
-        private void RenderPanelOnLoaded(IntPtr hwnd)
+        private void RenderPanelOnLoaded(IntPtr hwnd, int w, int h)
         {
-            _activeDocument = Controller.initDocument(Session, hwnd);
-            _documents.Add(_activeDocument);
-            ((DocumentViewModel)DocumentViewModels.Last().DataContext).Title = "Document # " + _activeDocument;
+            var activeDocument = Controller.initDocument(Session, hwnd);
+            Controller.activateDocement(Session, activeDocument, w, h);
+            ((DocumentViewModel)DocumentViewModels.Last().DataContext).Title = "Document # " + activeDocument;
+            ((DocumentViewModel)DocumentViewModels.Last().DataContext).DocumentID = activeDocument;
             IsActive = true;
+        }
+
+        private void RenderPanelOnResize(int w, int h)
+        {
+            Controller.resizeDocument(Session,
+                ((DocumentViewModel) DocumentViewModels[SelectedDocumentIndex].DataContext).DocumentID, w, h);
         }
 
 #if OLDDOTNET
@@ -212,7 +222,9 @@ namespace CADView
 
 #if OLDDOTNET
                 if (start)
-                    Controller.procOperation(Session, _activeDocument, (ApplicationController.operations)obj, data);
+                    Controller.procOperation(Session,
+                        ((DocumentViewModel) DocumentViewModels[SelectedDocumentIndex].DataContext).DocumentID,
+                        (ApplicationController.operations) obj, data);
 #else
                 if (start)
                     await Task.Run(delegate
@@ -244,7 +256,7 @@ namespace CADView
                 return _documentWorkCommand != null
                     ? _documentWorkCommand
                     : (_documentWorkCommand = new RelayCommand(ProcessDocumentWork,
-                        o => (_documents.Count > 0 && IsActive) || _documents.Count == 0));
+                        o => (DocumentViewModels.Count > 0 && IsActive) || DocumentViewModels.Count == 0));
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Security.Cryptography.X509Certificates;
 
 namespace CADView
 {
@@ -14,6 +15,12 @@ namespace CADView
                 _title = value;
                 OnPropertyChanged("Title");
             }
+        }
+
+        public uint DocumentID
+        {
+            get { return _documentId; }
+            set { _documentId = value; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -32,6 +39,7 @@ namespace CADView
         #region Private
 
         private string _title;
+        private uint _documentId;
 
         #endregion
     }

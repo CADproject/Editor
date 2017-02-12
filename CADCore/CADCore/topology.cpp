@@ -54,7 +54,7 @@ void Circle::drawing(void) const
 {
 	float x = _center.getX() - _side.getX(), y = _center.getY() - _side.getY();
 	float r = sqrt(x*x + y*y);
-	DrawCircle(_center.getX(), _center.getY(), r, 24);
+	DrawCircle(_center.getX(), _center.getY(), r, 48);
 
 #ifdef TRACE_DEBUG
 	std::cout << _law.getType();

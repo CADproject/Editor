@@ -53,30 +53,19 @@
         <Grid Grid.Row="1">
             <TabControl Name="DocumentTabs" ItemsSource="{Binding DocumentViewModels, Mode=TwoWay}"
                         SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        
                         >
-                <!--<TabControl.Resources>
-                    <DataTemplate DataType="{x:Type local:DocumentViewModel}">
-                        <Grid>
-                            <WindowsFormsHost>
-                                <local:RenderPanel />
-                            </WindowsFormsHost>
-                        </Grid>
-                    </DataTemplate>
-                </TabControl.Resources>-->
-
-                <!--<TabControl.ItemTemplate>
-                    <DataTemplate>
-                        <HeaderedContentControl Header="{Binding Title}"/>
+                <TabControl.ItemTemplate>
+                    <DataTemplate >
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Header}"/>
+                            <Button Content="X" Cursor="Hand" DockPanel.Dock="Right" Focusable="False"
+            FontFamily="Courier" FontSize="9" FontWeight="Bold"  Margin="0,1,0,0" Padding="0" 
+            VerticalContentAlignment="Bottom" Width="16" Height="16" />
+                        </StackPanel>
                     </DataTemplate>
                 </TabControl.ItemTemplate>
 
-                <TabControl.ContentTemplate>
-                    <DataTemplate>
-                        <WindowsFormsHost>
-                            <local:RenderPanel />
-                        </WindowsFormsHost>
-                    </DataTemplate>
-                </TabControl.ContentTemplate>-->
 
                 <TabControl.ItemContainerStyle>
                     <Style TargetType="TabItem">
