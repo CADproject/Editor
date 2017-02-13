@@ -33,9 +33,19 @@ private:
 	Buffer _buffer;			//the objects that appear on the screen
 	Base _base;				//user data
 	Settings _settings;		//document settings
-
+	HWND _hwnd;
+	HGLRC _hrc;
+	HDC _dc;
+	volatile bool _active;
+	Document() { }
 public:
-	Document() { _base.attachObserver(&_buffer); }
+	Document(void* hwnd);
+	~Document();
+
+	void RenderActivateContext(int w, int h);
+	void RenderDeactivateContext();
+	void RenderResize(int w, int h);
+	void RenderDraw();
 
 	ObjectId attachToBase(Generic* object);
 	Generic* detachFromBase(ObjectId objID);
@@ -55,6 +65,4 @@ public:
 
 	std::vector<unsigned> getLayers(void);
 	COLOR getBackgroundColor(void);
-
-	void toScreen(void);
 };

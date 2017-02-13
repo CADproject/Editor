@@ -15,3 +15,6 @@
 #include "definitions.h"
 #include "geometry.h"
 #include "topology.h"
+
+#include "Additional Libraries/GL Files/include/GL/glut.h"
+#include "windows.h"

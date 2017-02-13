@@ -51,9 +51,9 @@ namespace CADController
             return sessionID;
         }
 
-        public DocumentId initDocument(SessionId sessionID)  //used when creating new document
+        public uint initDocument(uint sessionID, IntPtr hwnd)  //used when creating new document
         {
-            IntPtr pDoc = CoreWrapper.documentFactory();
+            IntPtr pDoc = CoreWrapper.documentFactory(hwnd);
             DocumentId docID = CoreWrapper.attachDocument(_curSession, pDoc);
             return docID;
         }
@@ -116,14 +116,30 @@ namespace CADController
             curOperation.operationProcess(_curSession, docID, data);
         }
 
-        public void finalDocument(SessionId sessionID, DocumentId docID)    //closing the document
+        public void finalDocument(SessionId sessionID, DocumentId docID) //closing the document
         {
-            CoreWrapper.detachDocument(_curSession, docID);
+            IntPtr document = CoreWrapper.detachDocument(_curSession, docID);
+            CoreWrapper.destroyDocument(document);
         }
 
         public void finalSession(SessionId sessionID)   //closing the application
         {
             //nothing yet
+        }
+
+        public void draw(SessionId sessionID, DocumentId docID)
+        {
+            CoreWrapper.draw(_curSession, docID);
+        }
+
+        public void activateDocement(SessionId sessionID, DocumentId docID, int w, int h)
+        {
+            CoreWrapper.activateDocument(_curSession, docID, w, h);
+        }
+
+        public void resizeDocument(SessionId sessionID, DocumentId docID, int w, int h)
+        {
+            CoreWrapper.resizeDocument(_curSession, docID, w, h);
         }
     }
 
@@ -408,12 +424,6 @@ namespace CADController
         public static void setBackgroundColor(IntPtr curSes, DocumentId docID, Color newColor)
         {
             CoreWrapper.setBackgroundColor(curSes, docID, newColor);
-        }
-
-        //show the 2d editior field
-        public static void display(IntPtr curSes, DocumentId docID)
-        {
-            CoreWrapper.toScreen(curSes, docID);
         }
 
         //test operation - show and/or remove objects from controller

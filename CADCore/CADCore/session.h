@@ -11,13 +11,13 @@ class Session
 private:
 	static unsigned _counter;			//documents counter
 	std::map<DocumentId, Document*> _session;	//all open documents
-
+	DocumentId _activeDocument;
 public:
-	Session() {}
+	Session() { _activeDocument = 0; }
 	~Session() {}
 
 	DocumentId attachDocument(Document* doc);
-	void detachDocument(DocumentId docID);
+	void* detachDocument(DocumentId docID);
 	
 	ObjectId attachToBase(DocumentId docID, Generic* object);
 	Generic* detachFromBase(DocumentId docID, ObjectId objID);
@@ -36,6 +36,8 @@ public:
 	void setBackgroundColor(DocumentId docID, COLOR color);
 	void toScreen(DocumentId docID);
 
+	void SetDocumentActive(DocumentId docID, int w, int h);
+	void ResizeDocument(DocumentId docID, int w, int h);
 private:
 	Document* getDocument(DocumentId docID);
 	Generic* getGeneric(DocumentId docID, ObjectId objID);
