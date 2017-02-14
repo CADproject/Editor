@@ -4,6 +4,7 @@ using System.ComponentModel;
 using CADController;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -284,7 +285,8 @@ namespace CADView
                 if (start)
                     await Task.Run(delegate
                     {
-                        Controller.procOperation(Session, _activeDocument, (ApplicationController.operations)obj, data);
+                        Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
+                            (ApplicationController.operations) obj, data);
                     });
 #endif
             }
