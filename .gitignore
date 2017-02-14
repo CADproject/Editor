@@ -6,7 +6,7 @@ obj/
 Bin Editor/
 *.suo
 *.sdf
-*.sln
+#*.sln
 *.vcxproj.filters
 *.vcxproj.user
 *.csproj.user
