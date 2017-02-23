@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using CADController;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
+using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using System.Windows.Threading;
 using CADView.Dialogs;
+using Application = System.Windows.Application;
+using HorizontalAlignment = System.Windows.HorizontalAlignment;
+using MessageBox = System.Windows.MessageBox;
 #if !OLDDOTNET
 using System.Threading.Tasks;
 #endif
@@ -24,15 +26,17 @@ namespace CADView
         public MainWindowViewModel()
         {
             Controller = new ApplicationController();
-            RenderPanel.Loaded += RenderPanelOnLoaded;
+            RenderPanel.Loaded += RenderPanelOnLoad;
             RenderPanel.Resized += RenderPanelOnResize;
+            RenderPanel.Rendered += RenderPanelOnRender;
+            RenderPanel.MouseFired += RenderPanelOnMouseFire;
         }
 
         ~MainWindowViewModel()
         {
             foreach (var documentViewModel in DocumentViewModels)
             {
-                //Controller.finalDocument(Session, ((DocumentViewModel)documentViewModel.DataContext).DocumentID);
+                Controller.finalDocument(Session, documentViewModel.DocumentID);
             }
             Controller.finalSession(Session);
         }
@@ -60,7 +64,9 @@ namespace CADView
             _timer.Interval = new TimeSpan(0, 0, 0, 0, 33);
             _timer.Tick+= delegate
             {
-                if(DocumentViewModels.Count == 0) return;
+                if (DocumentViewModels.Count == 0) return;
+                //((WindowsFormsHost) DocumentViewModelsTabs[SelectedDocumentIndex].Content).InvalidateVisual();
+                //((WindowsFormsHost)DocumentViewModelsTabs[SelectedDocumentIndex].Content).Child.Refresh();
                 Controller.draw(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID);
             };
             _timer.Start();
@@ -72,30 +78,13 @@ namespace CADView
             {
                 Child = new RenderPanel(),
                 VerticalAlignment = VerticalAlignment.Stretch,
-                HorizontalAlignment = HorizontalAlignment.Stretch
+                HorizontalAlignment = HorizontalAlignment.Stretch,
             };
-            Grid grid = new Grid();
-            grid.Children.Add(host);
-            Binding binding = new Binding()
-            {
-                Source = this,
-                Path = new PropertyPath("WindowWidth"),
-                Mode = BindingMode.OneWayToSource,
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            };
-            var r = BindingOperations.SetBinding(grid, FrameworkElement.WidthProperty, binding);
-            binding = new Binding()
-            {
-                Source = this,
-                Path = new PropertyPath("WindowHeight"),
-                Mode = BindingMode.OneWayToSource,
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            };
-            BindingOperations.SetBinding(grid, FrameworkElement.HeightProperty, binding);
+
             var model = new DocumentViewModel();
             DocumentViewModelsTabs.Add(new TabItem()
             {
-                Content = grid,
+                Content = host,
                 DataContext = model
             });
             DocumentViewModels.Add(model);
@@ -111,9 +100,11 @@ namespace CADView
                 _selectedDocumentIndex = value;
                 OnPropertyChanged("SelectedDocumentIndex");
 
-                var size =
-                    ((WindowsFormsHost) ((Grid) DocumentViewModelsTabs[SelectedDocumentIndex].Content).Children[0])
-                        .Child.Size;
+                //var size =
+                //    ((WindowsFormsHost) ((Grid) DocumentViewModelsTabs[SelectedDocumentIndex].Content).Children[0])
+                //        .Child.Size;
+                var size = ((WindowsFormsHost) DocumentViewModelsTabs[SelectedDocumentIndex].Content)
+                    .Child.Size;
                 Controller.activateDocement(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, size.Width,
                     size.Height);
             }
@@ -199,8 +190,19 @@ namespace CADView
             CreateDocument();
         }
 
-        private void RenderPanelOnLoaded(IntPtr hwnd, int w, int h)
+        private void RenderPanelOnLoad(IntPtr hwnd, int w, int h)
         {
+            /*HwndSource.FromHwnd(hwnd).AddHook(
+                delegate(IntPtr ptr, int msg, IntPtr param, IntPtr lParam, ref bool handled)
+                {
+                    switch (msg)
+                    {
+                        case 0x0014:
+                            return (IntPtr) 1;
+                    }
+                    return IntPtr.Zero;
+                });*/
+
             var activeDocument = Controller.initDocument(Session, hwnd);
             Controller.activateDocement(Session, activeDocument, w, h);
             DocumentViewModels[SelectedDocumentIndex].Title = "Document # " + activeDocument;
@@ -211,6 +213,18 @@ namespace CADView
         private void RenderPanelOnResize(int w, int h)
         {
             Controller.resizeDocument(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, w, h);
+        }
+
+        private void RenderPanelOnRender()
+        {
+            if (DocumentViewModels.Count == 0) return;
+            Controller.draw(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID);
+        }
+
+        private void RenderPanelOnMouseFire(MouseEventArgs args)
+        {
+            //TODO: передавать инты и внутри пытаться аккуратно преобразовать.
+            Controller.eventHendling(DocumentViewModels[SelectedDocumentIndex].DocumentID, (ApplicationController.MouseButtons) (int) args.Button, args.X, args.Y, args.Delta);
         }
 
 #if OLDDOTNET

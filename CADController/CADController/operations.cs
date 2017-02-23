@@ -12,7 +12,36 @@ namespace CADController
 
     public class ApplicationController
     {
-        public enum mouseEvents : byte { leftButton, rightButton, move };
+        //
+        // Сводка:
+        //     Specifies constants that define which mouse button was pressed.
+        public enum MouseButtons
+        {
+            //
+            // Сводка:
+            //     No mouse button was pressed.
+            None = 0,
+            //
+            // Сводка:
+            //     The left mouse button was pressed.
+            Left = 1048576,
+            //
+            // Сводка:
+            //     The right mouse button was pressed.
+            Right = 2097152,
+            //
+            // Сводка:
+            //     The middle mouse button was pressed.
+            Middle = 4194304,
+            //
+            // Сводка:
+            //     The first XButton was pressed.
+            XButton1 = 8388608,
+            //
+            // Сводка:
+            //     The second XButton was pressed.
+            XButton2 = 16777216
+        }
 
         public enum operations : byte { OpPointCreate,
                                         OpLineCreate,
@@ -58,25 +87,27 @@ namespace CADController
             return docID;
         }
 
-        public void eventHendling(mouseEvents action, double coordX = 0, double coordY = 0)
+        public void eventHendling(uint docId, MouseButtons action, double coordX = 0, double coordY = 0, double delta = 0)
         {
+            _currentMouseCoordX = coordX;
+            _currentMouseCoordY = coordY;
             switch (action)
             {
-                case mouseEvents.leftButton:
+                case MouseButtons.Left:
                     _leftButton = true;
                     _rightButton = false;
                     break;
-                case mouseEvents.rightButton:
+                case MouseButtons.Right:
                     _rightButton = true;
                     _leftButton = false;
                     break;
-                case mouseEvents.move:
-                    _currentMouseCoordX = coordX;
-                    _currentMouseCoordY = coordY;
-                    break;
                 default:
-                    Debug.Assert(false , "unknown event");
+                    //Debug.Assert(false , "unknown event");
                     break;
+            }
+            if (delta != 0)
+            {
+                CoreWrapper.wheel(_curSession, docId, (int)delta);
             }
         }
 

@@ -39,6 +39,8 @@ private:
 	volatile bool _active;
 	Document() { }
 public:
+	double _height;
+
 	Document(void* hwnd);
 	~Document();
 

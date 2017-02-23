@@ -41,4 +41,6 @@ public:
 private:
 	Document* getDocument(DocumentId docID);
 	Generic* getGeneric(DocumentId docID, ObjectId objID);
+public:
+	void wheel(DocumentId docID, int val);
 };

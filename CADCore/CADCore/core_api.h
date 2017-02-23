@@ -21,6 +21,7 @@ extern "C" COREDLL_API void commit(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void undo(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void redo(void* pObject, DocumentId docID);
 
+extern "C" COREDLL_API void wheel(void* pObject, DocumentId docID, int val);
 extern "C" COREDLL_API void draw(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void activateDocument(void* pObject, DocumentId docID, int w, int h);
 extern "C" COREDLL_API void resizeDocument(void* pObject, DocumentId docID, int w, int h);

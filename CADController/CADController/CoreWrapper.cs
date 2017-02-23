@@ -63,6 +63,9 @@ namespace CADController
         public static extern void draw(IntPtr pObject, DocumentId docID);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void wheel(IntPtr pObject, DocumentId docID, int val);
+
+        [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void activateDocument(IntPtr pObject, DocumentId docID, int w, int h);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]

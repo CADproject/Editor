@@ -55,6 +55,12 @@ Generic* Session::getGeneric(DocumentId docID, ObjectId objID)
 	return getDocument(docID)->getGeneric(objID);
 }
 
+void Session::wheel(DocumentId docID, int val)
+{
+	//throw std::logic_error("The method or operation is not implemented.");
+	getDocument(docID)->_height += val;
+}
+
 Topology* Session::getGenTopology(DocumentId docID, ObjectId objID)
 {
 	return getDocument(docID)->getGeneric(objID)->getTopology();

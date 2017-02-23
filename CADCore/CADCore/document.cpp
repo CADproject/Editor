@@ -32,6 +32,8 @@ Document::Document(void* hwnd)
 
 	int pfc = ChoosePixelFormat(_dc, &pfd);
 	SetPixelFormat(_dc, pfc, &pfd);
+
+	_height = 480;
 }
 
 Document::~Document()
@@ -110,10 +112,12 @@ void Document::RenderDraw()
 	if (!_active) return;
 
 	glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.2f, 0.2f, 0.0f, 0.0f);
 
 	glLoadIdentity();
-	gluLookAt(0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+	gluLookAt(0.0, 0.0, pow(2.71828182845904523536, _height/360.0), 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
 
 	glColor3f(1, 1, 1);
 
@@ -129,8 +133,13 @@ void Document::RenderResize(int w, int h)
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0f, aspectratio, 0.0001f, 500.0f);
+
+	const double pi180 = 3.14 / 180.0;
+	auto fov1 = atan(tan(pi180 * 45 / 2.0) * h / 400.0) * 2.0 / pi180;
+
+	gluPerspective(fov1, aspectratio, 0.0001f, 500.0f);
 	glMatrixMode(GL_MODELVIEW);
+	
 	glLoadIdentity();
 }
 

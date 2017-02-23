@@ -93,6 +93,12 @@ void draw(void* pObject, DocumentId docID)
 	ses->toScreen(docID);
 }
 
+void wheel(void* pObject, DocumentId docID, int val)
+{
+	Session* ses = static_cast<Session*>(pObject);
+	ses->wheel(docID, val);
+}
+
 void activateDocument(void* pObject, DocumentId docID, int w, int h)
 {
 	Session* ses = static_cast<Session*>(pObject);
