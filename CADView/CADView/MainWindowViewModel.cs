@@ -267,7 +267,7 @@ namespace CADView
                     dialog.Title = "Create Contour";
                     break;
                 case ApplicationController.operations.OpSetBackgroundColor:
-                    dialog = new ElementIdInputDialog();
+                    dialog = new Dialogs.ColorDialog();
                     dialog.Title = "Set color number";
                     break;
                 case ApplicationController.operations.OpSetLayersToShow:

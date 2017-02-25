@@ -2,8 +2,6 @@
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Input;
-using CADController;
 using Application = System.Windows.Application;
 
 namespace CADView
