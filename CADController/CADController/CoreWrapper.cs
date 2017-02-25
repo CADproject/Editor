@@ -8,7 +8,14 @@ namespace CADController
     using OperationId = System.UInt32;
     using ObjectId = System.UInt32;
 
-    enum Color { black, red, green, blue, yellow };
+    public enum Color
+    {
+        black = 0,
+        red,
+        green,
+        blue,
+        yellow
+    };
     enum Thickness { one, two, three, four, five };
     enum dataType { unsigned, intptr };
 
