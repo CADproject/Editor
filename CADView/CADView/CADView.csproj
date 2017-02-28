@@ -64,7 +64,10 @@
     <Compile Include="Dialogs\ColorDialog.xaml.cs">
       <DependentUpon>ColorDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\DataDialog.cs" />
+    <Compile Include="Dialogs\DialogInterfaces.cs" />
+    <Compile Include="Dialogs\LayersDialog.xaml.cs">
+      <DependentUpon>LayersDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\OnePointDialog.xaml.cs">
       <DependentUpon>OnePointDialog.xaml</DependentUpon>
     </Compile>
@@ -83,6 +86,10 @@
       <DependentUpon>RenderPanel.cs</DependentUpon>
     </Compile>
     <Page Include="Dialogs\ColorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\LayersDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
