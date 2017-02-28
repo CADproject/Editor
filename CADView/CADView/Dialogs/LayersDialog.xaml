@@ -1,0 +1,25 @@
+﻿<Window x:Class="CADView.Dialogs.LayersDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CADView.Dialogs"
+        mc:Ignorable="d"
+        Title="LayersDialog" Height="300" Width="300"
+        d:DataContext="{d:DesignInstance local:LayersDialogViewModel}"
+        >
+    <Grid>
+        <DockPanel Margin="10,10,10,40">
+            <ListBox x:Name="LayersList" SelectionMode="Extended" ItemsSource="{Binding Layers}" 
+                     VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="100" Height="auto"></ListBox>
+            <StackPanel Margin="10,0,0,0" Orientation="Vertical">
+                <Button Command="{Binding AddLayer}" Content="Add layer" Margin="0,0,0,10"></Button>
+                <Button Command="{Binding SelectLayer}" Content="Set selected layer active" Margin="0,0,0,10"></Button>
+            </StackPanel>
+        </DockPanel>
+        <DockPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
+            <Button Visibility="Collapsed" Width="75" Content="Ok" Margin="10" Click="OkButtonClick"></Button>
+            <Button Width="75" Content="Close" Margin="10" Click="CancelButtonClick"></Button>
+        </DockPanel>
+    </Grid>
+</Window>
