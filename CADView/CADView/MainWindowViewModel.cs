@@ -192,17 +192,6 @@ namespace CADView
 
         private void RenderPanelOnLoad(IntPtr hwnd, int w, int h)
         {
-            /*HwndSource.FromHwnd(hwnd).AddHook(
-                delegate(IntPtr ptr, int msg, IntPtr param, IntPtr lParam, ref bool handled)
-                {
-                    switch (msg)
-                    {
-                        case 0x0014:
-                            return (IntPtr) 1;
-                    }
-                    return IntPtr.Zero;
-                });*/
-
             var activeDocument = Controller.initDocument(Session, hwnd);
             Controller.activateDocement(Session, activeDocument, w, h);
             DocumentViewModels[SelectedDocumentIndex].Title = "Document # " + activeDocument;
@@ -238,76 +227,97 @@ namespace CADView
 
             object [] data= new object[0];
 
-            Window dialog = null;
+            Window modalWindow = null;
+            Window separatedWindow = null;
 
             switch (type)
             {
                 case ApplicationController.operations.OpPointCreate:
-                    dialog = new OnePointDialog();
-                    dialog.Title = "Create Point";
+                    modalWindow = new OnePointDialog();
+                    modalWindow.Title = "Create Point";
                     break;
                 case ApplicationController.operations.OpLineCreate:
-                    dialog = new TwoPointDialog();
-                    dialog.Title = "Create Line";
+                    modalWindow = new TwoPointDialog();
+                    modalWindow.Title = "Create Line";
                     break;
                 case ApplicationController.operations.OpCircleCreate:
-                    dialog = new TwoPointDialog();
-                    dialog.Title = "Create Circle";
+                    modalWindow = new TwoPointDialog();
+                    modalWindow.Title = "Create Circle";
                     break;
                 case ApplicationController.operations.OpContourCreate:
-                    dialog = new ElementIdInputDialog();
-                    dialog.Title = "Create Contour";
+                    modalWindow = new ElementIdInputDialog();
+                    modalWindow.Title = "Create Contour";
                     break;
                 case ApplicationController.operations.OpDeleteObject:
-                    dialog = new ElementIdInputDialog();
-                    dialog.Title = "Create Contour";
+                    modalWindow = new ElementIdInputDialog();
+                    modalWindow.Title = "Create Contour";
                     break;
                 case ApplicationController.operations.OpDestroyContour:
-                    dialog = new ElementIdInputDialog();
-                    dialog.Title = "Create Contour";
+                    modalWindow = new ElementIdInputDialog();
+                    modalWindow.Title = "Create Contour";
                     break;
                 case ApplicationController.operations.OpSetBackgroundColor:
-                    dialog = new Dialogs.ColorDialog();
-                    dialog.Title = "Set color number";
+                    separatedWindow = Dialogs.ColorDialog.Instance;
+                    separatedWindow.Title = "Set color number";
                     break;
                 case ApplicationController.operations.OpSetLayersToShow:
-                    dialog = new ElementIdInputDialog();
-                    dialog.Title = "Set layer number";
+                    separatedWindow = LayersDialog.Instance;
+                    separatedWindow.Title = "Set layer number";
                     break;
             }
-
+            
             try
             {
-                bool start = true;
-
-                if (dialog != null)
+                if (modalWindow != null)
                 {
-                    if (dialog.ShowDialog() == true)
+                    bool start = true;
+                    if (modalWindow.ShowDialog() == true)
                     {
-                        if (dialog is IDataDialog)
-                            data = ((IDataDialog) dialog).Data.ToArray();
+                        if (modalWindow is IDataDialog)
+                            data = ((IDataDialog) modalWindow).Data.ToArray();
                     }
                     else
                         start = false;
-                }
 
 #if OLDDOTNET
                 if (start)
                     Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
                         (ApplicationController.operations) obj, data);
 #else
-                if (start)
-                    await Task.Run(delegate
-                    {
-                        Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                            (ApplicationController.operations) obj, data);
-                    });
+                    if (start)
+                        await Task.Run(delegate
+                        {
+                            Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
+                                (ApplicationController.operations)obj, data);
+                        });
 #endif
+                }
+                if (separatedWindow != null)
+                {
+                    separatedWindow.Show();
+                    separatedWindow.Activate();
+                    if (separatedWindow is ICallbackDialog)
+                        ((ICallbackDialog) separatedWindow).DataChanged += async delegate(object sender, EventArgs args)
+                        {
+                            List<object> cdata = (List<object>) sender;
+#if OLDDOTNET
+                            if (start)
+                                Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
+                                    (ApplicationController.operations) obj, data);
+#else
+                            await Task.Run(delegate
+                            {
+                                Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
+                                    (ApplicationController.operations) obj, cdata.ToArray());
+                            });
+#endif
+                        };
+                }
             }
             catch (Exception e)
             {
-                if (dialog != null && dialog.IsVisible)
-                    dialog.Close();
+                if (modalWindow != null && modalWindow.IsVisible)
+                    modalWindow.Close();
                 MessageBox.Show("Exception: " + e.Message);
             }
             finally
