@@ -1,5 +1,23 @@
 #include "document.h"
 
+static bool staticInitComplete = false;
+static std::map<COLOR, float*> colors;
+
+Settings::Settings() : _backgroundColor(BLACK), _defaultEdgeColor(WHITE),
+_defaultEdgeThickness(THREE), _showID(false)
+{
+	if (!staticInitComplete)
+	{
+		staticInitComplete = true;
+		colors[BLACK]	= new float[4]{ 0,0,0,0 };
+		colors[RED]		= new float[4]{ 1,0,0,1 };
+		colors[GREEN]	= new float[4]{ 0,1,0,1 };
+		colors[BLUE]	= new float[4]{ 0,0,1,1 };
+		colors[YELLOW]	= new float[4]{ 1,1,0,1 };
+		colors[WHITE]	= new float[4]{ 1,1,1,1 };
+	}
+}
+
 Document::Document(void* hwnd)
 {
 	_base.attachObserver(&_buffer);
@@ -112,7 +130,9 @@ void Document::RenderDraw()
 	if (!_active) return;
 
 	glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(0.2f, 0.2f, 0.0f, 0.0f);
+
+	auto color = colors[getBackgroundColor()];
+	glClearColor(color[0], color[1], color[2], color[3]);
 
 	glLoadIdentity();
 

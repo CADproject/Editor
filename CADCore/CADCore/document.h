@@ -13,8 +13,7 @@ private:
 	bool _showID;						//show or not edges ids
 
 public:
-	Settings(): _backgroundColor(BLUE), _defaultEdgeColor(BLACK),
-		_defaultEdgeThickness(THREE), _showID(false) {}
+	Settings();
 
 	bool getShowID(void) { return _showID; }
 	COLOR getBackgroundColor(void) { return _backgroundColor; }

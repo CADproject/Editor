@@ -3,7 +3,7 @@
 typedef unsigned DocumentId;
 typedef unsigned ObjectId;
 
-enum COLOR {BLACK, RED, GREEN, BLUE, YELLOW};
+enum COLOR {BLACK, RED, GREEN, BLUE, YELLOW, WHITE};
 enum THICKNESS {ONE, TWO, THREE, FOUR, FIVE};
 
 const ObjectId NOT_FROM_BASE = 0;
