@@ -9,17 +9,17 @@ namespace CADView
         {
             InitializeComponent();
 
-            this.HandleCreated += (sender, args) => { if (Loaded != null) Loaded?.Invoke(this.Handle, this.Width, this.Height); };
-            this.SizeChanged += (sender, args) => { if (Resized != null) Resized(this.Width, this.Height); };
-            this.Paint += (sender, args) => { if (Rendered != null) Rendered(); };
-            this.MouseWheel += (sender, args) => { if (MouseFired != null) MouseFired(args); };
-            this.MouseClick += (sender, args) => { if (MouseFired != null) MouseFired(args); };
-            this.MouseDown += (sender, args) => { if (MouseFired != null) MouseFired(args); };
-            this.MouseUp += (sender, args) => { if (MouseFired != null) MouseFired(args); };
-            this.MouseDoubleClick += (sender, args) => { if (MouseFired != null) MouseFired(args); };
-            this.MouseMove += (sender, args) => { if (MouseFired != null) MouseFired(args); };
+            HandleCreated += (sender, args) => { if (Loaded != null) Loaded?.Invoke(Handle, Width, Height); };
+            SizeChanged += (sender, args) => { if (Resized != null) Resized(Width, Height); };
+            Paint += (sender, args) => { if (Rendered != null) Rendered(); };
+            MouseWheel += (sender, args) => { if (MouseFired != null) MouseFired(args); };
+            MouseClick += (sender, args) => { if (MouseFired != null) MouseFired(args); };
+            MouseDown += (sender, args) => { if (MouseFired != null) MouseFired(args); };
+            MouseUp += (sender, args) => { if (MouseFired != null) MouseFired(args); };
+            MouseDoubleClick += (sender, args) => { if (MouseFired != null) MouseFired(args); };
+            MouseMove += (sender, args) => { if (MouseFired != null) MouseFired(args); };
 
-            this.DoubleBuffered = true;
+            DoubleBuffered = true;
         }
 
         public delegate void LoadedEventDelegate(IntPtr hwnd, int w, int h);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using CADController;
@@ -9,40 +10,51 @@ namespace CADView.Dialogs
     /// <summary>
     /// Логика взаимодействия для ColorDialog.xaml
     /// </summary>
-    public partial class ColorDialog : Window, IDataDialog
+    public partial class ColorDialog : ICallbackDialog
     {
-        private List<object> _data;
+        private static ColorDialog _instance;
 
-        public ColorDialog()
+        private ColorDialog()
         {
             InitializeComponent();
         }
 
-        public List<object> Data
-        {
-            get { return _data; }
-            set { _data = value; }
-        }
+        private bool _busy;
 
         private void OkButtonClick(object sender, RoutedEventArgs e)
         {
-            Data = new List<object>();
-
+            if(_busy) return;
             if (((Button) sender).Tag is Color)
             {
-                Data.Add(((Button) sender).Tag);
-                this.DialogResult = true;
+                _busy = true;
+                DataChanged?.Invoke(new List<object>() {((Button) sender).Tag}, EventArgs.Empty);
             }
         }
 
         private void CancelButtonClick(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            Visibility = Visibility.Hidden;
         }
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
             OkButtonClick(sender, e);
         }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            e.Cancel = true;
+            base.OnClosing(e);
+            CancelButtonClick(this, null);
+        }
+
+        public event EventHandler DataChanged;
+
+        public void DataProcessComplete()
+        {
+            _busy = false;
+        }
+
+        public static ColorDialog Instance => _instance ?? (_instance = new ColorDialog());
     }
 }

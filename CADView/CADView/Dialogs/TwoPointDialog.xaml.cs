@@ -28,12 +28,12 @@ namespace CADView.Dialogs
             Data.Add(double.Parse(X2.Text));
             Data.Add(double.Parse(Y2.Text));
 
-            this.DialogResult = true;
+            DialogResult = true;
         }
 
         private void CancelButtonClick(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            DialogResult = false;
         }
     }
 }
