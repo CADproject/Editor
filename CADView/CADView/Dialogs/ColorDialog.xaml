@@ -17,7 +17,7 @@
         </StackPanel>
         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
             <Button Visibility="Collapsed" Width="75" Content="Ok" Margin="10" Click="OkButtonClick"></Button>
-            <Button Width="75" Content="Cancel" Margin="10" Click="CancelButtonClick"></Button>
+            <Button Width="75" Content="Close" Margin="10" Click="CancelButtonClick"></Button>
         </DockPanel>
     </Grid>
 </Window>
