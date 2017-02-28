@@ -51,7 +51,7 @@ namespace CADView
             set
             {
                 _isActive = value;
-                OnPropertyChanged("IsActive");
+                OnPropertyChanged();
             }
         }
 
@@ -98,7 +98,7 @@ namespace CADView
             set
             {
                 _selectedDocumentIndex = value;
-                OnPropertyChanged("SelectedDocumentIndex");
+                OnPropertyChanged();
 
                 //var size =
                 //    ((WindowsFormsHost) ((Grid) DocumentViewModelsTabs[SelectedDocumentIndex].Content).Children[0])
@@ -117,6 +117,7 @@ namespace CADView
             {
                 _documentViewModelsTabs = value; 
                 OnPropertyChanged("DocumentViewModels");
+                OnPropertyChanged();
             }
         }
 
@@ -131,7 +132,7 @@ namespace CADView
             set
             {
                 _windowWidth = value;
-                OnPropertyChanged("WindowWidth");
+                OnPropertyChanged();
             }
         }
 
@@ -141,7 +142,7 @@ namespace CADView
             set
             {
                 _windowHeight = value;
-                OnPropertyChanged("WindowHeight");
+                OnPropertyChanged();
             }
         }
 
@@ -299,18 +300,34 @@ namespace CADView
                     if (separatedWindow is ICallbackDialog)
                         ((ICallbackDialog) separatedWindow).DataChanged += async delegate(object sender, EventArgs args)
                         {
-                            List<object> cdata = (List<object>) sender;
-#if OLDDOTNET
-                            if (start)
-                                Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                                    (ApplicationController.operations) obj, data);
-#else
-                            await Task.Run(delegate
+                            try
                             {
-                                Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                                    (ApplicationController.operations) obj, cdata.ToArray());
-                            });
+                                List<object> cdata = (List<object>) sender;
+#if OLDDOTNET
+                                if (start)
+                                    Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
+                                        (ApplicationController.operations) obj, data);
+#else
+                                await Task.Run(delegate
+                                {
+                                    IsActive = false;
+                                    Controller.procOperation(Session,
+                                        DocumentViewModels[SelectedDocumentIndex].DocumentID,
+                                        (ApplicationController.operations) obj, cdata.ToArray());
+                                });
 #endif
+                            }
+                            catch (Exception e)
+                            {
+                                if (modalWindow != null && modalWindow.IsVisible)
+                                    modalWindow.Close();
+                                MessageBox.Show("Exception: " + e.Message);
+                            }
+                            finally
+                            {
+                                ((ICallbackDialog)separatedWindow).DataProcessComplete();
+                                IsActive = true;
+                            }
                         };
                 }
             }

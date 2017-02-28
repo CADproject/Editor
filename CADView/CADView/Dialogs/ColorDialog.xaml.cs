@@ -10,7 +10,7 @@ namespace CADView.Dialogs
     /// <summary>
     /// Логика взаимодействия для ColorDialog.xaml
     /// </summary>
-    public partial class ColorDialog : Window, ICallbackDialog
+    public partial class ColorDialog : ICallbackDialog
     {
         private static ColorDialog _instance;
 
@@ -19,10 +19,14 @@ namespace CADView.Dialogs
             InitializeComponent();
         }
 
+        private bool _busy;
+
         private void OkButtonClick(object sender, RoutedEventArgs e)
         {
+            if(_busy) return;
             if (((Button) sender).Tag is Color)
             {
+                _busy = true;
                 DataChanged?.Invoke(new List<object>() {((Button) sender).Tag}, EventArgs.Empty);
             }
         }
@@ -45,6 +49,11 @@ namespace CADView.Dialogs
         }
 
         public event EventHandler DataChanged;
+
+        public void DataProcessComplete()
+        {
+            _busy = false;
+        }
 
         public static ColorDialog Instance => _instance ?? (_instance = new ColorDialog());
     }

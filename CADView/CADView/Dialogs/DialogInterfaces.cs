@@ -11,5 +11,6 @@ namespace CADView.Dialogs
     internal interface ICallbackDialog
     {
         event EventHandler DataChanged;
+        void DataProcessComplete();
     }
 }
