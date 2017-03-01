@@ -1,5 +1,6 @@
 ﻿/*This file contains controller sketch.*/
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
@@ -43,36 +44,45 @@ namespace CADController
             XButton2 = 16777216
         }
 
-        public enum operations : byte { OpPointCreate,
-                                        OpLineCreate,
-                                        OpCircleCreate,
-                                        OpContourCreate,
-                                        OpDestroyContour,
-                                        OpDeleteObject,
-                                        OpUndo,
-                                        OpRedo,
-                                        OpSetLayersToShow,
-                                        OpSetBackgroundColor };
+        public enum Operations : byte
+        {
+            OpPointCreate = 0,
+            OpLineCreate,
+            OpCircleCreate,
+            OpContourCreate,
+            OpDestroyContour,
+            OpDeleteObject,
+            OpUndo,
+            OpRedo,
+            OpSetLayersToShow,
+            OpSetBackgroundColor
+        };
 
-        private bool _leftButton;        //for active document
-        private bool _rightButton;       //for active document
+        #region Private
 
-        private double _currentMouseCoordX;  //for active document
-        private double _currentMouseCoordY;  //for active document
+        private bool _leftButton; //for active document
+        private bool _rightButton; //for active document
+        private double _currentMouseCoordX; //for active document
+        private double _currentMouseCoordY; //for active document
+        private IntPtr _curSession = IntPtr.Zero; //temporary mock for View
+        private uint _activeLayer;
 
-        private IntPtr _curSession;  //temporary mock for View
+        #endregion
 
         public ApplicationController()
         {
-            _leftButton = false;
-            _rightButton = false;
-
-            _currentMouseCoordX = 0.0;
-            _currentMouseCoordY = 0.0;
-
-            _curSession = IntPtr.Zero;
         }
-        
+
+        #region Public properties
+
+        public uint ActiveLayer
+        {
+            get { return _activeLayer; }
+            set { _activeLayer = value; }
+        }
+
+        #endregion
+
         public SessionId initSession()   //used when application running
         {
             _curSession = CoreWrapper.sessionFactory();
@@ -111,37 +121,51 @@ namespace CADController
             }
         }
 
-        private OperationController startOperation(operations opID)
+        private OperationController startOperation(Operations opID)
         {
+            OperationController operation = null;
             switch (opID)
             {
-                case operations.OpPointCreate:
-                    return new OpPointCreate();
-                case operations.OpLineCreate:
-                    return new OpLineCreate();
-                case operations.OpCircleCreate:
-                    return new OpCircleCreate();
-                case operations.OpContourCreate:
-                    return new OpContourCreate();
-                case operations.OpDestroyContour:
-                    return new OpDestroyContour();
-                case operations.OpDeleteObject:
-                    return new OpDeleteObject();
-                case operations.OpUndo:
-                    return new OpUndo();
-                case operations.OpRedo:
-                    return new OpRedo();
-                case operations.OpSetLayersToShow:
-                    return new OpSetLayersToShow();
-                case operations.OpSetBackgroundColor:
-                    return new OpSetBackgroundColor();
+                case Operations.OpPointCreate:
+                    operation = new OpPointCreate();
+                    break;
+                case Operations.OpLineCreate:
+                    operation = new OpLineCreate();
+                    break;
+                case Operations.OpCircleCreate:
+                    operation = new OpCircleCreate();
+                    break;
+                case Operations.OpContourCreate:
+                    operation = new OpContourCreate();
+                    break;
+                case Operations.OpDestroyContour:
+                    operation = new OpDestroyContour();
+                    break;
+                case Operations.OpDeleteObject:
+                    operation = new OpDeleteObject();
+                    break;
+                case Operations.OpUndo:
+                    operation = new OpUndo();
+                    break;
+                case Operations.OpRedo:
+                    operation = new OpRedo();
+                    break;
+                case Operations.OpSetLayersToShow:
+                    operation = new OpSetLayersToShow();
+                    break;
+                case Operations.OpSetBackgroundColor:
+                    operation = new OpSetBackgroundColor();
+                    break;
                 default:
                     Debug.Assert(false, "unknown operation");
-                    return new OperationController();
+                    operation = new OperationController();
+                    break;
             }
+            operation.Layer = ActiveLayer;
+            return operation;
         }
 
-        public void procOperation(SessionId sessionID, DocumentId docID, operations opID, Object[] data)
+        public void procOperation(SessionId sessionID, DocumentId docID, Operations opID, Object[] data)
         {
             OperationController curOperation = startOperation(opID);
             curOperation.operationProcess(_curSession, docID, data);
@@ -158,6 +182,8 @@ namespace CADController
             //nothing yet
         }
 
+        #region Core OpenGL draw functions
+
         public void draw(SessionId sessionID, DocumentId docID)
         {
             CoreWrapper.draw(_curSession, docID);
@@ -172,10 +198,17 @@ namespace CADController
         {
             CoreWrapper.resizeDocument(_curSession, docID, w, h);
         }
+
+        #endregion
+
     }
 
     class OperationController
     {
+        public uint Layer { get; set; } = 0;
+
+        public List<object> AdditionalData { get; } = new List<object>();
+
         public virtual void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
         {
             Debug.Assert(false, "This method without body");
@@ -191,7 +224,7 @@ namespace CADController
             
             IntPtr newNode = CoreWrapper.nodeFactory(X, Y);
             IntPtr newPoint = CoreWrapper.pointFactory(newNode);
-            IntPtr newPointGen = CoreWrapper.genericFactory(newPoint);
+            IntPtr newPointGen = CoreWrapper.genericFactory(newPoint, Layer);
 
             ObjectId newPointID = CoreWrapper.attachToBase(curSes, docID, newPointGen);
             CoreWrapper.commit(curSes, docID);
@@ -213,7 +246,7 @@ namespace CADController
             IntPtr end = CoreWrapper.nodeFactory(X2, Y2);
 
             IntPtr newLine = CoreWrapper.lineFactory(start, end);
-            IntPtr newLineGen = CoreWrapper.genericFactory(newLine);
+            IntPtr newLineGen = CoreWrapper.genericFactory(newLine, Layer);
 
             ObjectId newLineID = CoreWrapper.attachToBase(curSes, docID, newLineGen);
             CoreWrapper.commit(curSes, docID);
@@ -235,7 +268,7 @@ namespace CADController
             IntPtr side = CoreWrapper.nodeFactory(X2, Y2);
 
             IntPtr newCircle = CoreWrapper.circleFactory(center, side);
-            IntPtr newCircleGen = CoreWrapper.genericFactory(newCircle);
+            IntPtr newCircleGen = CoreWrapper.genericFactory(newCircle, Layer);
 
             ObjectId newCircleID = CoreWrapper.attachToBase(curSes, docID, newCircleGen);
             CoreWrapper.commit(curSes, docID);
@@ -335,7 +368,7 @@ namespace CADController
         }
     }
 
-    class Operations    //temporary class (old code)
+    /*class Operations    //temporary class (old code)
     {
         //create point
         public static ObjectId createPoint(IntPtr curSes, DocumentId docID, double X, double Y)
@@ -465,5 +498,5 @@ namespace CADController
             IntPtr newPointGen = CoreWrapper.genericFactory(newPoint);
             CoreWrapper.attachToBuffer(curSes, docID, newPointGen);
         }
-    }
+    }*/
 }
