@@ -10,11 +10,15 @@
         >
     <Grid>
         <DockPanel Margin="10,10,10,40">
-            <ListBox IsEnabled="{Binding Ready}" x:Name="LayersList" SelectionMode="Extended" ItemsSource="{Binding Layers}" 
+            <ListBox IsEnabled="{Binding Ready}" x:Name="LayersList" SelectionMode="Multiple" ItemsSource="{Binding Layers}" 
                      VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="100" Height="auto"></ListBox>
             <StackPanel Margin="10,0,0,0" Orientation="Vertical">
+                <DockPanel>
+                    <Label Content="Active layer:"></Label>
+                    <ComboBox ItemsSource="{Binding Layers}" Margin="0,5,5,5" SelectedItem="{Binding ActiveLayer}" />
+                </DockPanel>
                 <Button IsEnabled="{Binding Ready}" Command="{Binding AddLayer}" Content="Add layer" Margin="0,0,0,10"></Button>
-                <Button IsEnabled="{Binding Ready}" Command="{Binding SelectLayer}" Content="Set selected layer active" Margin="0,0,0,10"></Button>
+                <Button IsEnabled="{Binding Ready}" Command="{Binding SelectLayer}" Content="Set selected layers visible" Margin="0,0,0,10"></Button>
             </StackPanel>
         </DockPanel>
         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">

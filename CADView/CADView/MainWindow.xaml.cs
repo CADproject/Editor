@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Reflection;
+using System.Windows;
 using Application = System.Windows.Application;
 
 namespace CADView
@@ -8,7 +9,7 @@ namespace CADView
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow
+    public partial class MainWindow: Window
     {
         public MainWindow()
         {
