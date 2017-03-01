@@ -6,16 +6,11 @@ namespace CADView.Dialogs
     /// <summary>
     /// Логика взаимодействия для TwoPointDialog.xaml
     /// </summary>
-    public partial class TwoPointDialog : Window, IDataDialog
+    public partial class TwoPointDialog : IDataDialog
     {
         public TwoPointDialog()
         {
             InitializeComponent();
-        }
-
-        ~TwoPointDialog()
-        {
-            
         }
 
         public List<object> Data { get; set; }

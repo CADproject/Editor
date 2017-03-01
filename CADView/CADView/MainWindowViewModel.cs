@@ -13,9 +13,7 @@ using CADView.Dialogs;
 using Application = System.Windows.Application;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using MessageBox = System.Windows.MessageBox;
-#if !OLDDOTNET
 using System.Threading.Tasks;
-#endif
 
 namespace CADView
 {
@@ -65,8 +63,6 @@ namespace CADView
             _timer.Tick+= delegate
             {
                 if (DocumentViewModels.Count == 0) return;
-                //((WindowsFormsHost) DocumentViewModelsTabs[SelectedDocumentIndex].Content).InvalidateVisual();
-                //((WindowsFormsHost)DocumentViewModelsTabs[SelectedDocumentIndex].Content).Child.Refresh();
                 Controller.draw(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID);
             };
             _timer.Start();
@@ -100,9 +96,6 @@ namespace CADView
                 _selectedDocumentIndex = value;
                 OnPropertyChanged();
 
-                //var size =
-                //    ((WindowsFormsHost) ((Grid) DocumentViewModelsTabs[SelectedDocumentIndex].Content).Children[0])
-                //        .Child.Size;
                 var size = ((WindowsFormsHost) DocumentViewModelsTabs[SelectedDocumentIndex].Content)
                     .Child.Size;
                 Controller.activateDocement(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, size.Width,
@@ -217,11 +210,7 @@ namespace CADView
             Controller.eventHendling(DocumentViewModels[SelectedDocumentIndex].DocumentID, (ApplicationController.MouseButtons) (int) args.Button, args.X, args.Y, args.Delta);
         }
 
-#if OLDDOTNET
-        private void ProcessControllerWork(object obj)
-#else
         private async void ProcessControllerWork(object obj)
-#endif
         {
             IsActive = false;
             ApplicationController.operations type = (ApplicationController.operations) obj;
@@ -279,19 +268,12 @@ namespace CADView
                     }
                     else
                         start = false;
-
-#if OLDDOTNET
-                if (start)
-                    Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                        (ApplicationController.operations) obj, data);
-#else
                     if (start)
                         await Task.Run(delegate
                         {
                             Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
                                 (ApplicationController.operations)obj, data);
                         });
-#endif
                 }
                 if (separatedWindow != null)
                 {
@@ -303,11 +285,6 @@ namespace CADView
                             try
                             {
                                 List<object> cdata = (List<object>) sender;
-#if OLDDOTNET
-                                if (start)
-                                    Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                                        (ApplicationController.operations) obj, data);
-#else
                                 await Task.Run(delegate
                                 {
                                     IsActive = false;
@@ -315,7 +292,6 @@ namespace CADView
                                         DocumentViewModels[SelectedDocumentIndex].DocumentID,
                                         (ApplicationController.operations) obj, cdata.ToArray());
                                 });
-#endif
                             }
                             catch (Exception e)
                             {
@@ -351,10 +327,8 @@ namespace CADView
         {
             get
             {
-                return _documentWorkCommand != null
-                    ? _documentWorkCommand
-                    : (_documentWorkCommand = new RelayCommand(ProcessDocumentWork,
-                        o => (DocumentViewModels.Count > 0 && IsActive) || DocumentViewModels.Count == 0));
+                return _documentWorkCommand ?? (_documentWorkCommand = new RelayCommand(ProcessDocumentWork,
+                    o => (DocumentViewModels.Count > 0 && IsActive) || DocumentViewModels.Count == 0));
             }
         }
 
@@ -362,9 +336,7 @@ namespace CADView
         {
             get
             {
-                return _controllerWorkCommand != null
-                    ? _controllerWorkCommand
-                    : (_controllerWorkCommand = new RelayCommand(ProcessControllerWork));
+                return _controllerWorkCommand ?? (_controllerWorkCommand = new RelayCommand(ProcessControllerWork));
             }
         }
 
