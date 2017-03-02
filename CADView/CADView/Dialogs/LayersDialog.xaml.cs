@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Controls;
+using CADController;
 
 namespace CADView.Dialogs
 {
@@ -34,7 +34,7 @@ namespace CADView.Dialogs
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public static ObservableCollection<ListBoxItem> Layers { get; } = new ObservableCollection<ListBoxItem>() {new ListBoxItem() {Content = (uint)0, IsSelected = true} };
+        public static ObservableCollection<uint> Layers { get; } = new ObservableCollection<uint>() { 0 };
 
         public IList SelectedLayers { get; set; }
 
@@ -43,7 +43,20 @@ namespace CADView.Dialogs
             get
             {
                 return _addLayer ?? (_addLayer = new RelayCommand(
-                    obj => Layers.Add(new ListBoxItem() {Content = (uint) Layers.Last().Content + 1})));
+                    obj =>
+                    {
+                        Layers.Add(Layers.Last() + 1);
+                    }));
+            }
+        }
+
+        public uint ActiveLayer
+        {
+            get { return Controller.ActiveLayer; }
+            set
+            {
+                Controller.ActiveLayer = value;
+                OnPropertyChanged();
             }
         }
 
@@ -55,7 +68,7 @@ namespace CADView.Dialogs
                     obj =>
                     {
                         Ready = false;
-                        DataChanged?.Invoke(SelectedLayers.Cast<ListBoxItem>().Select(u => u.Content).ToList(), EventArgs.Empty);
+                        DataChanged?.Invoke(SelectedLayers.Cast<uint>().Select(u => u).ToList(), EventArgs.Empty);
                     }));
             }
         }
@@ -69,15 +82,17 @@ namespace CADView.Dialogs
                 OnPropertyChanged();
             }
         }
+
+        public ApplicationController Controller { get; set; }
     }
 
     /// <summary>
     /// Interaction logic for LayersDialog.xaml
     /// </summary>
-    public partial class LayersDialog : ICallbackDialog
+    public partial class LayersDialog : ICallbackDialog, IControlledDialog
     {
         private static LayersDialog _instance;
-        readonly LayersDialogViewModel _viewModel;
+        private readonly LayersDialogViewModel _viewModel;
 
         private LayersDialog()
         {
@@ -85,6 +100,7 @@ namespace CADView.Dialogs
 
             _viewModel = LayersDialogViewModel.GetLayersViewModel();
             _viewModel.SelectedLayers = LayersList.SelectedItems;
+            _viewModel.Controller = Controller;
             LayersList.SelectedItems.Add(1);
             _viewModel.DataChanged += delegate(object sender, EventArgs args)
             {
@@ -109,6 +125,12 @@ namespace CADView.Dialogs
             CancelButtonClick(this, null);
         }
 
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+            LayersList.Focus();
+        }
+
         public static LayersDialog Instance => _instance ?? (_instance = new LayersDialog());
 
         public event EventHandler DataChanged;
@@ -116,6 +138,12 @@ namespace CADView.Dialogs
         public void DataProcessComplete()
         {
             _viewModel.Ready = true;
+        }
+
+        public ApplicationController Controller
+        {
+            get { return _viewModel.Controller; }
+            set { _viewModel.Controller = value; }
         }
     }
 }

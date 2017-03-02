@@ -213,7 +213,7 @@ namespace CADView
         private async void ProcessControllerWork(object obj)
         {
             IsActive = false;
-            ApplicationController.operations type = (ApplicationController.operations) obj;
+            ApplicationController.Operations type = (ApplicationController.Operations) obj;
 
             object [] data= new object[0];
 
@@ -222,36 +222,37 @@ namespace CADView
 
             switch (type)
             {
-                case ApplicationController.operations.OpPointCreate:
+                case ApplicationController.Operations.OpPointCreate:
                     modalWindow = new OnePointDialog();
                     modalWindow.Title = "Create Point";
                     break;
-                case ApplicationController.operations.OpLineCreate:
+                case ApplicationController.Operations.OpLineCreate:
                     modalWindow = new TwoPointDialog();
                     modalWindow.Title = "Create Line";
                     break;
-                case ApplicationController.operations.OpCircleCreate:
+                case ApplicationController.Operations.OpCircleCreate:
                     modalWindow = new TwoPointDialog();
                     modalWindow.Title = "Create Circle";
                     break;
-                case ApplicationController.operations.OpContourCreate:
+                case ApplicationController.Operations.OpContourCreate:
                     modalWindow = new ElementIdInputDialog();
                     modalWindow.Title = "Create Contour";
                     break;
-                case ApplicationController.operations.OpDeleteObject:
+                case ApplicationController.Operations.OpDeleteObject:
                     modalWindow = new ElementIdInputDialog();
                     modalWindow.Title = "Create Contour";
                     break;
-                case ApplicationController.operations.OpDestroyContour:
+                case ApplicationController.Operations.OpDestroyContour:
                     modalWindow = new ElementIdInputDialog();
                     modalWindow.Title = "Create Contour";
                     break;
-                case ApplicationController.operations.OpSetBackgroundColor:
+                case ApplicationController.Operations.OpSetBackgroundColor:
                     separatedWindow = Dialogs.ColorDialog.Instance;
                     separatedWindow.Title = "Set color number";
                     break;
-                case ApplicationController.operations.OpSetLayersToShow:
+                case ApplicationController.Operations.OpSetLayersToShow:
                     separatedWindow = LayersDialog.Instance;
+                    LayersDialog.Instance.Controller = Controller;
                     separatedWindow.Title = "Set layer number";
                     break;
             }
@@ -272,7 +273,7 @@ namespace CADView
                         await Task.Run(delegate
                         {
                             Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                                (ApplicationController.operations)obj, data);
+                                (ApplicationController.Operations)obj, data);
                         });
                 }
                 if (separatedWindow != null)
@@ -290,7 +291,7 @@ namespace CADView
                                     IsActive = false;
                                     Controller.procOperation(Session,
                                         DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                                        (ApplicationController.operations) obj, cdata.ToArray());
+                                        (ApplicationController.Operations) obj, cdata.ToArray());
                                 });
                             }
                             catch (Exception e)
