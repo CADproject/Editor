@@ -121,13 +121,11 @@ void Buffer::toScreen(void)
 			std::cout << "Color: " << curPair.second->getColor();
 			std::cout << ", Thickness: " << curPair.second->getThickness();
 			std::cout << ", Layer: " << curPair.second->getLayer();
-#endif
-			
+	
 			bool whereObject = true;
 			if(curPair.first == NOT_FROM_BASE)
 				whereObject = false;
-			
-#ifdef TRACE_DEBUG
+
 			std::cout << ", From controller (0) or base (1): " << whereObject << ".";
 			std::cout << std::endl << std::endl;
 #endif
