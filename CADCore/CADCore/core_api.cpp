@@ -59,9 +59,14 @@ unsigned getGenLayer(void* pObject, DocumentId docID, ObjectId objID)
 void setLayers(void* pObject, DocumentId docID, void* pNewLayers, unsigned size)
 {
 	Session* ses = static_cast<Session*>(pObject);
-	std::vector<unsigned> layersToShow(size);
-	memcpy(layersToShow.data(), pNewLayers, size * sizeof(unsigned));
-	ses->setLayers(docID, layersToShow);
+	std::vector<int> layersToShow(size);
+	memcpy(layersToShow.data(), pNewLayers, size * sizeof(int));
+	std::vector<unsigned> layersToShowCopy(size);
+	for (size_t i = 0; i < size; i++)
+	{
+		layersToShowCopy[i] = layersToShow[i];
+	}
+	ses->setLayers(docID, layersToShowCopy);
 }
 
 void setBackgroundColor(void* pObject, DocumentId docID, COLOR color)
