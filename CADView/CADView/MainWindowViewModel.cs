@@ -19,7 +19,7 @@ namespace CADView
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-#region Public
+        #region Public
 
         public MainWindowViewModel()
         {
@@ -62,7 +62,7 @@ namespace CADView
 
             _timer = new DispatcherTimer(DispatcherPriority.Normal, Application.Current.Dispatcher);
             _timer.Interval = new TimeSpan(0, 0, 0, 0, 33);
-            _timer.Tick+= delegate
+            _timer.Tick += delegate
             {
                 if (DocumentViewModels.Count == 0) return;
                 Controller.draw(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID);
@@ -140,9 +140,9 @@ namespace CADView
             }
         }
 
-#endregion
+        #endregion
 
-#region Protected
+        #region Protected
 
 #if OLDDOTNET
         protected virtual void OnPropertyChanged(string propertyName)
@@ -153,9 +153,9 @@ namespace CADView
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-#endregion
+        #endregion
 
-#region Private
+        #region Private
 
         private uint _session;
         bool _inited;
@@ -208,7 +208,8 @@ namespace CADView
 
         private void RenderPanelOnMouseFire(MouseEventArgs args)
         {
-            Controller.eventHendling(DocumentViewModels[SelectedDocumentIndex].DocumentID, (int) args.Button, args.X, args.Y, args.Delta);
+            Controller.eventHendling(DocumentViewModels[SelectedDocumentIndex].DocumentID, (int) args.Button, args.X,
+                args.Y, args.Delta);
         }
 
         private async Task<bool> ProcessControllerWork(ApplicationController.Operations type, object data)
@@ -218,7 +219,8 @@ namespace CADView
                 IsActive = false;
                 await Task.Run(delegate
                 {
-                    Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, type, (object[])data);
+                    Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, type,
+                        (object[]) data);
                 });
                 return true;
             }
@@ -235,7 +237,7 @@ namespace CADView
 
         private async void ProcessControllerRaiseDialog(object obj)
         {
-            ApplicationController.Operations type = (ApplicationController.Operations)obj;
+            ApplicationController.Operations type = (ApplicationController.Operations) obj;
 
             Window modalWindow = null;
             Window separatedWindow = null;
@@ -290,13 +292,13 @@ namespace CADView
             if (separatedWindow is ICallbackDialog)
             {
                 separatedWindow.Show();
-                ((ICallbackDialog)separatedWindow).DataChanged+= o => ProcessControllerWork(type, o);
+                ((ICallbackDialog) separatedWindow).DataChanged += o => ProcessControllerWork(type, o);
             }
         }
 
-#endregion
+        #endregion
 
-#region Commands
+        #region Commands
 
         public RelayCommand DocumentWorkCommand
         {
@@ -322,10 +324,11 @@ namespace CADView
         {
             get
             {
-                return _controllerDialogCommand ?? (_controllerDialogCommand = new RelayCommand(ProcessControllerRaiseDialog));
+                return _controllerDialogCommand ??
+                       (_controllerDialogCommand = new RelayCommand(ProcessControllerRaiseDialog));
             }
         }
-        
-#endregion
+
+        #endregion
     }
 }

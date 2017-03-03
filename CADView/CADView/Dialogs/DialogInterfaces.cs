@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using CADController;
+﻿using System.Collections.Generic;
 
 namespace CADView.Dialogs
 {

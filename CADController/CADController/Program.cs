@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CADController
+﻿namespace CADController
 {
     using SessionId = System.UInt32;
     using DocumentId = System.UInt32;
