@@ -52,7 +52,7 @@ namespace CADController
         public static extern uint getGenLayer(IntPtr pObject, DocumentId docID, ObjectId objID);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void setLayers(IntPtr pObject, DocumentId docID, IntPtr newLayers);
+        public static extern void setLayers(IntPtr pObject, DocumentId docID, IntPtr newLayers, uint size);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void setBackgroundColor(IntPtr pObject, DocumentId docID, Color color);

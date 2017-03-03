@@ -356,7 +356,10 @@ namespace CADController
     {
         public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
         {
-            CoreWrapper.setLayers(curSes, docID, (IntPtr)data[0]);
+            // data[0] - массив беззнаковых целых, номера слоев для отображения (uint)
+            // data[1] - размер этого массива (uint)
+
+            CoreWrapper.setLayers(curSes, docID, (IntPtr)data[0], (uint)data[1]);
         }
     }
 

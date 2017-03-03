@@ -14,9 +14,9 @@ extern "C" COREDLL_API void* detachFromBase(void* pObject, DocumentId docID, Obj
 extern "C" COREDLL_API void attachToBuffer(void* pObject, DocumentId docID, void* gen);
 extern "C" COREDLL_API void* getGenTopology(void* pObject, DocumentId docID, ObjectId objID);
 extern "C" COREDLL_API unsigned getGenLayer(void* pObject, DocumentId docID, ObjectId objID);
-extern "C" COREDLL_API void setLayers(void* pObject, DocumentId docID, void* newLayers);
+extern "C" COREDLL_API void setLayers(void* pObject, DocumentId docID, void* pNewLayers, unsigned size);
 extern "C" COREDLL_API void setBackgroundColor(void* pObject, DocumentId docID, COLOR color);
-extern "C" COREDLL_API void toScreen(void* pObject, DocumentId docID);
+extern "C" COREDLL_API void toScreen(void* pObject, DocumentId docID);	//(?)
 extern "C" COREDLL_API void commit(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void undo(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void redo(void* pObject, DocumentId docID);
