@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,24 +7,72 @@ using CADController;
 
 namespace CADView.Dialogs
 {
+    internal class LayerModel : INotifyPropertyChanged
+    {
+        private int _id;
+        private bool _visible;
+        private static int _counter;
+
+        public LayerModel()
+        {
+            _id = _counter++;
+        }
+
+        public int Id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool Visible
+        {
+            get { return _visible; }
+            set
+            {
+                _visible = value;
+                OnPropertyChanged();
+                VisibleChangedStatic?.Invoke(this, new PropertyChangedEventArgs("Visible"));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public static event PropertyChangedEventHandler VisibleChangedStatic;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
     internal class LayersDialogViewModel : INotifyPropertyChanged
     {
-        public event EventHandler DataChanged;
+        public event MainWindowViewModel.ProcessDataDelegate DataChanged;
         private RelayCommand _addLayer;
-        private RelayCommand _selectLayer;
         private bool _ready = true;
-        private static LayersDialogViewModel _instance;
+        private readonly ApplicationController _controller;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public static LayersDialogViewModel GetLayersViewModel()
+        public LayersDialogViewModel(ApplicationController controller)
         {
-            return _instance ?? (_instance = new LayersDialogViewModel());
+            _controller = controller;
+            LayerModel.VisibleChangedStatic+=LayerModelOnVisibleChangedStatic;
         }
 
-        private LayersDialogViewModel()
+        ~LayersDialogViewModel()
         {
-            _instance = this;
+            LayerModel.VisibleChangedStatic -= LayerModelOnVisibleChangedStatic;
+        }
+
+        private void LayerModelOnVisibleChangedStatic(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        {
+            Ready = false;
+            DataChanged?.Invoke(Layers.Where(lm => lm.Visible).Select(lm => (object)lm.Id).ToArray());
+            Ready = true;
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -34,9 +80,10 @@ namespace CADView.Dialogs
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public static ObservableCollection<uint> Layers { get; } = new ObservableCollection<uint>() { 0 };
-
-        public IList SelectedLayers { get; set; }
+        public static ObservableCollection<LayerModel> Layers { get; } = new ObservableCollection<LayerModel>()
+        {
+            new LayerModel() {Visible = true}
+        };
 
         public RelayCommand AddLayer
         {
@@ -45,31 +92,18 @@ namespace CADView.Dialogs
                 return _addLayer ?? (_addLayer = new RelayCommand(
                     obj =>
                     {
-                        Layers.Add(Layers.Last() + 1);
+                        Layers.Add(new LayerModel());
                     }));
             }
         }
 
-        public uint ActiveLayer
+        public LayerModel ActiveLayer
         {
-            get { return Controller.ActiveLayer; }
+            get { return (Layers.First(lm => lm.Id == _controller.ActiveLayer) ?? Layers.First()) ?? new LayerModel(); }
             set
             {
-                Controller.ActiveLayer = value;
+                _controller.ActiveLayer = value.Id;
                 OnPropertyChanged();
-            }
-        }
-
-        public RelayCommand SelectLayer
-        {
-            get
-            {
-                return _selectLayer ?? (_selectLayer = new RelayCommand(
-                    obj =>
-                    {
-                        Ready = false;
-                        DataChanged?.Invoke(SelectedLayers.Cast<uint>().Select(u => u).ToList(), EventArgs.Empty);
-                    }));
             }
         }
 
@@ -82,30 +116,24 @@ namespace CADView.Dialogs
                 OnPropertyChanged();
             }
         }
-
-        public ApplicationController Controller { get; set; }
     }
 
     /// <summary>
     /// Interaction logic for LayersDialog.xaml
     /// </summary>
-    public partial class LayersDialog : ICallbackDialog, IControlledDialog
+    public partial class LayersDialog : ICallbackDialog
     {
         private static LayersDialog _instance;
         private readonly LayersDialogViewModel _viewModel;
 
-        private LayersDialog()
+        public LayersDialog(ApplicationController controller)
         {
             InitializeComponent();
+            _instance = this;
 
-            _viewModel = LayersDialogViewModel.GetLayersViewModel();
-            _viewModel.SelectedLayers = LayersList.SelectedItems;
-            _viewModel.Controller = Controller;
-            LayersList.SelectedItems.Add(1);
-            _viewModel.DataChanged += delegate(object sender, EventArgs args)
-            {
-                DataChanged?.Invoke(sender, args);
-            };
+            _viewModel = new LayersDialogViewModel(controller);
+
+            _viewModel.DataChanged += sender => DataChanged?.Invoke(sender);
             DataContext = _viewModel;
         }
 
@@ -125,25 +153,13 @@ namespace CADView.Dialogs
             CancelButtonClick(this, null);
         }
 
-        protected override void OnActivated(EventArgs e)
-        {
-            base.OnActivated(e);
-            LayersList.Focus();
-        }
+        public static LayersDialog Instance => _instance;
 
-        public static LayersDialog Instance => _instance ?? (_instance = new LayersDialog());
-
-        public event EventHandler DataChanged;
+        public event MainWindowViewModel.ProcessDataDelegate DataChanged;
 
         public void DataProcessComplete()
         {
             _viewModel.Ready = true;
-        }
-
-        public ApplicationController Controller
-        {
-            get { return _viewModel.Controller; }
-            set { _viewModel.Controller = value; }
         }
     }
 }

@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace CADView
 {
-    class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
 #region Public
 
@@ -40,6 +40,8 @@ namespace CADView
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public delegate Task ProcessDataDelegate(object[] o);
 
         internal ApplicationController Controller { get; private set; }
 
@@ -108,8 +110,7 @@ namespace CADView
             get { return _documentViewModelsTabs; }
             set
             {
-                _documentViewModelsTabs = value; 
-                OnPropertyChanged("DocumentViewModels");
+                _documentViewModelsTabs = value;
                 OnPropertyChanged();
             }
         }
@@ -161,6 +162,7 @@ namespace CADView
         private bool _isActive;
         private RelayCommand _documentWorkCommand;
         private RelayCommand _controllerWorkCommand;
+        private RelayCommand _controllerDialogCommand;
         private ObservableCollection<TabItem> _documentViewModelsTabs = new ObservableCollection<TabItem>();
         private int _selectedDocumentIndex;
         private DispatcherTimer _timer;
@@ -206,16 +208,34 @@ namespace CADView
 
         private void RenderPanelOnMouseFire(MouseEventArgs args)
         {
-            //TODO: передавать инты и внутри пытаться аккуратно преобразовать.
-            Controller.eventHendling(DocumentViewModels[SelectedDocumentIndex].DocumentID, (ApplicationController.MouseButtons) (int) args.Button, args.X, args.Y, args.Delta);
+            Controller.eventHendling(DocumentViewModels[SelectedDocumentIndex].DocumentID, (int) args.Button, args.X, args.Y, args.Delta);
         }
 
-        private async void ProcessControllerWork(object obj)
+        private async Task<bool> ProcessControllerWork(ApplicationController.Operations type, object data)
         {
-            IsActive = false;
-            ApplicationController.Operations type = (ApplicationController.Operations) obj;
+            try
+            {
+                IsActive = false;
+                await Task.Run(delegate
+                {
+                    Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, type, (object[])data);
+                });
+                return true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Exception");
+                return false;
+            }
+            finally
+            {
+                IsActive = true;
+            }
+        }
 
-            object [] data= new object[0];
+        private async void ProcessControllerRaiseDialog(object obj)
+        {
+            ApplicationController.Operations type = (ApplicationController.Operations)obj;
 
             Window modalWindow = null;
             Window separatedWindow = null;
@@ -251,72 +271,26 @@ namespace CADView
                     separatedWindow.Title = "Set color number";
                     break;
                 case ApplicationController.Operations.OpSetLayersToShow:
-                    separatedWindow = LayersDialog.Instance;
-                    LayersDialog.Instance.Controller = Controller;
+                    separatedWindow = LayersDialog.Instance ?? new LayersDialog(Controller);
                     separatedWindow.Title = "Set layer number";
                     break;
             }
-            
-            try
+
+            if (modalWindow is IDataDialog)
             {
-                if (modalWindow != null)
+                if (modalWindow.ShowDialog() == true)
                 {
-                    bool start = true;
-                    if (modalWindow.ShowDialog() == true)
                     {
-                        if (modalWindow is IDataDialog)
-                            data = ((IDataDialog) modalWindow).Data.ToArray();
+                        var data = ((IDataDialog) modalWindow).Data.ToArray();
+                        await ProcessControllerWork(type, data);
                     }
-                    else
-                        start = false;
-                    if (start)
-                        await Task.Run(delegate
-                        {
-                            Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                                (ApplicationController.Operations)obj, data);
-                        });
-                }
-                if (separatedWindow != null)
-                {
-                    separatedWindow.Show();
-                    separatedWindow.Activate();
-                    if (separatedWindow is ICallbackDialog)
-                        ((ICallbackDialog) separatedWindow).DataChanged += async delegate(object sender, EventArgs args)
-                        {
-                            try
-                            {
-                                List<object> cdata = (List<object>) sender;
-                                await Task.Run(delegate
-                                {
-                                    IsActive = false;
-                                    Controller.procOperation(Session,
-                                        DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                                        (ApplicationController.Operations) obj, cdata.ToArray());
-                                });
-                            }
-                            catch (Exception e)
-                            {
-                                if (modalWindow != null && modalWindow.IsVisible)
-                                    modalWindow.Close();
-                                MessageBox.Show("Exception: " + e.Message);
-                            }
-                            finally
-                            {
-                                ((ICallbackDialog)separatedWindow).DataProcessComplete();
-                                IsActive = true;
-                            }
-                        };
+
                 }
             }
-            catch (Exception e)
+            if (separatedWindow is ICallbackDialog)
             {
-                if (modalWindow != null && modalWindow.IsVisible)
-                    modalWindow.Close();
-                MessageBox.Show("Exception: " + e.Message);
-            }
-            finally
-            {
-                IsActive = true;
+                separatedWindow.Show();
+                ((ICallbackDialog)separatedWindow).DataChanged+= o => ProcessControllerWork(type, o);
             }
         }
 
@@ -337,10 +311,21 @@ namespace CADView
         {
             get
             {
-                return _controllerWorkCommand ?? (_controllerWorkCommand = new RelayCommand(ProcessControllerWork));
+                return _controllerWorkCommand ?? (_controllerWorkCommand = new RelayCommand(async delegate(object o)
+                {
+                    await ProcessControllerWork((ApplicationController.Operations) o, null);
+                }));
             }
         }
 
+        public RelayCommand ControllerDialogCommand
+        {
+            get
+            {
+                return _controllerDialogCommand ?? (_controllerDialogCommand = new RelayCommand(ProcessControllerRaiseDialog));
+            }
+        }
+        
 #endregion
     }
 }

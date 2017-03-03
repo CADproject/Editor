@@ -4,11 +4,6 @@ using CADController;
 
 namespace CADView.Dialogs
 {
-    internal interface IControlledDialog
-    {
-        ApplicationController Controller { get; set; }
-    }
-
     internal interface IDataDialog
     {
         List<object> Data { get; set; } 
@@ -16,7 +11,6 @@ namespace CADView.Dialogs
 
     internal interface ICallbackDialog
     {
-        event EventHandler DataChanged;
-        void DataProcessComplete();
+        event MainWindowViewModel.ProcessDataDelegate DataChanged;
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using CADController;
@@ -21,13 +19,15 @@ namespace CADView.Dialogs
 
         private bool _busy;
 
-        private void OkButtonClick(object sender, RoutedEventArgs e)
+        private async void OkButtonClick(object sender, RoutedEventArgs e)
         {
             if(_busy) return;
             if (((Button) sender).Tag is Color)
             {
                 _busy = true;
-                DataChanged?.Invoke(new List<object>() {((Button) sender).Tag}, EventArgs.Empty);
+                if (DataChanged != null)
+                    await DataChanged.Invoke(new[] {((Button) sender).Tag});
+                _busy = false;
             }
         }
 
@@ -48,12 +48,7 @@ namespace CADView.Dialogs
             CancelButtonClick(this, null);
         }
 
-        public event EventHandler DataChanged;
-
-        public void DataProcessComplete()
-        {
-            _busy = false;
-        }
+        public event MainWindowViewModel.ProcessDataDelegate DataChanged;
 
         public static ColorDialog Instance => _instance ?? (_instance = new ColorDialog());
     }

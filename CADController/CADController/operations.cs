@@ -66,7 +66,7 @@ namespace CADController
         private double _currentMouseCoordX; //for active document
         private double _currentMouseCoordY; //for active document
         private IntPtr _curSession = IntPtr.Zero; //temporary mock for View
-        private uint _activeLayer;
+        private int _activeLayer;
 
         #endregion
 
@@ -76,7 +76,7 @@ namespace CADController
 
         #region Public properties
 
-        public uint ActiveLayer
+        public int ActiveLayer
         {
             get { return _activeLayer; }
             set { _activeLayer = value; }
@@ -206,7 +206,7 @@ namespace CADController
 
     class OperationController
     {
-        public uint Layer { get; set; } = 0;
+        public int Layer { get; set; } = 0;
 
         public List<object> AdditionalData { get; } = new List<object>();
 
@@ -225,7 +225,7 @@ namespace CADController
             
             IntPtr newNode = CoreWrapper.nodeFactory(X, Y);
             IntPtr newPoint = CoreWrapper.pointFactory(newNode);
-            IntPtr newPointGen = CoreWrapper.genericFactory(newPoint, Layer);
+            IntPtr newPointGen = CoreWrapper.genericFactory(newPoint, (uint)Layer);
 
             ObjectId newPointID = CoreWrapper.attachToBase(curSes, docID, newPointGen);
             CoreWrapper.commit(curSes, docID);
@@ -247,7 +247,7 @@ namespace CADController
             IntPtr end = CoreWrapper.nodeFactory(X2, Y2);
 
             IntPtr newLine = CoreWrapper.lineFactory(start, end);
-            IntPtr newLineGen = CoreWrapper.genericFactory(newLine, Layer);
+            IntPtr newLineGen = CoreWrapper.genericFactory(newLine, (uint)Layer);
 
             ObjectId newLineID = CoreWrapper.attachToBase(curSes, docID, newLineGen);
             CoreWrapper.commit(curSes, docID);
@@ -269,7 +269,7 @@ namespace CADController
             IntPtr side = CoreWrapper.nodeFactory(X2, Y2);
 
             IntPtr newCircle = CoreWrapper.circleFactory(center, side);
-            IntPtr newCircleGen = CoreWrapper.genericFactory(newCircle, Layer);
+            IntPtr newCircleGen = CoreWrapper.genericFactory(newCircle, (uint)Layer);
 
             ObjectId newCircleID = CoreWrapper.attachToBase(curSes, docID, newCircleGen);
             CoreWrapper.commit(curSes, docID);
@@ -357,7 +357,7 @@ namespace CADController
     {
         public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
         {
-            UnmanagedArray<uint> udata = new UnmanagedArray<uint>(data.Cast<uint>().ToArray());
+            UnmanagedArray<int> udata = new UnmanagedArray<int>(data.Cast<int>().ToArray());
             CoreWrapper.setLayers(curSes, docID, udata, udata.Size);
         }
     }
