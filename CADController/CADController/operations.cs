@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Linq;
 
 namespace CADController
 {
     using SessionId = System.UInt32;
     using DocumentId = System.UInt32;
-    //using OperationId = System.UInt32;
     using ObjectId = System.UInt32;
 
     public class ApplicationController
@@ -65,7 +65,7 @@ namespace CADController
         private double _currentMouseCoordX; //for active document
         private double _currentMouseCoordY; //for active document
         private IntPtr _curSession = IntPtr.Zero; //temporary mock for View
-        private uint _activeLayer;
+        private int _activeLayer;
 
         #endregion
 
@@ -75,7 +75,7 @@ namespace CADController
 
         #region Public properties
 
-        public uint ActiveLayer
+        public int ActiveLayer
         {
             get { return _activeLayer; }
             set { _activeLayer = value; }
@@ -97,11 +97,11 @@ namespace CADController
             return docID;
         }
 
-        public void eventHendling(uint docId, MouseButtons action, double coordX = 0, double coordY = 0, double delta = 0)
+        public void eventHendling(uint docId, int action, double coordX = 0, double coordY = 0, double delta = 0)
         {
             _currentMouseCoordX = coordX;
             _currentMouseCoordY = coordY;
-            switch (action)
+            switch ((MouseButtons) action)
             {
                 case MouseButtons.Left:
                     _leftButton = true;
@@ -205,7 +205,7 @@ namespace CADController
 
     class OperationController
     {
-        public uint Layer { get; set; } = 0;
+        public int Layer { get; set; } = 0;
 
         public List<object> AdditionalData { get; } = new List<object>();
 
@@ -224,7 +224,7 @@ namespace CADController
             
             IntPtr newNode = CoreWrapper.nodeFactory(X, Y);
             IntPtr newPoint = CoreWrapper.pointFactory(newNode);
-            IntPtr newPointGen = CoreWrapper.genericFactory(newPoint, Layer);
+            IntPtr newPointGen = CoreWrapper.genericFactory(newPoint, (uint)Layer);
 
             ObjectId newPointID = CoreWrapper.attachToBase(curSes, docID, newPointGen);
             CoreWrapper.commit(curSes, docID);
@@ -246,7 +246,7 @@ namespace CADController
             IntPtr end = CoreWrapper.nodeFactory(X2, Y2);
 
             IntPtr newLine = CoreWrapper.lineFactory(start, end);
-            IntPtr newLineGen = CoreWrapper.genericFactory(newLine, Layer);
+            IntPtr newLineGen = CoreWrapper.genericFactory(newLine, (uint)Layer);
 
             ObjectId newLineID = CoreWrapper.attachToBase(curSes, docID, newLineGen);
             CoreWrapper.commit(curSes, docID);
@@ -268,7 +268,7 @@ namespace CADController
             IntPtr side = CoreWrapper.nodeFactory(X2, Y2);
 
             IntPtr newCircle = CoreWrapper.circleFactory(center, side);
-            IntPtr newCircleGen = CoreWrapper.genericFactory(newCircle, Layer);
+            IntPtr newCircleGen = CoreWrapper.genericFactory(newCircle, (uint)Layer);
 
             ObjectId newCircleID = CoreWrapper.attachToBase(curSes, docID, newCircleGen);
             CoreWrapper.commit(curSes, docID);
@@ -291,8 +291,8 @@ namespace CADController
                 CoreWrapper.detachFromBase(curSes, docID, (ObjectId)data[i]);
             }
 
-            UnmanagedArray edgesArray = new UnmanagedArray(edges);
-            IntPtr newContour = CoreWrapper.contourFactory(edgesArray.getPointer(), (uint)edgesArray.getSize());
+            UnmanagedArray<IntPtr> edgesArray = new UnmanagedArray<IntPtr>(edges);
+            IntPtr newContour = CoreWrapper.contourFactory(edgesArray, (uint)edgesArray.Size);
             IntPtr newContourGen = CoreWrapper.genericFactory(newContour, currentLayer);
 
             ObjectId newContourID = CoreWrapper.attachToBase(curSes, docID, newContourGen);
@@ -356,10 +356,8 @@ namespace CADController
     {
         public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
         {
-            // data[0] - массив беззнаковых целых, номера слоев для отображения (uint)
-            // data[1] - размер этого массива (uint)
-
-            CoreWrapper.setLayers(curSes, docID, (IntPtr)data[0], (uint)data[1]);
+            UnmanagedArray<int> udata = new UnmanagedArray<int>(data.Cast<int>().ToArray());
+            CoreWrapper.setLayers(curSes, docID, udata, udata.Size);
         }
     }
 
@@ -430,7 +428,7 @@ namespace CADController
             }
 
             UnmanagedArray edgesArray = new UnmanagedArray(edges);
-            IntPtr newContour = CoreWrapper.contourFactory(edgesArray.getPointer(), (uint)edgesArray.getSize());         
+            IntPtr newContour = CoreWrapper.contourFactory(edgesArray.Pointer(), (uint)edgesArray.getSize());         
             IntPtr newContourGen = CoreWrapper.genericFactory(newContour, currentLayer);
         
         	ObjectId newContourID = CoreWrapper.attachToBase(curSes, docID, newContourGen);

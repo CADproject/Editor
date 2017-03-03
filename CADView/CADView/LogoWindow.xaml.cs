@@ -18,12 +18,10 @@ namespace CADView
             var main = new MainWindow();
             MainWindowViewModel view = (MainWindowViewModel) main.DataContext;
 
-            Task initTask = Task.Factory.StartNew(() =>
+            await Task.Run(delegate
             {
                 view.Init();
             });
-
-            await initTask;
 
             main.Show();
             Close();
