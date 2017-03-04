@@ -9,12 +9,12 @@ _defaultEdgeThickness(THREE), _showID(false)
 	if (!staticInitComplete)
 	{
 		staticInitComplete = true;
-		colors[BLACK]	= new float[4]{ 0,0,0,0 };
-		colors[RED]		= new float[4]{ 1,0,0,1 };
-		colors[GREEN]	= new float[4]{ 0,1,0,1 };
-		colors[BLUE]	= new float[4]{ 0,0,1,1 };
-		colors[YELLOW]	= new float[4]{ 1,1,0,1 };
-		colors[WHITE]	= new float[4]{ 1,1,1,1 };
+		colors[BLACK]	= new float[4]{ 0.212f, 0.212f, 0.212f, 0 };	//grey21
+		colors[RED]		= new float[4]{ 1,      0.549f, 0.412f, 1 };	//Salmon1
+		colors[GREEN]	= new float[4]{ 0.306f, 0.933f, 0.580f, 1 };	//SeaGreen2	
+		colors[BLUE]	= new float[4]{ 0.392f, 0.583f, 0.929f, 1 };	//CornflowerBlue
+		colors[YELLOW]	= new float[4]{ 0.804f, 0.804f, 0,      1 };	//Yellow3
+		colors[WHITE]	= new float[4]{ 0.961f, 0.961f, 0.961f, 1 };	//WhiteSmoke
 	}
 }
 

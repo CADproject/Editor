@@ -13,7 +13,7 @@
                 <GradientStop Color="White" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
-        <Label Content="Cloud CAD" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" FontSize="40" FontStyle="Italic" FontWeight="ExtraBold" RenderTransformOrigin="0.5,0.5" Background="#00000000" />
+        <Label Content="EDITOR" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" FontSize="40" FontStyle="Italic" FontWeight="ExtraBold" RenderTransformOrigin="0.5,0.5" Background="#00000000" />
 
     </Grid>
 </Window>

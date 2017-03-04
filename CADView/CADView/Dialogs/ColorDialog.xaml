@@ -6,14 +6,14 @@
         xmlns:local="clr-namespace:CADView.Dialogs"
         xmlns:cadController="clr-namespace:CADController;assembly=CADController"
         mc:Ignorable="d"
-        Title="ColorDialog" Height="300" Width="300">
+        Title="ColorDialog" Height="256.667" Width="186">
     <Grid>
         <StackPanel Margin="10">
-            <Button Margin="10,10,10,0" Width="50" Height="20" HorizontalAlignment="Left" Background="Black" Tag="{x:Static cadController:Color.black}" Click="ButtonBase_OnClick"/>
-            <Button Margin="10,10,10,0" Width="50" Height="20" HorizontalAlignment="Left" Background="Blue" Tag="{x:Static cadController:Color.blue}" Click="ButtonBase_OnClick"/>
-            <Button Margin="10,10,10,0" Width="50" Height="20" HorizontalAlignment="Left" Background="Green" Tag="{x:Static cadController:Color.green}" Click="ButtonBase_OnClick"/>
-            <Button Margin="10,10,10,0" Width="50" Height="20" HorizontalAlignment="Left" Background="Red" Tag="{x:Static cadController:Color.red}" Click="ButtonBase_OnClick"/>
-            <Button Margin="10,10,10,0" Width="50" Height="20" HorizontalAlignment="Left" Background="Yellow" Tag="{x:Static cadController:Color.yellow}" Click="ButtonBase_OnClick"/>
+            <Button Margin="10,10,0,0" Width="139" Height="20" HorizontalAlignment="Left" Background="Black" Tag="{x:Static cadController:Color.black}" Click="ButtonBase_OnClick"/>
+            <Button Margin="10,10,0,0" Width="139" Height="20" HorizontalAlignment="Left" Background="Blue" Tag="{x:Static cadController:Color.blue}" Click="ButtonBase_OnClick"/>
+            <Button Margin="10,10,0,0" Width="139" Height="20" HorizontalAlignment="Left" Background="Green" Tag="{x:Static cadController:Color.green}" Click="ButtonBase_OnClick"/>
+            <Button Margin="10,10,0,0" Width="139" Height="20" HorizontalAlignment="Left" Background="Red" Tag="{x:Static cadController:Color.red}" Click="ButtonBase_OnClick"/>
+            <Button Margin="10,10,0,0" Width="139" Height="20" HorizontalAlignment="Left" Background="Yellow" Tag="{x:Static cadController:Color.yellow}" Click="ButtonBase_OnClick"/>
         </StackPanel>
         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
             <Button Visibility="Collapsed" Width="75" Content="Ok" Margin="10" Click="OkButtonClick"></Button>
