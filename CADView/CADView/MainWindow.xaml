@@ -7,7 +7,7 @@
         xmlns:cadController="clr-namespace:CADController;assembly=CADController"
         xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
-        Title="Cloud CAD system" BorderThickness="2" Height="350" Width="650" MinHeight="350" MinWidth="650" WindowStartupLocation="CenterScreen"
+        Title="Editor" BorderThickness="2" Height="350" Width="594" MinHeight="350" MinWidth="650" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}">
     <Window.BorderBrush>
         <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
@@ -31,15 +31,15 @@
                     <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;point" Tag="{x:Static cadController:ApplicationController+Operations.OpPointCreate}" ></Button>
                     <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;line" Tag="{x:Static cadController:ApplicationController+Operations.OpLineCreate}"></Button>
                     <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;circle" Tag="{x:Static cadController:ApplicationController+Operations.OpCircleCreate}"></Button>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;contour" Tag="{x:Static cadController:ApplicationController+Operations.OpContourCreate}"></Button>
+                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;contour" Tag="{x:Static cadController:ApplicationController+Operations.OpContourCreate}" Width="54"></Button>
                     <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Set background&#xD;&#xA;color" Tag="{x:Static cadController:ApplicationController+Operations.OpSetBackgroundColor}"></Button>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Layers&#xD;&#xA;manager" Tag="{x:Static cadController:ApplicationController+Operations.OpSetLayersToShow}"></Button>
+                    Content="Destroy&#xA;contour" Tag="{x:Static cadController:ApplicationController+Operations.OpDestroyContour}"/>
                     <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="25,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
                     Content="Delete &#xD;&#xA;element" Tag="{x:Static cadController:ApplicationController+Operations.OpDeleteObject}"></Button>
                     <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Destroy&#xD;&#xA;contour" Tag="{x:Static cadController:ApplicationController+Operations.OpDestroyContour}"></Button>
+                    Content="Background&#xD;&#xA;color" Tag="{x:Static cadController:ApplicationController+Operations.OpSetBackgroundColor}"></Button>
+                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                    Content="Layers&#xD;&#xA;manager" Tag="{x:Static cadController:ApplicationController+Operations.OpSetLayersToShow}"></Button>
                 </StackPanel>
                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,5,5">
                     <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Undo" Tag="{x:Static cadController:ApplicationController+Operations.OpUndo}"></Button>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView.Dialogs"
         mc:Ignorable="d"
-        Title="OnePointDialog" Height="300" Width="300">
+        Title="OnePointDialog" Height="135" Width="225">
     <Grid>
         <StackPanel>
             <DockPanel>
@@ -18,7 +18,7 @@
             </DockPanel>
         </StackPanel>
         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
-            <Button Width="75" Content="Ok" Margin="10" Click="OkButtonClick"></Button>
+            <Button Width="75" Content="OK" Margin="10" Click="OkButtonClick"></Button>
             <Button Width="75" Content="Cancel" Margin="10" Click="CancelButtonClick"></Button>
         </DockPanel>
     </Grid>

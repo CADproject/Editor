@@ -5,28 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView.Dialogs"
         mc:Ignorable="d"
-        Title="TwoPointDialog" Height="300" Width="300">
+        Title="TwoPointDialog" Height="203" Width="244">
     <Grid>
         <StackPanel>
             <DockPanel>
-                <Label Margin="5,0,0,0" Content="X:"></Label>
+                <Label Margin="5,0,0,0" Content="X1:"></Label>
                 <TextBox Name="X1" Text="0" Margin="5,5,0,0" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
             </DockPanel>
             <DockPanel>
-                <Label Margin="5,0,0,0" Content="Y:"></Label>
+                <Label Margin="5,0,0,0" Content="Y1:"></Label>
                 <TextBox Name="Y1" Text="0" Margin="5,5,0,0" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
             </DockPanel>
             <DockPanel>
-                <Label Margin="5,0,0,0" Content="X:"></Label>
+                <Label Margin="5,0,0,0" Content="X2:"></Label>
                 <TextBox Name="X2" Text="0" Margin="5,5,0,0" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
             </DockPanel>
             <DockPanel>
-                <Label Margin="5,0,0,0" Content="Y:"></Label>
+                <Label Margin="5,0,0,0" Content="Y2:"></Label>
                 <TextBox Name="Y2" Text="0" Margin="5,5,0,0" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
             </DockPanel>
         </StackPanel>
         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
-            <Button Width="75" Content="Ok" Margin="10" Click="OkButtonClick"></Button>
+            <Button Width="75" Content="OK" Margin="10" Click="OkButtonClick"></Button>
             <Button Width="75" Content="Cancel" Margin="10" Click="CancelButtonClick"></Button>
         </DockPanel>
     </Grid>
