@@ -34,6 +34,7 @@ namespace CADView
         {
             foreach (var documentViewModel in DocumentViewModels)
             {
+                documentViewModel.Dispose();
                 Controller.finalDocument(Session, documentViewModel.DocumentID);
             }
             Controller.finalSession(Session);
@@ -95,8 +96,12 @@ namespace CADView
             get { return _selectedDocumentIndex; }
             set
             {
+
+
                 _selectedDocumentIndex = value;
                 OnPropertyChanged();
+
+                if (SelectedDocumentIndex < 0 || SelectedDocumentIndex > DocumentViewModelsTabs.Count) return;
 
                 var size = ((WindowsFormsHost) DocumentViewModelsTabs[SelectedDocumentIndex].Content)
                     .Child.Size;
@@ -163,12 +168,14 @@ namespace CADView
         private RelayCommand _documentWorkCommand;
         private RelayCommand _controllerWorkCommand;
         private RelayCommand _controllerDialogCommand;
+        private RelayCommand _closeDocumentCommand;
         private ObservableCollection<TabItem> _documentViewModelsTabs = new ObservableCollection<TabItem>();
         private int _selectedDocumentIndex;
         private DispatcherTimer _timer;
         private double _windowWidth;
         private double _windowHeight;
         private readonly List<DocumentViewModel> _documentViewModels = new List<DocumentViewModel>();
+        private RelayCommand _closeApplicationCommand;
 
         private uint Session
         {
@@ -258,22 +265,22 @@ namespace CADView
                     break;
                 case ApplicationController.Operations.OpContourCreate:
                     modalWindow = new ElementIdInputDialog();
-                    modalWindow.Title = "Create Contour";
+                    modalWindow.Title = "Create Contour from objects";
                     break;
                 case ApplicationController.Operations.OpDeleteObject:
-                    modalWindow = new ElementIdInputDialog();
-                    modalWindow.Title = "Create Contour";
+                    modalWindow = new DestroyObjectDialog();
+                    modalWindow.Title = "Delete object";
                     break;
                 case ApplicationController.Operations.OpDestroyContour:
-                    modalWindow = new ElementIdInputDialog();
-                    modalWindow.Title = "Create Contour";
+                    modalWindow = new DestroyContourDialog();
+                    modalWindow.Title = "Destroy Contour";
                     break;
                 case ApplicationController.Operations.OpSetBackgroundColor:
                     separatedWindow = Dialogs.ColorDialog.Instance;
                     separatedWindow.Title = "Set color number";
                     break;
                 case ApplicationController.Operations.OpSetLayersToShow:
-                    separatedWindow = LayersDialog.Instance ?? new LayersDialog(Controller);
+                    separatedWindow = LayersDialog.Instance ?? new LayersDialog(Controller, DocumentViewModels[SelectedDocumentIndex].DocumentID);
                     separatedWindow.Title = "Set layer number";
                     break;
             }
@@ -291,8 +298,8 @@ namespace CADView
             }
             if (separatedWindow is ICallbackDialog)
             {
-                separatedWindow.Show();
                 ((ICallbackDialog) separatedWindow).DataChanged += o => ProcessControllerWork(type, o);
+                separatedWindow.ShowDialog();
             }
         }
 
@@ -326,6 +333,46 @@ namespace CADView
             {
                 return _controllerDialogCommand ??
                        (_controllerDialogCommand = new RelayCommand(ProcessControllerRaiseDialog));
+            }
+        }
+
+        public RelayCommand CloseApplicationCommand
+        {
+            get
+            {
+                return _closeApplicationCommand ??
+                       (_closeApplicationCommand = new RelayCommand(o => App.Current.Shutdown()));
+            }
+        }
+
+        public RelayCommand CloseDocumentCommand
+        {
+            get
+            {
+                return _closeDocumentCommand ??
+                       (_closeDocumentCommand = new RelayCommand(delegate(object i)
+                       {
+                           string name = i as string;
+                           if(string.IsNullOrEmpty(name)) return;
+
+                           var document = DocumentViewModels.Find(d => d.Title.Equals(name));
+
+                           if(document == null) return;
+
+                           int index = DocumentViewModels.IndexOf(document);
+                           var tab = DocumentViewModelsTabs[index];
+                           var host = (WindowsFormsHost) tab.Content;
+                           tab.Content = null;
+                           tab.DataContext = null;
+                           DocumentViewModels.RemoveAt(index);
+                           DocumentViewModelsTabs.RemoveAt(index);
+                           host.Child.Dispose();
+                           host.Dispose();
+                           document.Dispose();
+                           Controller.finalDocument(Session, document.DocumentID);
+                           SelectedDocumentIndex = SelectedDocumentIndex;
+                           IsActive = DocumentViewModels.Count > 0;
+                       }));
             }
         }
 

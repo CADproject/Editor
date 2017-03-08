@@ -7,8 +7,10 @@
         xmlns:cadController="clr-namespace:CADController;assembly=CADController"
         xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
-        Title="Editor" BorderThickness="2" Height="350" Width="820" MinHeight="350" MinWidth="820" WindowStartupLocation="CenterScreen"
-        d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}">
+        AllowsTransparency="False"
+        Title="Editor" BorderThickness="2" Height="350" Width="870" MinHeight="350" MinWidth="870" WindowStartupLocation="CenterScreen"
+        d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}"
+        >
     <Window.BorderBrush>
         <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
             <GradientStop Color="Black" Offset="1"/>
@@ -18,7 +20,7 @@
         </LinearGradientBrush>
     </Window.BorderBrush>
     <Window.Resources>
-        <Style TargetType="{x:Type Button}">
+        <Style x:Key="RoundedButton" TargetType="{x:Type Button}">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="1"/>
@@ -31,8 +33,7 @@
                                     <RadialGradientBrush GradientOrigin="0.496,1.052">
                                         <RadialGradientBrush.RelativeTransform>
                                             <TransformGroup>
-                                                <ScaleTransform CenterX="0.5" CenterY="0.5" 
-                                   ScaleX="1.5" ScaleY="1.5"/>
+                                                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.5" ScaleY="1.5"/>
                                                 <TranslateTransform X="0.02" Y="0.3"/>
                                             </TransformGroup>
                                         </RadialGradientBrush.RelativeTransform>
@@ -72,10 +73,11 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style TargetType="Button" BasedOn="{StaticResource RoundedButton}"></Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition MinHeight="40" Height="Auto"/>
+            <RowDefinition MinHeight="50" Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Vertical">
@@ -98,33 +100,40 @@
                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,5,5">
                     <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Undo" Tag="{x:Static cadController:ApplicationController+Operations.OpUndo}"/>
                     <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Redo" Tag="{x:Static cadController:ApplicationController+Operations.OpRedo}"/>
+                    <Button Command="{Binding CloseApplicationCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="X" Width="30" Height="30"/>
                 </StackPanel>
             </Grid>
         </StackPanel>
-        <GridSplitter Grid.Row="0" x:Name="gridSplitter" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
+        <GridSplitter Grid.Row="0" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
         <Grid Grid.Row="1">
             <Grid.Resources>
-                <DataTemplate x:Key="CustomHeaderTemplate">
-                    <DockPanel LastChildFill="True">
-                        <Button Content="X" DockPanel.Dock="Right"
-                            Command="{Binding DataContext.CloseCommand, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
-                            CommandParameter="{Binding ID}">
-                            <Button.Template>
-                                <ControlTemplate>
-                                    <Label FontWeight="Bold" Content="X" />
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-                        <Label Content="{Binding ID}" />
-                    </DockPanel>
-                </DataTemplate>
+                <ControlTemplate x:Key="CustomHeaderTemplate">
+                    <Border BorderThickness="2" CornerRadius="4">
+                        <DockPanel LastChildFill="True">
+                            <Button Content="X" DockPanel.Dock="Right" 
+                                    IsEnabled="{Binding DataContext.IsActive, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
+                                    Command="{Binding DataContext.CloseDocumentCommand, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
+                                    CommandParameter="{Binding}" Style="{StaticResource RoundedButton}" FontWeight="Bold" Width="20" Height="20">
+                            </Button>
+                            <Label Content="{Binding}" />
+                        </DockPanel>
+                    </Border>
+                </ControlTemplate>
             </Grid.Resources>
-            <TabControl Name="DocumentTabs" ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
-                        SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        ItemTemplate="{StaticResource CustomHeaderTemplate}">
+            <TabControl ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
+                        SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <TabControl.ItemContainerStyle>
                     <Style TargetType="TabItem">
                         <Setter Property="Header" Value="{Binding Title}" />
+                        <Setter Property="HeaderTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <Border BorderThickness="2" CornerRadius="4">
+                                        <Control Template="{StaticResource CustomHeaderTemplate}"></Control>
+                                    </Border>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
                 </TabControl.ItemContainerStyle>
             </TabControl>

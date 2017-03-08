@@ -1,8 +1,9 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 
 namespace CADView
 {
-    public class DocumentViewModel : INotifyPropertyChanged
+    public class DocumentViewModel : INotifyPropertyChanged, IDisposable
     {
         #region Public
 
@@ -24,6 +25,12 @@ namespace CADView
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+        }
+
         #endregion
 
         #region Protected
@@ -39,6 +46,12 @@ namespace CADView
 
         private string _title;
         private uint _documentId;
+        private bool _disposed;
+
+        ~DocumentViewModel()
+        {
+            Dispose();
+        }
 
         #endregion
     }

@@ -75,6 +75,14 @@ namespace CADController
 
         #region Public properties
 
+        public class CLayer
+        {
+            public int Id { get; set; }
+            public bool Visible { get; set; }
+        }
+
+        public Dictionary<uint, List<CLayer>> DocumentsLayers { get; } = new Dictionary<uint, List<CLayer>>();
+
         public int ActiveLayer
         {
             get { return _activeLayer; }
@@ -94,6 +102,7 @@ namespace CADController
         {
             IntPtr pDoc = CoreWrapper.documentFactory(hwnd);
             DocumentId docID = CoreWrapper.attachDocument(_curSession, pDoc);
+            DocumentsLayers[docID] = new List<CLayer>() {new CLayer() {Id = 0, Visible = true} };
             return docID;
         }
 
