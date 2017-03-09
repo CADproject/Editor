@@ -64,6 +64,12 @@
     <Compile Include="Dialogs\ColorDialog.xaml.cs">
       <DependentUpon>ColorDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\DestroyContourDialog.xaml.cs">
+      <DependentUpon>DestroyContourDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\DestroyObjectDialog.xaml.cs">
+      <DependentUpon>DestroyObjectDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\DialogInterfaces.cs" />
     <Compile Include="Dialogs\LayersDialog.xaml.cs">
       <DependentUpon>LayersDialog.xaml</DependentUpon>
@@ -77,7 +83,7 @@
     <Compile Include="Dialogs\ElementIdInputDialog.xaml.cs">
       <DependentUpon>ElementIdInputDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DocumentViewModel.cs" />
+    <Compile Include="DocumentModel.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="RenderPanel.cs">
       <SubType>UserControl</SubType>
@@ -86,6 +92,14 @@
       <DependentUpon>RenderPanel.cs</DependentUpon>
     </Compile>
     <Page Include="Dialogs\ColorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\DestroyContourDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\DestroyObjectDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

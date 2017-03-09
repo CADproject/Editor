@@ -31,7 +31,7 @@ namespace CADView
         {
             if (execute == null)
             {
-                throw new ArgumentNullException("execute");
+                throw new ArgumentNullException(nameof(execute));
             }
 
             this.execute = execute;

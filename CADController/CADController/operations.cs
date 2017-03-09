@@ -1,6 +1,7 @@
 ﻿/*This file contains controller sketch.*/
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Linq;
@@ -10,6 +11,119 @@ namespace CADController
     using SessionId = System.UInt32;
     using DocumentId = System.UInt32;
     using ObjectId = System.UInt32;
+
+    public class Layer
+    {
+        private int _id;
+        private bool _visible;
+        private static int _counter;
+
+        public Layer(bool visible = false)
+        {
+            _id = _counter++;
+            _visible = visible;
+        }
+
+        public Layer(Layer layer)
+        {
+            _id = layer.Id;
+            _visible = layer.Visible;
+        }
+
+        public Layer(int id, bool visible = false)
+        {
+            _id = id;
+            _visible = visible;
+        }
+
+        public virtual int Id
+        {
+            get { return _id; }
+            set { _id = value; }
+        }
+
+        public virtual bool Visible
+        {
+            get { return _visible; }
+            set { _visible = value; }
+        }
+    }
+
+    public class Document : IDisposable
+    {
+        #region Public
+
+        public Document(Layer firstLayer)
+        {
+            Layers.Add(firstLayer);
+        }
+
+        public Document(IEnumerable<Layer> layers)
+        {
+            foreach (var l in layers)
+                Layers.Add(l);
+        }
+
+        public Document(Document document)
+        {
+            _title = document.Title;
+            _documentId = document.DocumentID;
+            _disposed = document._disposed;
+            Layers.Clear();
+            foreach (var l in document.Layers)
+                Layers.Add(l);
+        }
+
+        public virtual string Title
+        {
+            get { return _title; }
+            set { _title = value; }
+        }
+
+        public virtual uint DocumentID
+        {
+            get { return _documentId; }
+            set { _documentId = value; }
+        }
+
+        public virtual void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+        }
+
+        public ObservableCollection<Layer> Layers
+        {
+            get { return _layers; }
+        }
+
+        public virtual Layer ActiveLayer
+        {
+            get { return _activeLayer ?? Layers.FirstOrDefault(); }
+            set { _activeLayer = value; }
+        }
+
+        #endregion
+
+        #region Protected
+
+        #endregion
+
+        #region Private
+
+        private string _title;
+        private uint _documentId;
+        private bool _disposed;
+        private readonly ObservableCollection<Layer> _layers = new ObservableCollection<Layer>();
+        private Layer _activeLayer;
+
+        ~Document()
+        {
+            Dispose();
+        }
+
+        #endregion
+    }
 
     public class ApplicationController
     {
@@ -44,7 +158,7 @@ namespace CADController
             XButton2 = 16777216
         }
 
-        public enum Operations : byte
+        public enum Operations
         {
             OpPointCreate = 0,
             OpLineCreate,
@@ -56,7 +170,7 @@ namespace CADController
             OpRedo,
             OpSetLayersToShow,
             OpSetBackgroundColor
-        };
+        }
 
         #region Private
 
@@ -65,7 +179,6 @@ namespace CADController
         private double _currentMouseCoordX; //for active document
         private double _currentMouseCoordY; //for active document
         private IntPtr _curSession = IntPtr.Zero; //temporary mock for View
-        private int _activeLayer;
 
         #endregion
 
@@ -75,11 +188,7 @@ namespace CADController
 
         #region Public properties
 
-        public int ActiveLayer
-        {
-            get { return _activeLayer; }
-            set { _activeLayer = value; }
-        }
+        public Dictionary<uint, Document> Documents { get; } = new Dictionary<uint, Document>();
 
         #endregion
 
@@ -90,10 +199,16 @@ namespace CADController
             return sessionID;
         }
 
-        public uint initDocument(uint sessionID, IntPtr hwnd)  //used when creating new document
+        public uint initDocument(uint sessionID, IntPtr hwnd, Document document)  //used when creating new document
         {
             IntPtr pDoc = CoreWrapper.documentFactory(hwnd);
             DocumentId docID = CoreWrapper.attachDocument(_curSession, pDoc);
+            if (Documents.ContainsKey(docID))
+            {
+                throw new ApplicationException("Document with same id already exists.");
+            }
+            document.DocumentID = docID;
+            Documents[docID] = document;
             return docID;
         }
 
@@ -161,13 +276,13 @@ namespace CADController
                     operation = new OperationController();
                     break;
             }
-            operation.Layer = ActiveLayer;
             return operation;
         }
 
         public void procOperation(SessionId sessionID, DocumentId docID, Operations opID, Object[] data)
         {
             OperationController curOperation = startOperation(opID);
+            curOperation.Layer = Documents[docID].ActiveLayer.Id;
             curOperation.operationProcess(_curSession, docID, data);
         }
 
@@ -175,6 +290,7 @@ namespace CADController
         {
             IntPtr document = CoreWrapper.detachDocument(_curSession, docID);
             CoreWrapper.destroyDocument(document);
+            Documents.Remove(docID);
         }
 
         public void finalSession(SessionId sessionID)   //closing the application
