@@ -3,17 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CADView.Dialogs"
         xmlns:cadController="clr-namespace:CADController;assembly=CADController"
         mc:Ignorable="d"
-        Title="ColorDialog" Height="250" Width="185" MinHeight="250" MinWidth="185">
-    <Grid>
-        <StackPanel Margin="10">
-            <Button Margin="10,10,0,0" Width="139" Height="20" HorizontalAlignment="Left" Background="Black" Tag="{x:Static cadController:Color.black}" Click="ButtonBase_OnClick"/>
-            <Button Margin="10,10,0,0" Width="139" Height="20" HorizontalAlignment="Left" Background="Blue" Tag="{x:Static cadController:Color.blue}" Click="ButtonBase_OnClick"/>
-            <Button Margin="10,10,0,0" Width="139" Height="20" HorizontalAlignment="Left" Background="Green" Tag="{x:Static cadController:Color.green}" Click="ButtonBase_OnClick"/>
-            <Button Margin="10,10,0,0" Width="139" Height="20" HorizontalAlignment="Left" Background="Red" Tag="{x:Static cadController:Color.red}" Click="ButtonBase_OnClick"/>
-            <Button Margin="10,10,0,0" Width="139" Height="20" HorizontalAlignment="Left" Background="Yellow" Tag="{x:Static cadController:Color.yellow}" Click="ButtonBase_OnClick"/>
+        Title="ColorDialog" Height="250" Width="180" MinHeight="250" MinWidth="180">
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10">
+            <Button Margin="10,10,10,0" Width="Auto" Height="20" HorizontalAlignment="Stretch" Background="Black" Tag="{x:Static cadController:Color.black}" Click="ButtonBase_OnClick"/>
+            <Button Margin="10,10,10,0" Width="Auto" Height="20" HorizontalAlignment="Stretch" Background="Blue" Tag="{x:Static cadController:Color.blue}" Click="ButtonBase_OnClick"/>
+            <Button Margin="10,10,10,0" Width="Auto" Height="20" HorizontalAlignment="Stretch" Background="Green" Tag="{x:Static cadController:Color.green}" Click="ButtonBase_OnClick"/>
+            <Button Margin="10,10,10,0" Width="Auto" Height="20" HorizontalAlignment="Stretch" Background="Red" Tag="{x:Static cadController:Color.red}" Click="ButtonBase_OnClick"/>
+            <Button Margin="10,10,10,0" Width="Auto" Height="20" HorizontalAlignment="Stretch" Background="Yellow" Tag="{x:Static cadController:Color.yellow}" Click="ButtonBase_OnClick"/>
         </StackPanel>
         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
             <Button Visibility="Collapsed" Width="75" Content="Ok" Margin="10" Click="OkButtonClick"></Button>

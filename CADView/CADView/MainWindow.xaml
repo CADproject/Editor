@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView"
         xmlns:cadController="clr-namespace:CADController;assembly=CADController"
-        xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
         AllowsTransparency="False"
         Title="Editor" BorderThickness="2" Height="350" Width="870" MinHeight="350" MinWidth="870" WindowStartupLocation="CenterScreen"

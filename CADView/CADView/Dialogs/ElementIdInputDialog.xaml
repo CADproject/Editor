@@ -3,15 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CADView.Dialogs"
         mc:Ignorable="d"
-        Title="ElementIdInputDialog" Height="139.5" Width="241.667">
-    <Grid>
-        <StackPanel>
+        Title="ElementIdInputDialog" Height="140" Width="240" MinHeight="140" MinWidth="240">
+    <Grid HorizontalAlignment="Stretch">
+        <StackPanel HorizontalAlignment="Stretch">
             <Label Margin="5,0,0,0" Content="Enter ids (comma for separation)"></Label>
-            <DockPanel>
+            <DockPanel LastChildFill="True">
                 <Label Margin="5,0,0,0" Content="IDs:"></Label>
-                <TextBox Name="X1" Text="0" Margin="5,5,0,0" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
+                <TextBox Name="X1" Text="0" Margin="5,5,5,0" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top"></TextBox>
             </DockPanel>
         </StackPanel>
         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
