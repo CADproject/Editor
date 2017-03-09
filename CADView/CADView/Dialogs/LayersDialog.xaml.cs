@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,38 +7,37 @@ using CADController;
 
 namespace CADView.Dialogs
 {
-    internal class LayerModel : INotifyPropertyChanged
+    public class LayerModel : Layer, INotifyPropertyChanged
     {
-        private int _id;
-        private bool _visible;
-        private static int _counter;
-
-        public LayerModel()
+        public LayerModel(bool visible = false) : base(visible)
         {
-            _id = _counter++;
         }
 
-        public LayerModel(int id)
+        public LayerModel(int id, bool visible = false) : base(id, visible)
         {
-            _id = id;
         }
 
-        public int Id
+        public LayerModel(Layer layer) : base(layer)
         {
-            get { return _id; }
+
+        }
+
+        public override int Id
+        {
+            get { return base.Id; }
             set
             {
-                _id = value;
+                base.Id = value;
                 OnPropertyChanged();
             }
         }
 
-        public bool Visible
+        public override bool Visible
         {
-            get { return _visible; }
+            get { return base.Visible; }
             set
             {
-                _visible = value;
+                base.Visible = value;
                 OnPropertyChanged();
                 VisibleChangedStatic?.Invoke(this, new PropertyChangedEventArgs("Visible"));
             }
@@ -89,10 +86,20 @@ namespace CADView.Dialogs
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public ObservableCollection<LayerModel> Layers { get; } = new ObservableCollection<LayerModel>()
+        public ObservableCollection<Layer> Layers
         {
-            new LayerModel() {Visible = true}
-        };
+            get { return _controller.Documents[_documentId].Layers; }
+        }
+
+        public Layer ActiveLayer
+        {
+            get { return _controller.Documents[_documentId].ActiveLayer; }
+            set
+            {
+                _controller.Documents[_documentId].ActiveLayer = value;
+                OnPropertyChanged();
+            }
+        }
 
         public RelayCommand AddLayer
         {
@@ -106,21 +113,6 @@ namespace CADView.Dialogs
             }
         }
 
-        public LayerModel ActiveLayer
-        {
-            get
-            {
-                if (Layers.Count == 0) return null;
-                return (Layers.First(lm => lm.Id == _controller.ActiveLayer) ?? Layers.First()) ?? new LayerModel();
-            }
-            set
-            {
-                if (value == null) return;
-                _controller.ActiveLayer = value.Id;
-                OnPropertyChanged();
-            }
-        }
-
         public bool Ready
         {
             get { return _ready; }
@@ -129,20 +121,6 @@ namespace CADView.Dialogs
                 _ready = value;
                 OnPropertyChanged();
             }
-        }
-
-        public void Init()
-        {
-            Layers.Clear();
-            foreach (var l in _controller.DocumentsLayers[_documentId])
-            {
-                Layers.Add(new LayerModel(l.Id) {Visible = l.Visible});
-            }
-            Layers.CollectionChanged+= delegate
-            {
-                _controller.DocumentsLayers[_documentId] =
-                    Layers.Select(lm => new ApplicationController.CLayer() {Id = lm.Id, Visible = lm.Visible}).ToList();
-            };
         }
     }
 
@@ -153,7 +131,6 @@ namespace CADView.Dialogs
     {
         private static LayersDialog _instance;
         private readonly LayersDialogViewModel _viewModel;
-        private bool _hidden;
 
         public LayersDialog(ApplicationController controller, uint documentId)
         {
@@ -172,24 +149,7 @@ namespace CADView.Dialogs
 
         private void CancelButtonClick(object sender, RoutedEventArgs e)
         {
-            Visibility = Visibility.Hidden;
-        }
-
-        protected override void OnActivated(EventArgs e)
-        {
-            base.OnActivated(e);
-
-            if (_hidden)
-                _viewModel.Init();
-            _hidden = false;
-        }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            _hidden = true;
-            e.Cancel = true;
-            base.OnClosing(e);
-            CancelButtonClick(this, null);
+            DialogResult = false;
         }
 
         public static LayersDialog Instance => _instance;

@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Windows.Forms;
+using CADController;
 
 namespace CADView
 {
-    public partial class RenderPanel : UserControl
+    public sealed partial class RenderPanel : UserControl
     {
-        public RenderPanel()
+        public DocumentModel Model { get; set; }
+
+        public RenderPanel(DocumentModel model)
         {
+            Model = model;
             InitializeComponent();
 
-            HandleCreated += (sender, args) => { if (Loaded != null) Loaded?.Invoke(Handle, Width, Height); };
+            HandleCreated += (sender, args) => { if (Loaded != null) Loaded?.Invoke(Handle, Width, Height, Model); };
             SizeChanged += (sender, args) => { if (Resized != null) Resized(Width, Height); };
             Paint += (sender, args) => { if (Rendered != null) Rendered(); };
             MouseWheel += (sender, args) => { if (MouseFired != null) MouseFired(args); };
@@ -22,7 +26,7 @@ namespace CADView
             DoubleBuffered = true;
         }
 
-        public delegate void LoadedEventDelegate(IntPtr hwnd, int w, int h);
+        public delegate void LoadedEventDelegate(IntPtr hwnd, int w, int h, Document model);
         public static event LoadedEventDelegate Loaded;
 
         public delegate void ResizedEventDelegate(int w, int h);

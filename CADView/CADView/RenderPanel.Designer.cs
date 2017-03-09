@@ -1,6 +1,6 @@
 ﻿namespace CADView
 {
-    partial class RenderPanel
+    sealed partial class RenderPanel
     {
         /// <summary> 
         /// Обязательная переменная конструктора.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using CADController;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,10 +33,11 @@ namespace CADView
 
         ~MainWindowViewModel()
         {
-            foreach (var documentViewModel in DocumentViewModels)
+            var ids = DocumentViewModels.Select(d => d.Key).ToList();
+            foreach (var id in ids)
             {
-                documentViewModel.Dispose();
-                Controller.finalDocument(Session, documentViewModel.DocumentID);
+                DocumentViewModels[id].Dispose();
+                Controller.finalDocument(Session, id);
             }
             Controller.finalSession(Session);
         }
@@ -66,27 +68,28 @@ namespace CADView
             _timer.Tick += delegate
             {
                 if (DocumentViewModels.Count == 0) return;
-                Controller.draw(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID);
+                Controller.draw(Session, ActiveDocument.DocumentID);
             };
             _timer.Start();
         }
 
         public void CreateDocument()
         {
+            var model = new DocumentModel(new LayerModel(true));
             var host = new WindowsFormsHost()
             {
-                Child = new RenderPanel(),
+                Child = new RenderPanel(model),
                 VerticalAlignment = VerticalAlignment.Stretch,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
-            var model = new DocumentViewModel();
-            DocumentViewModelsTabs.Add(new TabItem()
+            TabItem tab = new TabItem()
             {
                 Content = host,
-                DataContext = model
-            });
-            DocumentViewModels.Add(model);
+                DataContext = model,
+            };
+            DocumentViewModelsTabs.Add(tab);
+            _tabsDocuments[tab] = model;
             _selectedDocumentIndex = DocumentViewModelsTabs.Count - 1;
             OnPropertyChanged("SelectedDocumentIndex");
         }
@@ -96,8 +99,6 @@ namespace CADView
             get { return _selectedDocumentIndex; }
             set
             {
-
-
                 _selectedDocumentIndex = value;
                 OnPropertyChanged();
 
@@ -105,7 +106,7 @@ namespace CADView
 
                 var size = ((WindowsFormsHost) DocumentViewModelsTabs[SelectedDocumentIndex].Content)
                     .Child.Size;
-                Controller.activateDocement(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, size.Width,
+                Controller.activateDocement(Session, ActiveDocument.DocumentID, size.Width,
                     size.Height);
             }
         }
@@ -120,9 +121,9 @@ namespace CADView
             }
         }
 
-        public List<DocumentViewModel> DocumentViewModels
+        public Dictionary<uint, Document> DocumentViewModels
         {
-            get { return _documentViewModels; }
+            get { return Controller.Documents; }
         }
 
         public double WindowWidth
@@ -142,6 +143,20 @@ namespace CADView
             {
                 _windowHeight = value;
                 OnPropertyChanged();
+            }
+        }
+
+        public Document ActiveDocument
+        {
+            get
+            {
+                if (SelectedDocumentIndex < 0) return null;
+                return _tabsDocuments[DocumentViewModelsTabs[SelectedDocumentIndex]];
+            }
+            set
+            {
+                SelectedDocumentIndex =
+                    DocumentViewModelsTabs.IndexOf(_tabsDocuments.FirstOrDefault(i => i.Value == value).Key);
             }
         }
 
@@ -174,8 +189,9 @@ namespace CADView
         private DispatcherTimer _timer;
         private double _windowWidth;
         private double _windowHeight;
-        private readonly List<DocumentViewModel> _documentViewModels = new List<DocumentViewModel>();
+        private readonly List<DocumentModel> _documentViewModels = new List<DocumentModel>();
         private RelayCommand _closeApplicationCommand;
+        private readonly Dictionary<TabItem, Document> _tabsDocuments = new Dictionary<TabItem, Document>(); 
 
         private uint Session
         {
@@ -193,29 +209,29 @@ namespace CADView
             CreateDocument();
         }
 
-        private void RenderPanelOnLoad(IntPtr hwnd, int w, int h)
+        private void RenderPanelOnLoad(IntPtr hwnd, int w, int h, Document model)
         {
-            var activeDocument = Controller.initDocument(Session, hwnd);
+            var activeDocument = Controller.initDocument(Session, hwnd, model);
             Controller.activateDocement(Session, activeDocument, w, h);
-            DocumentViewModels[SelectedDocumentIndex].Title = "Document # " + activeDocument;
-            DocumentViewModels[SelectedDocumentIndex].DocumentID = activeDocument;
+            ActiveDocument.Title = "Document # " + activeDocument;
+            ActiveDocument.DocumentID = activeDocument;
             IsActive = true;
         }
 
         private void RenderPanelOnResize(int w, int h)
         {
-            Controller.resizeDocument(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, w, h);
+            Controller.resizeDocument(Session, ActiveDocument.DocumentID, w, h);
         }
 
         private void RenderPanelOnRender()
         {
             if (DocumentViewModels.Count == 0) return;
-            Controller.draw(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID);
+            Controller.draw(Session, ActiveDocument.DocumentID);
         }
 
         private void RenderPanelOnMouseFire(MouseEventArgs args)
         {
-            Controller.eventHendling(DocumentViewModels[SelectedDocumentIndex].DocumentID, (int) args.Button, args.X,
+            Controller.eventHendling(ActiveDocument.DocumentID, (int) args.Button, args.X,
                 args.Y, args.Delta);
         }
 
@@ -226,7 +242,7 @@ namespace CADView
                 IsActive = false;
                 await Task.Run(delegate
                 {
-                    Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, type,
+                    Controller.procOperation(Session, ActiveDocument.DocumentID, type,
                         (object[]) data);
                 });
                 return true;
@@ -277,11 +293,11 @@ namespace CADView
                     break;
                 case ApplicationController.Operations.OpSetBackgroundColor:
                     separatedWindow = Dialogs.ColorDialog.Instance;
-                    separatedWindow.Title = "Set color number";
+                    separatedWindow.Title = "Colors manager";
                     break;
                 case ApplicationController.Operations.OpSetLayersToShow:
-                    separatedWindow = LayersDialog.Instance ?? new LayersDialog(Controller, DocumentViewModels[SelectedDocumentIndex].DocumentID);
-                    separatedWindow.Title = "Set layer number";
+                    separatedWindow = new LayersDialog(Controller, ActiveDocument.DocumentID);
+                    separatedWindow.Title = "Layers manager";
                     break;
             }
 
@@ -355,17 +371,16 @@ namespace CADView
                            string name = i as string;
                            if(string.IsNullOrEmpty(name)) return;
 
-                           var document = DocumentViewModels.Find(d => d.Title.Equals(name));
+                           var tab = DocumentViewModelsTabs.ToList().Find(d => d.Header.Equals(name));
+                           var document = _tabsDocuments[tab];
 
                            if(document == null) return;
 
-                           int index = DocumentViewModels.IndexOf(document);
-                           var tab = DocumentViewModelsTabs[index];
                            var host = (WindowsFormsHost) tab.Content;
                            tab.Content = null;
                            tab.DataContext = null;
-                           DocumentViewModels.RemoveAt(index);
-                           DocumentViewModelsTabs.RemoveAt(index);
+                           DocumentViewModelsTabs.Remove(tab);
+                           _tabsDocuments.Remove(tab);
                            host.Child.Dispose();
                            host.Dispose();
                            document.Dispose();
