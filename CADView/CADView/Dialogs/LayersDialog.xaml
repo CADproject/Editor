@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView.Dialogs"
         mc:Ignorable="d"
-        Title="LayerModelsDialog" Height="400" Width="400"
+        Title="LayerModelsDialog" Height="400" Width="400" MinHeight="400" MinWidth="400"
         d:DataContext="{d:DesignInstance local:LayersDialogViewModel}"
         >
     <Grid>

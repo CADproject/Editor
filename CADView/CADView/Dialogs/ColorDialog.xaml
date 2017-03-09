@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CADView.Dialogs"
         xmlns:cadController="clr-namespace:CADController;assembly=CADController"
         mc:Ignorable="d"
-        Title="ColorDialog" Height="256.667" Width="186">
+        Title="ColorDialog" Height="250" Width="185" MinHeight="250" MinWidth="185">
     <Grid>
         <StackPanel Margin="10">
             <Button Margin="10,10,0,0" Width="139" Height="20" HorizontalAlignment="Left" Background="Black" Tag="{x:Static cadController:Color.black}" Click="ButtonBase_OnClick"/>
