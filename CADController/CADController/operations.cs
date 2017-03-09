@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Linq;
@@ -16,11 +17,10 @@ namespace CADController
     {
         private int _id;
         private bool _visible;
-        private static int _counter;
 
         public Layer(bool visible = false)
         {
-            _id = _counter++;
+            _id = -1;
             _visible = visible;
         }
 
@@ -39,7 +39,7 @@ namespace CADController
         public virtual int Id
         {
             get { return _id; }
-            set { _id = value; }
+            internal set { _id = value; }
         }
 
         public virtual bool Visible
@@ -56,12 +56,16 @@ namespace CADController
         public Document(Layer firstLayer)
         {
             Layers.Add(firstLayer);
+            if (firstLayer.Id == -1)
+                firstLayer.Id = _layersCounter++;
+            Layers.CollectionChanged+=AddLayer;
         }
 
         public Document(IEnumerable<Layer> layers)
         {
             foreach (var l in layers)
                 Layers.Add(l);
+            Layers.CollectionChanged += AddLayer;
         }
 
         public Document(Document document)
@@ -72,6 +76,7 @@ namespace CADController
             Layers.Clear();
             foreach (var l in document.Layers)
                 Layers.Add(l);
+            Layers.CollectionChanged += AddLayer;
         }
 
         public virtual string Title
@@ -116,10 +121,19 @@ namespace CADController
         private bool _disposed;
         private readonly ObservableCollection<Layer> _layers = new ObservableCollection<Layer>();
         private Layer _activeLayer;
+        private int _layersCounter;
 
         ~Document()
         {
             Dispose();
+        }
+
+        private void AddLayer(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        {
+            if(notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Add || notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Replace || notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Reset)
+                foreach (Layer item in notifyCollectionChangedEventArgs.NewItems)
+                    if (item.Id == -1)
+                        item.Id = _layersCounter++;
         }
 
         #endregion
@@ -209,6 +223,8 @@ namespace CADController
             }
             document.DocumentID = docID;
             Documents[docID] = document;
+            procOperation(sessionID, docID, Operations.OpSetLayersToShow,
+                document.Layers.Select(l => (object) l.Id).ToArray());
             return docID;
         }
 

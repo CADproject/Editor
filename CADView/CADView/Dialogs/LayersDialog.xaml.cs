@@ -1,7 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using CADController;
 
@@ -25,11 +27,6 @@ namespace CADView.Dialogs
         public override int Id
         {
             get { return base.Id; }
-            set
-            {
-                base.Id = value;
-                OnPropertyChanged();
-            }
         }
 
         public override bool Visible
@@ -52,13 +49,14 @@ namespace CADView.Dialogs
         }
     }
 
-    internal class LayersDialogViewModel : INotifyPropertyChanged
+    internal class LayersDialogViewModel : INotifyPropertyChanged, IDisposable
     {
         public event MainWindowViewModel.ProcessDataDelegate DataChanged;
         private RelayCommand _addLayer;
         private bool _ready = true;
         private readonly ApplicationController _controller;
         private readonly uint _documentId;
+        private bool _disposed;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -71,6 +69,13 @@ namespace CADView.Dialogs
 
         ~LayersDialogViewModel()
         {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
             LayerModel.VisibleChangedStatic -= LayerModelOnVisibleChangedStatic;
         }
 
@@ -129,18 +134,21 @@ namespace CADView.Dialogs
     /// </summary>
     public partial class LayersDialog : ICallbackDialog
     {
-        private static LayersDialog _instance;
-        private readonly LayersDialogViewModel _viewModel;
+        private LayersDialogViewModel _viewModel;
 
         public LayersDialog(ApplicationController controller, uint documentId)
         {
             InitializeComponent();
-            _instance = this;
 
             _viewModel = new LayersDialogViewModel(controller, documentId);
 
-            _viewModel.DataChanged += sender => DataChanged?.Invoke(sender);
+            _viewModel.DataChanged += OnDataChanged;
             DataContext = _viewModel;
+        }
+
+        private Task OnDataChanged(object[] sender)
+        {
+            return DataChanged?.Invoke(sender);
         }
 
         private void OkButtonClick(object sender, RoutedEventArgs e)
@@ -149,10 +157,13 @@ namespace CADView.Dialogs
 
         private void CancelButtonClick(object sender, RoutedEventArgs e)
         {
+            _viewModel.DataChanged -= OnDataChanged;
+            _viewModel.Dispose();
+            _viewModel = null;
+            DataContext = null;
             DialogResult = false;
+            //GC.Collect();
         }
-
-        public static LayersDialog Instance => _instance;
 
         public event MainWindowViewModel.ProcessDataDelegate DataChanged;
 

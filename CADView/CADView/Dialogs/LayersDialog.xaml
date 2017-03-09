@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView.Dialogs"
         mc:Ignorable="d"
-        Title="LayerModelsDialog" Height="251" Width="300"
+        Title="LayerModelsDialog" Height="400" Width="400"
         d:DataContext="{d:DesignInstance local:LayersDialogViewModel}"
         >
     <Grid>
@@ -16,10 +16,28 @@
             </Grid.RowDefinitions>
             <DataGrid ItemsSource="{Binding Layers}" 
                       CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" HeadersVisibility="Column"
-                      AutoGenerateColumns="False">
+                      AutoGenerateColumns="False" SelectionUnit="FullRow" SelectionMode="Single">
+                <DataGrid.CellStyle>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                    </Style>
+                </DataGrid.CellStyle>
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Transparent"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="Black"/>
+                </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Width="1*" Header="Id" Binding="{Binding Id}"/>
-                    <DataGridCheckBoxColumn Width="1*" Header="Visible" Binding="{Binding Visible, UpdateSourceTrigger=PropertyChanged}"></DataGridCheckBoxColumn>
+                    <DataGridTextColumn Width="1*" Header="Id" Binding="{Binding Id, Mode=OneWay}" IsReadOnly="True"/>
+                    <DataGridTemplateColumn Width="1*" Header="Visible">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox HorizontalAlignment="Center" IsChecked="{Binding Visible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
             <StackPanel Grid.Row="1" Margin="0,10,0,0" Orientation="Vertical">

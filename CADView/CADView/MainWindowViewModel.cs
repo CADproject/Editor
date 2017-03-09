@@ -303,6 +303,7 @@ namespace CADView
 
             if (modalWindow is IDataDialog)
             {
+                modalWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 if (modalWindow.ShowDialog() == true)
                 {
                     {
@@ -314,6 +315,7 @@ namespace CADView
             }
             if (separatedWindow is ICallbackDialog)
             {
+                separatedWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
                 ((ICallbackDialog) separatedWindow).DataChanged += o => ProcessControllerWork(type, o);
                 separatedWindow.ShowDialog();
             }
