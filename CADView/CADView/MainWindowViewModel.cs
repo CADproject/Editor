@@ -281,11 +281,11 @@ namespace CADView
                     break;
                 case ApplicationController.Operations.OpContourCreate:
                     modalWindow = new ElementIdInputDialog();
-                    modalWindow.Title = "Create Contour from objects";
+                    modalWindow.Title = "Create Contour";
                     break;
                 case ApplicationController.Operations.OpDeleteObject:
                     modalWindow = new DestroyObjectDialog();
-                    modalWindow.Title = "Delete object";
+                    modalWindow.Title = "Delete element";
                     break;
                 case ApplicationController.Operations.OpDestroyContour:
                     modalWindow = new DestroyContourDialog();
@@ -293,7 +293,7 @@ namespace CADView
                     break;
                 case ApplicationController.Operations.OpSetBackgroundColor:
                     separatedWindow = Dialogs.ColorDialog.Instance;
-                    separatedWindow.Title = "Colors manager";
+                    separatedWindow.Title = "Colors";
                     break;
                 case ApplicationController.Operations.OpSetLayersToShow:
                     separatedWindow = new LayersDialog(Controller, ActiveDocument.DocumentID);

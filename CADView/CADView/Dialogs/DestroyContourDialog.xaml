@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Destroy Contour Dialog" Height="130" Width="300" MinHeight="130" MinWidth="300">
+        Title="Destroy Contour Dialog" Height="130" Width="235" MinHeight="130" MinWidth="235">
     <Grid>
         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-30,0,0">
             <Label Margin="5,0,0,0" Content="Contour ID:"></Label>

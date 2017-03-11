@@ -18,7 +18,7 @@
                                         </TransformGroup>
                                     </RadialGradientBrush.RelativeTransform>
                                     <GradientStop Offset="1" Color="#00000000"/>
-                                    <GradientStop Offset="0.3" Color="{Binding Path=Background.Color, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"/>
+                                    <GradientStop Offset="0.7" Color="{Binding Path=Background.Color, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"/>
                                 </RadialGradientBrush>
                             </Border.Background>
                             <ContentPresenter HorizontalAlignment="Center"
