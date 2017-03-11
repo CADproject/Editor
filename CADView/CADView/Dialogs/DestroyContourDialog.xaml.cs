@@ -18,7 +18,7 @@ namespace CADView.Dialogs
         private void OkButtonClick(object sender, RoutedEventArgs e)
         {
             Data = new List<object>(2);
-            Data.Add(double.Parse(IdTextBox.Text));
+            Data.Add(uint.Parse(IdTextBox.Text));
 
             DialogResult = true;
         }
