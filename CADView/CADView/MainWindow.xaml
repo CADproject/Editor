@@ -7,7 +7,7 @@
         xmlns:cadController="clr-namespace:CADController;assembly=CADController"
         mc:Ignorable="d"
         AllowsTransparency="False"
-        Title="Editor" BorderThickness="2" Height="350" Width="870" MinHeight="350" MinWidth="870" WindowStartupLocation="CenterScreen"
+        Title="Editor" BorderThickness="2" Height="450" Width="870" MinHeight="450" MinWidth="870" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}"
         >
     <Window.BorderBrush>
