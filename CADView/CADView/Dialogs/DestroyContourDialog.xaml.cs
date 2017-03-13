@@ -4,11 +4,11 @@ using System.Windows;
 namespace CADView.Dialogs
 {
     /// <summary>
-    /// Логика взаимодействия для TwoPointDialog.xaml
+    /// Логика взаимодействия для DestroyObject.xaml
     /// </summary>
-    public partial class TwoPointDialog : IDataDialog
+    public partial class DestroyContourDialog : IDataDialog
     {
-        public TwoPointDialog()
+        public DestroyContourDialog()
         {
             InitializeComponent();
         }
@@ -18,10 +18,7 @@ namespace CADView.Dialogs
         private void OkButtonClick(object sender, RoutedEventArgs e)
         {
             Data = new List<object>(2);
-            Data.Add(double.Parse(X1.Text));
-            Data.Add(double.Parse(Y1.Text));
-            Data.Add(double.Parse(X2.Text));
-            Data.Add(double.Parse(Y2.Text));
+            Data.Add(uint.Parse(IdTextBox.Text));
 
             DialogResult = true;
         }

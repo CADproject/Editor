@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView"
         xmlns:cadController="clr-namespace:CADController;assembly=CADController"
-        xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
-        Title="Cloud CAD system" BorderThickness="2" Height="350" Width="650" MinHeight="350" MinWidth="650" WindowStartupLocation="CenterScreen"
-        d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}">
+        AllowsTransparency="False"
+        Title="Editor" BorderThickness="2" Height="450" Width="870" MinHeight="450" MinWidth="870" WindowStartupLocation="CenterScreen"
+        d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}"
+        >
     <Window.BorderBrush>
         <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
             <GradientStop Color="Black" Offset="1"/>
@@ -21,39 +22,63 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition MinHeight="40" Height="Auto"/>
+            <RowDefinition MinHeight="50" Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <Grid>
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5,5,5">
-                    <Button Command="{Binding DocumentWorkCommand}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="New &#xD;&#xA;Document"></Button>
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;point" Tag="{x:Static cadController:ApplicationController+operations.OpPointCreate}" ></Button>
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;line" Tag="{x:Static cadController:ApplicationController+operations.OpLineCreate}"></Button>
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;circle" Tag="{x:Static cadController:ApplicationController+operations.OpCircleCreate}"></Button>
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xD;&#xA;contour" Tag="{x:Static cadController:ApplicationController+operations.OpContourCreate}"></Button>
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Set background&#xD;&#xA;color" Tag="{x:Static cadController:ApplicationController+operations.OpSetBackgroundColor}"></Button>
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Set visible&#xD;&#xA;layer" Tag="{x:Static cadController:ApplicationController+operations.OpSetLayersToShow}"></Button>
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="25,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Delete &#xD;&#xA;element" Tag="{x:Static cadController:ApplicationController+operations.OpDeleteObject}"></Button>
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Destroy&#xD;&#xA;contour" Tag="{x:Static cadController:ApplicationController+operations.OpDestroyContour}"></Button>
+                    <Button Command="{Binding DocumentWorkCommand}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="New &#xA;Document" Width="70"/>
+                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;point" Tag="{x:Static cadController:ApplicationController+Operations.OpPointCreate}" Width="70" />
+                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;line" Tag="{x:Static cadController:ApplicationController+Operations.OpLineCreate}" Width="70"/>
+                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;circle" Tag="{x:Static cadController:ApplicationController+Operations.OpCircleCreate}" Width="70"/>
+                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;contour" Tag="{x:Static cadController:ApplicationController+Operations.OpContourCreate}" Width="70"/>
+                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                    Content="Destroy&#xA;contour" Tag="{x:Static cadController:ApplicationController+Operations.OpDestroyContour}" Width="70"/>
+                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                    Content="Delete &#xA;element" Tag="{x:Static cadController:ApplicationController+Operations.OpDeleteObject}" Width="70"/>
+                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                    Content="Background&#xA;color" Tag="{x:Static cadController:ApplicationController+Operations.OpSetBackgroundColor}" Width="70"/>
+                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                    Content="Layers&#xA;manager" Tag="{x:Static cadController:ApplicationController+Operations.OpSetLayersToShow}" Width="70"/>
                 </StackPanel>
                 <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,5,5">
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Undo" Tag="{x:Static cadController:ApplicationController+operations.OpUndo}"></Button>
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Redo" Tag="{x:Static cadController:ApplicationController+operations.OpRedo}"></Button>
+                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Undo" Tag="{x:Static cadController:ApplicationController+Operations.OpUndo}"/>
+                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Redo" Tag="{x:Static cadController:ApplicationController+Operations.OpRedo}"/>
+                    <Button Command="{Binding CloseApplicationCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="X" Width="30" Height="30"/>
                 </StackPanel>
             </Grid>
         </StackPanel>
-        <GridSplitter Grid.Row="0" x:Name="gridSplitter" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
+        <GridSplitter Grid.Row="0" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
         <Grid Grid.Row="1">
-            <TabControl Name="DocumentTabs" ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
+            <Grid.Resources>
+                <ControlTemplate x:Key="CustomHeaderTemplate">
+                    <Border BorderThickness="2" CornerRadius="4">
+                        <DockPanel LastChildFill="True">
+                            <Button Content="X" DockPanel.Dock="Right" 
+                                    IsEnabled="{Binding DataContext.IsActive, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
+                                    Command="{Binding DataContext.CloseDocumentCommand, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
+                                    CommandParameter="{Binding}" Style="{StaticResource RoundedButton}" FontWeight="Bold" Width="20" Height="20">
+                            </Button>
+                            <Label Content="{Binding}" />
+                        </DockPanel>
+                    </Border>
+                </ControlTemplate>
+            </Grid.Resources>
+            <TabControl ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
                         SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <TabControl.ItemContainerStyle>
                     <Style TargetType="TabItem">
                         <Setter Property="Header" Value="{Binding Title}" />
+                        <Setter Property="HeaderTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <Border BorderThickness="2" CornerRadius="4">
+                                        <Control Template="{StaticResource CustomHeaderTemplate}"></Control>
+                                    </Border>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
                 </TabControl.ItemContainerStyle>
             </TabControl>

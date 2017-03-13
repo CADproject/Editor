@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CADView.Dialogs
 {
@@ -10,7 +9,6 @@ namespace CADView.Dialogs
 
     internal interface ICallbackDialog
     {
-        event EventHandler DataChanged;
-        void DataProcessComplete();
+        event MainWindowViewModel.ProcessDataDelegate DataChanged;
     }
 }

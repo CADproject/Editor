@@ -3,22 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CADView.Dialogs"
         mc:Ignorable="d"
-        Title="OnePointDialog" Height="300" Width="300">
+        Title="OnePointDialog" Height="135" Width="225" MinHeight="135" MinWidth="225">
     <Grid>
         <StackPanel>
             <DockPanel>
                 <Label Margin="5,0,0,0" Content="X:"></Label>
-                <TextBox Name="X1" Text="0" Margin="5,5,0,0" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
+                <TextBox Name="X1" Text="0" Margin="5,5,5,0" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top"></TextBox>
             </DockPanel>
             <DockPanel>
                 <Label Margin="5,0,0,0" Content="Y:"></Label>
-                <TextBox Name="Y1" Text="0" Margin="5,5,0,0" Width="80" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
+                <TextBox Name="Y1" Text="0" Margin="5,5,5,0" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top"></TextBox>
             </DockPanel>
         </StackPanel>
         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
-            <Button Width="75" Content="Ok" Margin="10" Click="OkButtonClick"></Button>
+            <Button Width="75" Content="OK" Margin="10" Click="OkButtonClick"></Button>
             <Button Width="75" Content="Cancel" Margin="10" Click="CancelButtonClick"></Button>
         </DockPanel>
     </Grid>

@@ -12,13 +12,13 @@ DocumentId attachDocument(void* pObject, void* doc)
 	return ses->attachDocument(pDoc);
 }
 
-extern "C" COREDLL_API void* detachDocument(void* pObject, DocumentId docID)
+void* detachDocument(void* pObject, DocumentId docID)
 {
 	Session* ses = static_cast<Session*>(pObject);
 	return ses->detachDocument(docID);
 }
 
-extern "C" COREDLL_API void destroyDocument(void* pObject)
+void destroyDocument(void* pObject)
 {
 	Document* pDoc = static_cast<Document*>(pObject);
 	delete pDoc;
@@ -56,11 +56,17 @@ unsigned getGenLayer(void* pObject, DocumentId docID, ObjectId objID)
 	return ses->getGenLayer(docID, objID);
 }
 
-void setLayers(void* pObject, DocumentId docID, void* pNewLayers)
+void setLayers(void* pObject, DocumentId docID, void* pNewLayers, unsigned size)
 {
 	Session* ses = static_cast<Session*>(pObject);
-	auto pNL = static_cast<std::vector<unsigned>*>(pNewLayers); 
-	ses->setLayers(docID, *pNL);
+	std::vector<int> layersToShow(size);
+	memcpy(layersToShow.data(), pNewLayers, size * sizeof(int));
+	std::vector<unsigned> layersToShowCopy(size);
+	for (size_t i = 0; i < size; i++)
+	{
+		layersToShowCopy[i] = layersToShow[i];
+	}
+	ses->setLayers(docID, layersToShowCopy);
 }
 
 void setBackgroundColor(void* pObject, DocumentId docID, COLOR color)

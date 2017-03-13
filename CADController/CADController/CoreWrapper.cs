@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace CADController
@@ -52,7 +54,7 @@ namespace CADController
         public static extern uint getGenLayer(IntPtr pObject, DocumentId docID, ObjectId objID);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void setLayers(IntPtr pObject, DocumentId docID, IntPtr newLayers);
+        public static extern void setLayers(IntPtr pObject, DocumentId docID, IntPtr newLayers, uint size);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void setBackgroundColor(IntPtr pObject, DocumentId docID, Color color);
@@ -110,29 +112,52 @@ namespace CADController
         public static extern IntPtr getGenericTopology(IntPtr pObject);
     }
 
-    public unsafe class UnmanagedArray
+    public unsafe class UnmanagedArray<T> where T: struct
     {
-        public IntPtr _pointer;
-        public int _size;
+        private readonly int _size;
 
-        public UnmanagedArray(IntPtr[] array)
+        public UnmanagedArray(IEnumerable<T> array)
         {
-            _size = array.Length;
-            _pointer = Marshal.AllocHGlobal(_size * sizeof(IntPtr));
-            Marshal.Copy(array, 0, _pointer, _size);
+            if(array == null)
+                throw new ArgumentException("Empty array.");
+            IEnumerable<T> enumerable = array as T[] ?? array.ToArray();
+            _size = enumerable.Count();
+            Pointer = Marshal.AllocHGlobal(_size * sizeof (IntPtr));
+            if (typeof (T) == typeof (int))
+                Marshal.Copy(enumerable.Cast<int>().ToArray(), 0, Pointer, _size);
+            else if (typeof (T) == typeof (byte))
+                Marshal.Copy(enumerable.Cast<byte>().ToArray(), 0, Pointer, _size);
+            else if (typeof (T) == typeof (float))
+                Marshal.Copy(enumerable.Cast<float>().ToArray(), 0, Pointer, _size);
+            else if (typeof (T) == typeof (IntPtr))
+                Marshal.Copy(enumerable.Cast<IntPtr>().ToArray(), 0, Pointer, _size);
+            else if (typeof (T) == typeof (long))
+                Marshal.Copy(enumerable.Cast<long>().ToArray(), 0, Pointer, _size);
+            else if (typeof (T) == typeof (short))
+                Marshal.Copy(enumerable.Cast<short>().ToArray(), 0, Pointer, _size);
+            else if (typeof (T) == typeof (char))
+                Marshal.Copy(enumerable.Cast<char>().ToArray(), 0, Pointer, _size);
+            else if (typeof (T) == typeof (double))
+                Marshal.Copy(enumerable.Cast<double>().ToArray(), 0, Pointer, _size);
+            else
+                throw new ArgumentException("Wrong type of array.", typeof (T).FullName);
         }
-        
+
         ~UnmanagedArray()
         {
-            Marshal.FreeHGlobal(_pointer);
+            Marshal.FreeHGlobal(Pointer);
         }
 
-        public static implicit operator IntPtr(UnmanagedArray ptr)
+        public static implicit operator IntPtr(UnmanagedArray<T> ptr)
         {
-            return ptr._pointer;
+            return ptr.Pointer;
         }
 
-        public IntPtr getPointer() { return _pointer; }
-        public int getSize() { return _size; }
+        public IntPtr Pointer { get; }
+
+        public uint Size
+        {
+            get { return (uint) _size; }
+        }
     }
 }

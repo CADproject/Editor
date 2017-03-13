@@ -1,14 +1,143 @@
 ﻿/*This file contains controller sketch.*/
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Linq;
 
 namespace CADController
 {
     using SessionId = System.UInt32;
     using DocumentId = System.UInt32;
-    //using OperationId = System.UInt32;
     using ObjectId = System.UInt32;
+
+    public class Layer
+    {
+        private int _id;
+        private bool _visible;
+
+        public Layer(bool visible = false)
+        {
+            _id = -1;
+            _visible = visible;
+        }
+
+        public Layer(Layer layer)
+        {
+            _id = layer.Id;
+            _visible = layer.Visible;
+        }
+
+        public Layer(int id, bool visible = false)
+        {
+            _id = id;
+            _visible = visible;
+        }
+
+        public virtual int Id
+        {
+            get { return _id; }
+            internal set { _id = value; }
+        }
+
+        public virtual bool Visible
+        {
+            get { return _visible; }
+            set { _visible = value; }
+        }
+    }
+
+    public class Document : IDisposable
+    {
+        #region Public
+
+        public Document(Layer firstLayer)
+        {
+            Layers.Add(firstLayer);
+            if (firstLayer.Id == -1)
+                firstLayer.Id = _layersCounter++;
+            Layers.CollectionChanged+=AddLayer;
+        }
+
+        public Document(IEnumerable<Layer> layers)
+        {
+            foreach (var l in layers)
+                Layers.Add(l);
+            Layers.CollectionChanged += AddLayer;
+        }
+
+        public Document(Document document)
+        {
+            _title = document.Title;
+            _documentId = document.DocumentID;
+            _disposed = document._disposed;
+            Layers.Clear();
+            foreach (var l in document.Layers)
+                Layers.Add(l);
+            Layers.CollectionChanged += AddLayer;
+        }
+
+        public virtual string Title
+        {
+            get { return _title; }
+            set { _title = value; }
+        }
+
+        public virtual uint DocumentID
+        {
+            get { return _documentId; }
+            set { _documentId = value; }
+        }
+
+        public virtual void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+        }
+
+        public ObservableCollection<Layer> Layers
+        {
+            get { return _layers; }
+        }
+
+        public virtual Layer ActiveLayer
+        {
+            get { return _activeLayer ?? Layers.FirstOrDefault(); }
+            set { _activeLayer = value; }
+        }
+
+        #endregion
+
+        #region Protected
+
+        #endregion
+
+        #region Private
+
+        private string _title;
+        private uint _documentId;
+        private bool _disposed;
+        private readonly ObservableCollection<Layer> _layers = new ObservableCollection<Layer>();
+        private Layer _activeLayer;
+        private int _layersCounter;
+
+        ~Document()
+        {
+            Dispose();
+        }
+
+        private void AddLayer(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        {
+            if(notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Add || notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Replace || notifyCollectionChangedEventArgs.Action == NotifyCollectionChangedAction.Reset)
+                foreach (Layer item in notifyCollectionChangedEventArgs.NewItems)
+                    if (item.Id == -1)
+                        item.Id = _layersCounter++;
+        }
+
+        #endregion
+    }
 
     public class ApplicationController
     {
@@ -43,36 +172,40 @@ namespace CADController
             XButton2 = 16777216
         }
 
-        public enum operations : byte { OpPointCreate,
-                                        OpLineCreate,
-                                        OpCircleCreate,
-                                        OpContourCreate,
-                                        OpDestroyContour,
-                                        OpDeleteObject,
-                                        OpUndo,
-                                        OpRedo,
-                                        OpSetLayersToShow,
-                                        OpSetBackgroundColor };
+        public enum Operations
+        {
+            OpPointCreate = 0,
+            OpLineCreate,
+            OpCircleCreate,
+            OpContourCreate,
+            OpDestroyContour,
+            OpDeleteObject,
+            OpUndo,
+            OpRedo,
+            OpSetLayersToShow,
+            OpSetBackgroundColor
+        }
 
-        private bool _leftButton;        //for active document
-        private bool _rightButton;       //for active document
+        #region Private
 
-        private double _currentMouseCoordX;  //for active document
-        private double _currentMouseCoordY;  //for active document
+        private bool _leftButton; //for active document
+        private bool _rightButton; //for active document
+        private double _currentMouseCoordX; //for active document
+        private double _currentMouseCoordY; //for active document
+        private IntPtr _curSession = IntPtr.Zero; //temporary mock for View
 
-        private IntPtr _curSession;  //temporary mock for View
+        #endregion
 
         public ApplicationController()
         {
-            _leftButton = false;
-            _rightButton = false;
-
-            _currentMouseCoordX = 0.0;
-            _currentMouseCoordY = 0.0;
-
-            _curSession = IntPtr.Zero;
         }
-        
+
+        #region Public properties
+
+        public Dictionary<uint, Document> Documents { get; } = new Dictionary<uint, Document>();
+
+        #endregion
+
         public SessionId initSession()   //used when application running
         {
             _curSession = CoreWrapper.sessionFactory();
@@ -80,18 +213,26 @@ namespace CADController
             return sessionID;
         }
 
-        public uint initDocument(uint sessionID, IntPtr hwnd)  //used when creating new document
+        public uint initDocument(uint sessionID, IntPtr hwnd, Document document)  //used when creating new document
         {
             IntPtr pDoc = CoreWrapper.documentFactory(hwnd);
             DocumentId docID = CoreWrapper.attachDocument(_curSession, pDoc);
+            if (Documents.ContainsKey(docID))
+            {
+                throw new ApplicationException("Document with same id already exists.");
+            }
+            document.DocumentID = docID;
+            Documents[docID] = document;
+            procOperation(sessionID, docID, Operations.OpSetLayersToShow,
+                document.Layers.Select(l => (object) l.Id).ToArray());
             return docID;
         }
 
-        public void eventHendling(uint docId, MouseButtons action, double coordX = 0, double coordY = 0, double delta = 0)
+        public void eventHendling(uint docId, int action, double coordX = 0, double coordY = 0, double delta = 0)
         {
             _currentMouseCoordX = coordX;
             _currentMouseCoordY = coordY;
-            switch (action)
+            switch ((MouseButtons) action)
             {
                 case MouseButtons.Left:
                     _leftButton = true;
@@ -111,39 +252,53 @@ namespace CADController
             }
         }
 
-        private OperationController startOperation(operations opID)
+        private OperationController startOperation(Operations opID)
         {
+            OperationController operation = null;
             switch (opID)
             {
-                case operations.OpPointCreate:
-                    return new OpPointCreate();
-                case operations.OpLineCreate:
-                    return new OpLineCreate();
-                case operations.OpCircleCreate:
-                    return new OpCircleCreate();
-                case operations.OpContourCreate:
-                    return new OpContourCreate();
-                case operations.OpDestroyContour:
-                    return new OpDestroyContour();
-                case operations.OpDeleteObject:
-                    return new OpDeleteObject();
-                case operations.OpUndo:
-                    return new OpUndo();
-                case operations.OpRedo:
-                    return new OpRedo();
-                case operations.OpSetLayersToShow:
-                    return new OpSetLayersToShow();
-                case operations.OpSetBackgroundColor:
-                    return new OpSetBackgroundColor();
+                case Operations.OpPointCreate:
+                    operation = new OpPointCreate();
+                    break;
+                case Operations.OpLineCreate:
+                    operation = new OpLineCreate();
+                    break;
+                case Operations.OpCircleCreate:
+                    operation = new OpCircleCreate();
+                    break;
+                case Operations.OpContourCreate:
+                    operation = new OpContourCreate();
+                    break;
+                case Operations.OpDestroyContour:
+                    operation = new OpDestroyContour();
+                    break;
+                case Operations.OpDeleteObject:
+                    operation = new OpDeleteObject();
+                    break;
+                case Operations.OpUndo:
+                    operation = new OpUndo();
+                    break;
+                case Operations.OpRedo:
+                    operation = new OpRedo();
+                    break;
+                case Operations.OpSetLayersToShow:
+                    operation = new OpSetLayersToShow();
+                    break;
+                case Operations.OpSetBackgroundColor:
+                    operation = new OpSetBackgroundColor();
+                    break;
                 default:
                     Debug.Assert(false, "unknown operation");
-                    return new OperationController();
+                    operation = new OperationController();
+                    break;
             }
+            return operation;
         }
 
-        public void procOperation(SessionId sessionID, DocumentId docID, operations opID, Object[] data)
+        public void procOperation(SessionId sessionID, DocumentId docID, Operations opID, Object[] data)
         {
             OperationController curOperation = startOperation(opID);
+            curOperation.Layer = Documents[docID].ActiveLayer.Id;
             curOperation.operationProcess(_curSession, docID, data);
         }
 
@@ -151,12 +306,15 @@ namespace CADController
         {
             IntPtr document = CoreWrapper.detachDocument(_curSession, docID);
             CoreWrapper.destroyDocument(document);
+            Documents.Remove(docID);
         }
 
         public void finalSession(SessionId sessionID)   //closing the application
         {
             //nothing yet
         }
+
+        #region Core OpenGL draw functions
 
         public void draw(SessionId sessionID, DocumentId docID)
         {
@@ -172,10 +330,17 @@ namespace CADController
         {
             CoreWrapper.resizeDocument(_curSession, docID, w, h);
         }
+
+        #endregion
+
     }
 
     class OperationController
     {
+        public int Layer { get; set; } = 0;
+
+        public List<object> AdditionalData { get; } = new List<object>();
+
         public virtual void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
         {
             Debug.Assert(false, "This method without body");
@@ -191,7 +356,7 @@ namespace CADController
             
             IntPtr newNode = CoreWrapper.nodeFactory(X, Y);
             IntPtr newPoint = CoreWrapper.pointFactory(newNode);
-            IntPtr newPointGen = CoreWrapper.genericFactory(newPoint);
+            IntPtr newPointGen = CoreWrapper.genericFactory(newPoint, (uint)Layer);
 
             ObjectId newPointID = CoreWrapper.attachToBase(curSes, docID, newPointGen);
             CoreWrapper.commit(curSes, docID);
@@ -213,7 +378,7 @@ namespace CADController
             IntPtr end = CoreWrapper.nodeFactory(X2, Y2);
 
             IntPtr newLine = CoreWrapper.lineFactory(start, end);
-            IntPtr newLineGen = CoreWrapper.genericFactory(newLine);
+            IntPtr newLineGen = CoreWrapper.genericFactory(newLine, (uint)Layer);
 
             ObjectId newLineID = CoreWrapper.attachToBase(curSes, docID, newLineGen);
             CoreWrapper.commit(curSes, docID);
@@ -235,7 +400,7 @@ namespace CADController
             IntPtr side = CoreWrapper.nodeFactory(X2, Y2);
 
             IntPtr newCircle = CoreWrapper.circleFactory(center, side);
-            IntPtr newCircleGen = CoreWrapper.genericFactory(newCircle);
+            IntPtr newCircleGen = CoreWrapper.genericFactory(newCircle, (uint)Layer);
 
             ObjectId newCircleID = CoreWrapper.attachToBase(curSes, docID, newCircleGen);
             CoreWrapper.commit(curSes, docID);
@@ -258,8 +423,8 @@ namespace CADController
                 CoreWrapper.detachFromBase(curSes, docID, (ObjectId)data[i]);
             }
 
-            UnmanagedArray edgesArray = new UnmanagedArray(edges);
-            IntPtr newContour = CoreWrapper.contourFactory(edgesArray.getPointer(), (uint)edgesArray.getSize());
+            UnmanagedArray<IntPtr> edgesArray = new UnmanagedArray<IntPtr>(edges);
+            IntPtr newContour = CoreWrapper.contourFactory(edgesArray, (uint)edgesArray.Size);
             IntPtr newContourGen = CoreWrapper.genericFactory(newContour, currentLayer);
 
             ObjectId newContourID = CoreWrapper.attachToBase(curSes, docID, newContourGen);
@@ -323,7 +488,8 @@ namespace CADController
     {
         public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
         {
-            CoreWrapper.setLayers(curSes, docID, (IntPtr)data[0]);
+            UnmanagedArray<int> udata = new UnmanagedArray<int>(data.Cast<int>().ToArray());
+            CoreWrapper.setLayers(curSes, docID, udata, udata.Size);
         }
     }
 
@@ -335,7 +501,7 @@ namespace CADController
         }
     }
 
-    class Operations    //temporary class (old code)
+    /*class Operations    //temporary class (old code)
     {
         //create point
         public static ObjectId createPoint(IntPtr curSes, DocumentId docID, double X, double Y)
@@ -394,7 +560,7 @@ namespace CADController
             }
 
             UnmanagedArray edgesArray = new UnmanagedArray(edges);
-            IntPtr newContour = CoreWrapper.contourFactory(edgesArray.getPointer(), (uint)edgesArray.getSize());         
+            IntPtr newContour = CoreWrapper.contourFactory(edgesArray.Pointer(), (uint)edgesArray.getSize());         
             IntPtr newContourGen = CoreWrapper.genericFactory(newContour, currentLayer);
         
         	ObjectId newContourID = CoreWrapper.attachToBase(curSes, docID, newContourGen);
@@ -465,5 +631,5 @@ namespace CADController
             IntPtr newPointGen = CoreWrapper.genericFactory(newPoint);
             CoreWrapper.attachToBuffer(curSes, docID, newPointGen);
         }
-    }
+    }*/
 }

@@ -5,18 +5,49 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView.Dialogs"
         mc:Ignorable="d"
-        Title="LayersDialog" Height="300" Width="300"
+        Title="LayerModelsDialog" Height="300" Width="300" MinHeight="300" MinWidth="300"
         d:DataContext="{d:DesignInstance local:LayersDialogViewModel}"
         >
     <Grid>
-        <DockPanel Margin="10,10,10,40">
-            <ListBox IsEnabled="{Binding Ready}" x:Name="LayersList" SelectionMode="Extended" ItemsSource="{Binding Layers}" 
-                     VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="100" Height="auto"></ListBox>
-            <StackPanel Margin="10,0,0,0" Orientation="Vertical">
+        <Grid Margin="10,10,10,40">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1* "/>
+            </Grid.RowDefinitions>
+            <DataGrid ItemsSource="{Binding Layers}" 
+                      CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserSortColumns="False" HeadersVisibility="Column"
+                      AutoGenerateColumns="False" SelectionUnit="FullRow" SelectionMode="Single">
+                <DataGrid.CellStyle>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                    </Style>
+                </DataGrid.CellStyle>
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Transparent"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="Black"/>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Width="1*" Header="Id" Binding="{Binding Id, Mode=OneWay}" IsReadOnly="True"/>
+                    <DataGridTemplateColumn Width="1*" Header="Visible">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox HorizontalAlignment="Center" IsChecked="{Binding Visible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <StackPanel Grid.Row="1" Margin="0,10,0,0" Orientation="Vertical">
+                <DockPanel>
+                    <Label Content="Active layer:"></Label>
+                    <ComboBox ItemsSource="{Binding Layers}" Margin="0,5,0,5" SelectedItem="{Binding ActiveLayer, Mode=TwoWay}" DisplayMemberPath="Id" SelectedValuePath="Id" />
+                </DockPanel>
                 <Button IsEnabled="{Binding Ready}" Command="{Binding AddLayer}" Content="Add layer" Margin="0,0,0,10"></Button>
-                <Button IsEnabled="{Binding Ready}" Command="{Binding SelectLayer}" Content="Set selected layer active" Margin="0,0,0,10"></Button>
             </StackPanel>
-        </DockPanel>
+        </Grid>
         <DockPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
             <Button Visibility="Collapsed" Width="75" Content="Ok" Margin="10" Click="OkButtonClick"></Button>
             <Button Width="75" Content="Close" Margin="10" Click="CancelButtonClick"></Button>

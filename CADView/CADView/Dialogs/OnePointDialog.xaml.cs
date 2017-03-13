@@ -6,16 +6,11 @@ namespace CADView.Dialogs
     /// <summary>
     /// Логика взаимодействия для OnePointDialog.xaml
     /// </summary>
-    public partial class OnePointDialog : Window, IDataDialog
+    public partial class OnePointDialog : IDataDialog
     {
         public OnePointDialog()
         {
             InitializeComponent();
-        }
-
-        ~OnePointDialog()
-        {
-            
         }
 
         public List<object> Data { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using CADController;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,15 +14,13 @@ using CADView.Dialogs;
 using Application = System.Windows.Application;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using MessageBox = System.Windows.MessageBox;
-#if !OLDDOTNET
 using System.Threading.Tasks;
-#endif
 
 namespace CADView
 {
-    class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
-#region Public
+        #region Public
 
         public MainWindowViewModel()
         {
@@ -34,14 +33,18 @@ namespace CADView
 
         ~MainWindowViewModel()
         {
-            foreach (var documentViewModel in DocumentViewModels)
+            var ids = DocumentViewModels.Select(d => d.Key).ToList();
+            foreach (var id in ids)
             {
-                Controller.finalDocument(Session, documentViewModel.DocumentID);
+                DocumentViewModels[id].Dispose();
+                Controller.finalDocument(Session, id);
             }
             Controller.finalSession(Session);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public delegate Task ProcessDataDelegate(object[] o);
 
         internal ApplicationController Controller { get; private set; }
 
@@ -62,32 +65,31 @@ namespace CADView
 
             _timer = new DispatcherTimer(DispatcherPriority.Normal, Application.Current.Dispatcher);
             _timer.Interval = new TimeSpan(0, 0, 0, 0, 33);
-            _timer.Tick+= delegate
+            _timer.Tick += delegate
             {
                 if (DocumentViewModels.Count == 0) return;
-                //((WindowsFormsHost) DocumentViewModelsTabs[SelectedDocumentIndex].Content).InvalidateVisual();
-                //((WindowsFormsHost)DocumentViewModelsTabs[SelectedDocumentIndex].Content).Child.Refresh();
-                Controller.draw(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID);
+                Controller.draw(Session, ActiveDocument.DocumentID);
             };
             _timer.Start();
         }
 
         public void CreateDocument()
         {
+            var model = new DocumentModel(new LayerModel(true));
             var host = new WindowsFormsHost()
             {
-                Child = new RenderPanel(),
+                Child = new RenderPanel(model),
                 VerticalAlignment = VerticalAlignment.Stretch,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
             };
 
-            var model = new DocumentViewModel();
-            DocumentViewModelsTabs.Add(new TabItem()
+            TabItem tab = new TabItem()
             {
                 Content = host,
-                DataContext = model
-            });
-            DocumentViewModels.Add(model);
+                DataContext = model,
+            };
+            DocumentViewModelsTabs.Add(tab);
+            _tabsDocuments[tab] = model;
             _selectedDocumentIndex = DocumentViewModelsTabs.Count - 1;
             OnPropertyChanged("SelectedDocumentIndex");
         }
@@ -100,12 +102,11 @@ namespace CADView
                 _selectedDocumentIndex = value;
                 OnPropertyChanged();
 
-                //var size =
-                //    ((WindowsFormsHost) ((Grid) DocumentViewModelsTabs[SelectedDocumentIndex].Content).Children[0])
-                //        .Child.Size;
+                if (SelectedDocumentIndex < 0 || SelectedDocumentIndex > DocumentViewModelsTabs.Count) return;
+
                 var size = ((WindowsFormsHost) DocumentViewModelsTabs[SelectedDocumentIndex].Content)
                     .Child.Size;
-                Controller.activateDocement(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, size.Width,
+                Controller.activateDocement(Session, ActiveDocument.DocumentID, size.Width,
                     size.Height);
             }
         }
@@ -115,15 +116,14 @@ namespace CADView
             get { return _documentViewModelsTabs; }
             set
             {
-                _documentViewModelsTabs = value; 
-                OnPropertyChanged("DocumentViewModels");
+                _documentViewModelsTabs = value;
                 OnPropertyChanged();
             }
         }
 
-        public List<DocumentViewModel> DocumentViewModels
+        public Dictionary<uint, Document> DocumentViewModels
         {
-            get { return _documentViewModels; }
+            get { return Controller.Documents; }
         }
 
         public double WindowWidth
@@ -146,9 +146,23 @@ namespace CADView
             }
         }
 
-#endregion
+        public Document ActiveDocument
+        {
+            get
+            {
+                if (SelectedDocumentIndex < 0) return null;
+                return _tabsDocuments[DocumentViewModelsTabs[SelectedDocumentIndex]];
+            }
+            set
+            {
+                SelectedDocumentIndex =
+                    DocumentViewModelsTabs.IndexOf(_tabsDocuments.FirstOrDefault(i => i.Value == value).Key);
+            }
+        }
 
-#region Protected
+        #endregion
+
+        #region Protected
 
 #if OLDDOTNET
         protected virtual void OnPropertyChanged(string propertyName)
@@ -159,21 +173,25 @@ namespace CADView
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-#endregion
+        #endregion
 
-#region Private
+        #region Private
 
         private uint _session;
         bool _inited;
         private bool _isActive;
         private RelayCommand _documentWorkCommand;
         private RelayCommand _controllerWorkCommand;
+        private RelayCommand _controllerDialogCommand;
+        private RelayCommand _closeDocumentCommand;
         private ObservableCollection<TabItem> _documentViewModelsTabs = new ObservableCollection<TabItem>();
         private int _selectedDocumentIndex;
         private DispatcherTimer _timer;
         private double _windowWidth;
         private double _windowHeight;
-        private readonly List<DocumentViewModel> _documentViewModels = new List<DocumentViewModel>();
+        private readonly List<DocumentModel> _documentViewModels = new List<DocumentModel>();
+        private RelayCommand _closeApplicationCommand;
+        private readonly Dictionary<TabItem, Document> _tabsDocuments = new Dictionary<TabItem, Document>(); 
 
         private uint Session
         {
@@ -191,151 +209,48 @@ namespace CADView
             CreateDocument();
         }
 
-        private void RenderPanelOnLoad(IntPtr hwnd, int w, int h)
+        private void RenderPanelOnLoad(IntPtr hwnd, int w, int h, Document model)
         {
-            var activeDocument = Controller.initDocument(Session, hwnd);
+            var activeDocument = Controller.initDocument(Session, hwnd, model);
             Controller.activateDocement(Session, activeDocument, w, h);
-            DocumentViewModels[SelectedDocumentIndex].Title = "Document # " + activeDocument;
-            DocumentViewModels[SelectedDocumentIndex].DocumentID = activeDocument;
+            ActiveDocument.Title = "Document # " + activeDocument;
+            ActiveDocument.DocumentID = activeDocument;
             IsActive = true;
         }
 
         private void RenderPanelOnResize(int w, int h)
         {
-            Controller.resizeDocument(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID, w, h);
+            Controller.resizeDocument(Session, ActiveDocument.DocumentID, w, h);
         }
 
         private void RenderPanelOnRender()
         {
             if (DocumentViewModels.Count == 0) return;
-            Controller.draw(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID);
+            Controller.draw(Session, ActiveDocument.DocumentID);
         }
 
         private void RenderPanelOnMouseFire(MouseEventArgs args)
         {
-            //TODO: передавать инты и внутри пытаться аккуратно преобразовать.
-            Controller.eventHendling(DocumentViewModels[SelectedDocumentIndex].DocumentID, (ApplicationController.MouseButtons) (int) args.Button, args.X, args.Y, args.Delta);
+            Controller.eventHendling(ActiveDocument.DocumentID, (int) args.Button, args.X,
+                args.Y, args.Delta);
         }
 
-#if OLDDOTNET
-        private void ProcessControllerWork(object obj)
-#else
-        private async void ProcessControllerWork(object obj)
-#endif
+        private async Task<bool> ProcessControllerWork(ApplicationController.Operations type, object data)
         {
-            IsActive = false;
-            ApplicationController.operations type = (ApplicationController.operations) obj;
-
-            object [] data= new object[0];
-
-            Window modalWindow = null;
-            Window separatedWindow = null;
-
-            switch (type)
-            {
-                case ApplicationController.operations.OpPointCreate:
-                    modalWindow = new OnePointDialog();
-                    modalWindow.Title = "Create Point";
-                    break;
-                case ApplicationController.operations.OpLineCreate:
-                    modalWindow = new TwoPointDialog();
-                    modalWindow.Title = "Create Line";
-                    break;
-                case ApplicationController.operations.OpCircleCreate:
-                    modalWindow = new TwoPointDialog();
-                    modalWindow.Title = "Create Circle";
-                    break;
-                case ApplicationController.operations.OpContourCreate:
-                    modalWindow = new ElementIdInputDialog();
-                    modalWindow.Title = "Create Contour";
-                    break;
-                case ApplicationController.operations.OpDeleteObject:
-                    modalWindow = new ElementIdInputDialog();
-                    modalWindow.Title = "Create Contour";
-                    break;
-                case ApplicationController.operations.OpDestroyContour:
-                    modalWindow = new ElementIdInputDialog();
-                    modalWindow.Title = "Create Contour";
-                    break;
-                case ApplicationController.operations.OpSetBackgroundColor:
-                    separatedWindow = Dialogs.ColorDialog.Instance;
-                    separatedWindow.Title = "Set color number";
-                    break;
-                case ApplicationController.operations.OpSetLayersToShow:
-                    separatedWindow = LayersDialog.Instance;
-                    separatedWindow.Title = "Set layer number";
-                    break;
-            }
-            
             try
             {
-                if (modalWindow != null)
+                IsActive = false;
+                await Task.Run(delegate
                 {
-                    bool start = true;
-                    if (modalWindow.ShowDialog() == true)
-                    {
-                        if (modalWindow is IDataDialog)
-                            data = ((IDataDialog) modalWindow).Data.ToArray();
-                    }
-                    else
-                        start = false;
-
-#if OLDDOTNET
-                if (start)
-                    Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                        (ApplicationController.operations) obj, data);
-#else
-                    if (start)
-                        await Task.Run(delegate
-                        {
-                            Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                                (ApplicationController.operations)obj, data);
-                        });
-#endif
-                }
-                if (separatedWindow != null)
-                {
-                    separatedWindow.Show();
-                    separatedWindow.Activate();
-                    if (separatedWindow is ICallbackDialog)
-                        ((ICallbackDialog) separatedWindow).DataChanged += async delegate(object sender, EventArgs args)
-                        {
-                            try
-                            {
-                                List<object> cdata = (List<object>) sender;
-#if OLDDOTNET
-                                if (start)
-                                    Controller.procOperation(Session, DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                                        (ApplicationController.operations) obj, data);
-#else
-                                await Task.Run(delegate
-                                {
-                                    IsActive = false;
-                                    Controller.procOperation(Session,
-                                        DocumentViewModels[SelectedDocumentIndex].DocumentID,
-                                        (ApplicationController.operations) obj, cdata.ToArray());
-                                });
-#endif
-                            }
-                            catch (Exception e)
-                            {
-                                if (modalWindow != null && modalWindow.IsVisible)
-                                    modalWindow.Close();
-                                MessageBox.Show("Exception: " + e.Message);
-                            }
-                            finally
-                            {
-                                ((ICallbackDialog)separatedWindow).DataProcessComplete();
-                                IsActive = true;
-                            }
-                        };
-                }
+                    Controller.procOperation(Session, ActiveDocument.DocumentID, type,
+                        (object[]) data);
+                });
+                return true;
             }
             catch (Exception e)
             {
-                if (modalWindow != null && modalWindow.IsVisible)
-                    modalWindow.Close();
-                MessageBox.Show("Exception: " + e.Message);
+                MessageBox.Show(e.Message, "Exception");
+                return false;
             }
             finally
             {
@@ -343,18 +258,79 @@ namespace CADView
             }
         }
 
-#endregion
+        private async void ProcessControllerRaiseDialog(object obj)
+        {
+            ApplicationController.Operations type = (ApplicationController.Operations) obj;
 
-#region Commands
+            Window modalWindow = null;
+            Window separatedWindow = null;
+
+            switch (type)
+            {
+                case ApplicationController.Operations.OpPointCreate:
+                    modalWindow = new OnePointDialog();
+                    modalWindow.Title = "Create Point";
+                    break;
+                case ApplicationController.Operations.OpLineCreate:
+                    modalWindow = new TwoPointDialog();
+                    modalWindow.Title = "Create Line";
+                    break;
+                case ApplicationController.Operations.OpCircleCreate:
+                    modalWindow = new TwoPointDialog();
+                    modalWindow.Title = "Create Circle";
+                    break;
+                case ApplicationController.Operations.OpContourCreate:
+                    modalWindow = new ElementIdInputDialog();
+                    modalWindow.Title = "Create Contour";
+                    break;
+                case ApplicationController.Operations.OpDeleteObject:
+                    modalWindow = new DestroyObjectDialog();
+                    modalWindow.Title = "Delete element";
+                    break;
+                case ApplicationController.Operations.OpDestroyContour:
+                    modalWindow = new DestroyContourDialog();
+                    modalWindow.Title = "Destroy Contour";
+                    break;
+                case ApplicationController.Operations.OpSetBackgroundColor:
+                    separatedWindow = Dialogs.ColorDialog.Instance;
+                    separatedWindow.Title = "Colors";
+                    break;
+                case ApplicationController.Operations.OpSetLayersToShow:
+                    separatedWindow = new LayersDialog(Controller, ActiveDocument.DocumentID);
+                    separatedWindow.Title = "Layers manager";
+                    break;
+            }
+
+            if (modalWindow is IDataDialog)
+            {
+                modalWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                if (modalWindow.ShowDialog() == true)
+                {
+                    {
+                        var data = ((IDataDialog) modalWindow).Data.ToArray();
+                        await ProcessControllerWork(type, data);
+                    }
+
+                }
+            }
+            if (separatedWindow is ICallbackDialog)
+            {
+                separatedWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                ((ICallbackDialog) separatedWindow).DataChanged += o => ProcessControllerWork(type, o);
+                separatedWindow.ShowDialog();
+            }
+        }
+
+        #endregion
+
+        #region Commands
 
         public RelayCommand DocumentWorkCommand
         {
             get
             {
-                return _documentWorkCommand != null
-                    ? _documentWorkCommand
-                    : (_documentWorkCommand = new RelayCommand(ProcessDocumentWork,
-                        o => (DocumentViewModels.Count > 0 && IsActive) || DocumentViewModels.Count == 0));
+                return _documentWorkCommand ?? (_documentWorkCommand = new RelayCommand(ProcessDocumentWork,
+                    o => (DocumentViewModels.Count > 0 && IsActive) || DocumentViewModels.Count == 0));
             }
         }
 
@@ -362,12 +338,61 @@ namespace CADView
         {
             get
             {
-                return _controllerWorkCommand != null
-                    ? _controllerWorkCommand
-                    : (_controllerWorkCommand = new RelayCommand(ProcessControllerWork));
+                return _controllerWorkCommand ?? (_controllerWorkCommand = new RelayCommand(async delegate(object o)
+                {
+                    await ProcessControllerWork((ApplicationController.Operations) o, null);
+                }));
             }
         }
 
-#endregion
+        public RelayCommand ControllerDialogCommand
+        {
+            get
+            {
+                return _controllerDialogCommand ??
+                       (_controllerDialogCommand = new RelayCommand(ProcessControllerRaiseDialog));
+            }
+        }
+
+        public RelayCommand CloseApplicationCommand
+        {
+            get
+            {
+                return _closeApplicationCommand ??
+                       (_closeApplicationCommand = new RelayCommand(o => App.Current.Shutdown()));
+            }
+        }
+
+        public RelayCommand CloseDocumentCommand
+        {
+            get
+            {
+                return _closeDocumentCommand ??
+                       (_closeDocumentCommand = new RelayCommand(delegate(object i)
+                       {
+                           string name = i as string;
+                           if(string.IsNullOrEmpty(name)) return;
+
+                           var tab = DocumentViewModelsTabs.ToList().Find(d => d.Header.Equals(name));
+                           var document = _tabsDocuments[tab];
+
+                           if(document == null) return;
+
+                           var host = (WindowsFormsHost) tab.Content;
+                           tab.Content = null;
+                           tab.DataContext = null;
+                           DocumentViewModelsTabs.Remove(tab);
+                           _tabsDocuments.Remove(tab);
+                           host.Child.Dispose();
+                           host.Dispose();
+                           document.Dispose();
+                           Controller.finalDocument(Session, document.DocumentID);
+                           SelectedDocumentIndex = SelectedDocumentIndex;
+                           IsActive = DocumentViewModels.Count > 0;
+                       }));
+            }
+        }
+
+        #endregion
     }
 }

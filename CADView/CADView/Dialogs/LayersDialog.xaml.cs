@@ -1,32 +1,89 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
+using CADController;
 
 namespace CADView.Dialogs
 {
-    internal class LayersDialogViewModel : INotifyPropertyChanged
+    public class LayerModel : Layer, INotifyPropertyChanged
     {
-        public event EventHandler DataChanged;
+        public LayerModel(bool visible = false) : base(visible)
+        {
+        }
+
+        public LayerModel(int id, bool visible = false) : base(id, visible)
+        {
+        }
+
+        public LayerModel(Layer layer) : base(layer)
+        {
+
+        }
+
+        public override int Id
+        {
+            get { return base.Id; }
+        }
+
+        public override bool Visible
+        {
+            get { return base.Visible; }
+            set
+            {
+                base.Visible = value;
+                OnPropertyChanged();
+                VisibleChangedStatic?.Invoke(this, new PropertyChangedEventArgs("Visible"));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public static event PropertyChangedEventHandler VisibleChangedStatic;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    internal class LayersDialogViewModel : INotifyPropertyChanged, IDisposable
+    {
+        public event MainWindowViewModel.ProcessDataDelegate DataChanged;
         private RelayCommand _addLayer;
-        private RelayCommand _selectLayer;
         private bool _ready = true;
-        private static LayersDialogViewModel _instance;
+        private readonly ApplicationController _controller;
+        private readonly uint _documentId;
+        private bool _disposed;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public static LayersDialogViewModel GetLayersViewModel()
+        public LayersDialogViewModel(ApplicationController controller, uint documentId)
         {
-            return _instance ?? (_instance = new LayersDialogViewModel());
+            _controller = controller;
+            _documentId = documentId;
+            LayerModel.VisibleChangedStatic+=LayerModelOnVisibleChangedStatic;
         }
 
-        private LayersDialogViewModel()
+        ~LayersDialogViewModel()
         {
-            _instance = this;
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+            LayerModel.VisibleChangedStatic -= LayerModelOnVisibleChangedStatic;
+        }
+
+        private void LayerModelOnVisibleChangedStatic(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        {
+            Ready = false;
+            DataChanged?.Invoke(Layers.Where(lm => lm.Visible).Select(lm => (object)lm.Id).ToArray());
+            Ready = true;
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -34,28 +91,29 @@ namespace CADView.Dialogs
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public static ObservableCollection<ListBoxItem> Layers { get; } = new ObservableCollection<ListBoxItem>() {new ListBoxItem() {Content = (uint)0, IsSelected = true} };
+        public ObservableCollection<Layer> Layers
+        {
+            get { return _controller.Documents[_documentId].Layers; }
+        }
 
-        public IList SelectedLayers { get; set; }
+        public Layer ActiveLayer
+        {
+            get { return _controller.Documents[_documentId].ActiveLayer; }
+            set
+            {
+                _controller.Documents[_documentId].ActiveLayer = value;
+                OnPropertyChanged();
+            }
+        }
 
         public RelayCommand AddLayer
         {
             get
             {
                 return _addLayer ?? (_addLayer = new RelayCommand(
-                    obj => Layers.Add(new ListBoxItem() {Content = (uint) Layers.Last().Content + 1})));
-            }
-        }
-
-        public RelayCommand SelectLayer
-        {
-            get
-            {
-                return _selectLayer ?? (_selectLayer = new RelayCommand(
                     obj =>
                     {
-                        Ready = false;
-                        DataChanged?.Invoke(SelectedLayers.Cast<ListBoxItem>().Select(u => u.Content).ToList(), EventArgs.Empty);
+                        Layers.Add(new LayerModel());
                     }));
             }
         }
@@ -76,21 +134,21 @@ namespace CADView.Dialogs
     /// </summary>
     public partial class LayersDialog : ICallbackDialog
     {
-        private static LayersDialog _instance;
-        readonly LayersDialogViewModel _viewModel;
+        private LayersDialogViewModel _viewModel;
 
-        private LayersDialog()
+        public LayersDialog(ApplicationController controller, uint documentId)
         {
             InitializeComponent();
 
-            _viewModel = LayersDialogViewModel.GetLayersViewModel();
-            _viewModel.SelectedLayers = LayersList.SelectedItems;
-            LayersList.SelectedItems.Add(1);
-            _viewModel.DataChanged += delegate(object sender, EventArgs args)
-            {
-                DataChanged?.Invoke(sender, args);
-            };
+            _viewModel = new LayersDialogViewModel(controller, documentId);
+
+            _viewModel.DataChanged += OnDataChanged;
             DataContext = _viewModel;
+        }
+
+        private Task OnDataChanged(object[] sender)
+        {
+            return DataChanged?.Invoke(sender);
         }
 
         private void OkButtonClick(object sender, RoutedEventArgs e)
@@ -99,19 +157,15 @@ namespace CADView.Dialogs
 
         private void CancelButtonClick(object sender, RoutedEventArgs e)
         {
-            Visibility = Visibility.Hidden;
+            _viewModel.DataChanged -= OnDataChanged;
+            _viewModel.Dispose();
+            _viewModel = null;
+            DataContext = null;
+            DialogResult = false;
+            //GC.Collect();
         }
 
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            e.Cancel = true;
-            base.OnClosing(e);
-            CancelButtonClick(this, null);
-        }
-
-        public static LayersDialog Instance => _instance ?? (_instance = new LayersDialog());
-
-        public event EventHandler DataChanged;
+        public event MainWindowViewModel.ProcessDataDelegate DataChanged;
 
         public void DataProcessComplete()
         {

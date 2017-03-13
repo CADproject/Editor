@@ -7,16 +7,11 @@ namespace CADView.Dialogs
     /// <summary>
     /// Логика взаимодействия для OnePointDialog.xaml
     /// </summary>
-    public partial class ElementIdInputDialog : Window, IDataDialog
+    public partial class ElementIdInputDialog : IDataDialog
     {
         public ElementIdInputDialog()
         {
             InitializeComponent();
-        }
-
-        ~ElementIdInputDialog()
-        {
-            
         }
 
         public List<object> Data { get; set; }
@@ -28,7 +23,7 @@ namespace CADView.Dialogs
             {
                 foreach (string ids in X1.Text.Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    uint id = 0;
+                    uint id;
                     if (uint.TryParse(ids, out id))
                         Data.Add(id);
                 }
