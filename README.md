@@ -2,7 +2,7 @@
 
 2d редактор для создания эскизов и чертежей, первый шаг на пути к созданию cad-системы.
 
-![view](https://github.com/CADproject/Editor/raw/master/test1.bmp)
+![view](https://github.com/CADproject/Editor/raw/master/Images/car.bmp)
 
 ## Цели проекта
 1. Создать полноценное десктопное приложение;
