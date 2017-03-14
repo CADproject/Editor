@@ -4,6 +4,7 @@ Release/
 bin/
 obj/
 Bin Editor/
+Bin Editor x64/
 *.suo
 *.sdf
 #*.sln
@@ -13,4 +14,3 @@ Bin Editor/
 *.opensdf
 CADEditor.VC.VC.opendb
 CADEditor.VC.db
-
