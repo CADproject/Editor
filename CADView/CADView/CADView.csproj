@@ -204,7 +204,20 @@
       <Name>CADController</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Icons\Button Add.png" />
+    <Resource Include="Icons\Button Check.png" />
+    <Resource Include="Icons\Button Delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Home.png" />
+    <Resource Include="Icons\Medal.png" />
+    <Resource Include="Icons\Oscilloscope.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Paint Brush.png" />
+    <Resource Include="Icons\Paint Bucket.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
