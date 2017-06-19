@@ -15,9 +15,175 @@ using Application = System.Windows.Application;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using MessageBox = System.Windows.MessageBox;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace CADView
 {
+    /// <summary>
+    /// Базовый класс для элементов меню.
+    /// </summary>
+    public abstract class BaseMenuElement : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private string _image;
+        private string _hintText;
+        private int _width;
+        private int _height;
+        private Brush _color = Brushes.LightSlateGray;
+        private string _description;
+
+        public const int DefaultWidth = 40;
+        public const int DefaultHeight = 40;
+
+        public BaseMenuElement(string image, string hintText, int width, int height)
+        {
+            Image = image;
+            HintText = hintText;
+            Width = width;
+            Height = height;
+        }
+
+        public string Image
+        {
+            get { return _image; }
+            set
+            {
+                _image = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string HintText
+        {
+            get { return _hintText; }
+            set
+            {
+                _hintText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string Description
+        {
+            get { return _description; }
+            set
+            {
+                _description = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int Width
+        {
+            get { return _width; }
+            set
+            {
+                _width = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int Height
+        {
+            get { return _height; }
+            set
+            {
+                _height = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public System.Windows.Media.Brush Color
+        {
+            get { return _color; }
+            set
+            {
+                _color = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Панель-экспандер с элементами
+    /// </summary>
+    public class MenuExpanderItem : BaseMenuElement
+    {
+        private IEnumerable<BaseMenuElement> _subItems;
+
+        public IEnumerable<BaseMenuElement> SubItems
+        {
+            get { return _subItems; }
+            set
+            {
+                _subItems = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public MenuExpanderItem(string image, string hintText, IEnumerable<BaseMenuElement> subItems, Brush color, int width = 0, int height = 0) : base(image, hintText, width, height)
+        {
+            SubItems = subItems;
+            Color = color;
+        }
+    }
+
+    /// <summary>
+    /// Вертикальный экспандер с элементами
+    /// </summary>
+    public class MenuSubItem : BaseMenuElement
+    {
+        private IEnumerable<BaseMenuElement> _subItems;
+
+        public MenuSubItem(string image, string hintText, IEnumerable<BaseMenuElement> subItems,
+            int width = DefaultWidth + 14, int height = DefaultHeight) : base(image, hintText, width, height)
+        {
+            SubItems = subItems;
+            Image = image;
+            HintText = hintText;
+        }
+
+        public IEnumerable<BaseMenuElement> SubItems
+        {
+            get { return _subItems; }
+            set
+            {
+                _subItems = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Кнопка в меню
+    /// </summary>
+    public class MenuButtonItem : BaseMenuElement
+    {
+        private ApplicationController.Operations _operationType;
+
+        public MenuButtonItem(string image, string hintText, ApplicationController.Operations operationType, int width = DefaultWidth, int height = DefaultHeight) : base(image, hintText, width, height)
+        {
+            OperationType = operationType;
+            Color = Brushes.Black;
+        }
+
+        public ApplicationController.Operations OperationType
+        {
+            get { return _operationType; }
+            set
+            {
+                _operationType = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         #region Public
@@ -33,6 +199,7 @@ namespace CADView
 
         ~MainWindowViewModel()
         {
+            return;
             var ids = DocumentViewModels.Select(d => d.Key).ToList();
             foreach (var id in ids)
             {
@@ -60,6 +227,7 @@ namespace CADView
 
         public void Init()
         {
+            return;
             Session = Controller.initSession();
             _inited = true;
 
@@ -159,6 +327,57 @@ namespace CADView
                     DocumentViewModelsTabs.IndexOf(_tabsDocuments.FirstOrDefault(i => i.Value == value).Key);
             }
         }
+
+        #region UI Buttons
+
+        public ObservableCollection<BaseMenuElement> UIMenuElements { get; } =
+            new ObservableCollection<BaseMenuElement>(
+                new BaseMenuElement[]
+                {
+                    new MenuExpanderItem("Icons/Home.png", "Документ", null, Brushes.Gray),
+                    new MenuExpanderItem("Icons/Edit.png", "Редактирование", new BaseMenuElement[]
+                    {
+                        new MenuButtonItem("Icons/Modification Tools/_0058_Eraser-SU.png", "Ластик", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Modification Tools/_0065_Trim-SU.png", "Триммирование", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("", "Продление", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Modification Tools/_0059_Make-Component.png", "Создать ломаную", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Modification Tools/_0059_UnMake-Component.png", "Разрушить ломаную", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Modification Tools/_0060_Select-SU.png", "Корректировка", ApplicationController.Operations.OpCircleCreate),
+                        new MenuSubItem("Icons/Modification Tools/_0019_X-Ray.png", "Узлы", new[]
+                        {
+                            new MenuButtonItem("Icons/Modification Tools/_0019_X-Ray.png", "Добавить узел", ApplicationController.Operations.OpCircleCreate),
+                            new MenuButtonItem("Icons/Modification Tools/_0019_X-Ray-Delete.png", "Удалить узел", ApplicationController.Operations.OpCircleCreate),
+                        }) {Color = Brushes.DimGray},
+                        new MenuButtonItem("Icons/Modification Tools/_0001_Tape-Measure.png", "Линейка", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Modification Tools/_0045_Protractor.png", "Транспортир", ApplicationController.Operations.OpCircleCreate),
+                    }, Brushes.DarkGray),
+                    new MenuExpanderItem("Icons/Paint Brush.png", "Рисование", new BaseMenuElement[]
+                    {
+                        new MenuButtonItem("", "Карандаш", ApplicationController.Operations.OpCircleCreate),
+                        new MenuSubItem("Icons/Drawing Tools/_0054_Line-SU.png", "Линия",
+                            new[]
+                            {
+                                new MenuButtonItem("", "Тонкая", ApplicationController.Operations.OpCircleCreate),
+                                new MenuButtonItem("", "Средняя", ApplicationController.Operations.OpCircleCreate),
+                                new MenuButtonItem("", "Толстая", ApplicationController.Operations.OpCircleCreate),
+                            }) {Color = Brushes.DimGray},
+                        new MenuButtonItem("Icons/Drawing Tools/_0055_Arc-SU.png", "Дуга",
+                            ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Drawing Tools/_0056_Circle-SU.png", "Окружность",
+                            ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("", "Ломаная", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("", "Сплайн", ApplicationController.Operations.OpCircleCreate),
+                    }, Brushes.DarkSlateGray),
+                    new MenuExpanderItem("Icons/Question 4.png", "Справка", new BaseMenuElement[]
+                    {
+                        new MenuButtonItem("", "Справка",
+                            ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("", "О программе", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("", "Документация", ApplicationController.Operations.OpCircleCreate),
+                    }, Brushes.DarkSlateGray),
+                });
+
+        #endregion
 
         #endregion
 
@@ -260,6 +479,7 @@ namespace CADView
 
         private async void ProcessControllerRaiseDialog(object obj)
         {
+            return;
             ApplicationController.Operations type = (ApplicationController.Operations) obj;
 
             Window modalWindow = null;

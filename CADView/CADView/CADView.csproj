@@ -218,6 +218,45 @@
     <Resource Include="Icons\Paint Brush.png" />
     <Resource Include="Icons\Paint Bucket.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Drawing Tools\_0051_Freehand-SU.png" />
+    <Resource Include="Icons\Drawing Tools\_0052_Polygon.png" />
+    <Resource Include="Icons\Drawing Tools\_0053_Rectangle-SU.png" />
+    <Resource Include="Icons\Drawing Tools\_0054_Line-SU.png" />
+    <Resource Include="Icons\Drawing Tools\_0055_Arc-SU.png" />
+    <Resource Include="Icons\Drawing Tools\_0056_Circle-SU.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Modification Tools\_0040_Rotate.png" />
+    <Resource Include="Icons\Modification Tools\_0041_Scale.png" />
+    <Resource Include="Icons\Modification Tools\_0042_Offset.png" />
+    <Resource Include="Icons\Modification Tools\_0048_Follow-Me.png" />
+    <Resource Include="Icons\Modification Tools\_0049_Push-Pull.png" />
+    <Resource Include="Icons\Modification Tools\_0050_Move.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Modification Tools\_0001_Tape-Measure.png" />
+    <Resource Include="Icons\Modification Tools\_0045_Protractor.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Modification Tools\_0058_Eraser-SU.png" />
+    <Resource Include="Icons\Modification Tools\_0059_Make-Component.png" />
+    <Resource Include="Icons\Modification Tools\_0059_UnMake-Component.png" />
+    <Resource Include="Icons\Modification Tools\_0060_Select-SU.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Modification Tools\_0065_Trim-SU.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Modification Tools\_0019_X-Ray-Delete.png" />
+    <Resource Include="Icons\Modification Tools\_0019_X-Ray.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Question 4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Edit.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView"
-        xmlns:cadController="clr-namespace:CADController;assembly=CADController"
         mc:Ignorable="d"
         AllowsTransparency="False"
         Title="Editor" BorderThickness="2" Height="450" Width="870" MinHeight="450" MinWidth="870" WindowStartupLocation="CenterScreen"
@@ -18,47 +17,96 @@
             <GradientStop Color="#FF676767" Offset="0.998"/>
         </LinearGradientBrush>
     </Window.BorderBrush>
-    <Window.Resources>
-    </Window.Resources>
     <Grid>
+        <Grid.Resources>
+            
+            <DataTemplate DataType="{x:Type local:MenuSubItem}">
+                <!--<Border BorderBrush="Black" BorderThickness="1">-->
+                    <Expander Width="{Binding Width}" MinHeight="{Binding Height}" Background="{Binding Color}" Margin="0,0,0,0">
+                        <Expander.Header>
+                            <BulletDecorator Margin="0,8,0,0" MinHeight="26">
+                                <BulletDecorator.Bullet>
+                                <Image Source="{Binding Image}" Stretch="Fill" Width="25" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </BulletDecorator.Bullet>
+                                <!--<TextBlock Margin="3,0,0,0" Text="{Binding HintText}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Foreground="White" />-->
+                            </BulletDecorator>
+                        </Expander.Header>
+                        <WrapPanel>
+                            <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding SubItems}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"></StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </WrapPanel>
+                    </Expander>
+                <!--</Border>-->
+            </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type local:MenuButtonItem}">
+                <Label Width="{Binding Width}" Height="{Binding Height}" Background="#80808080"
+                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                       VerticalAlignment="Top" Margin="1,1,1,1" Foreground="White" ToolTip="{Binding HintText}">
+                    <Label.InputBindings>
+                        <MouseBinding Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                      CommandParameter="{Binding OperationType}" MouseAction="LeftClick" />
+                    </Label.InputBindings>
+                    <Label.Style>
+                        <Style TargetType="Label">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True" >
+                                    <Setter Property="BorderBrush" Value="Black"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Label.Style>
+                    <Image Margin="1,1,1,1" Source="{Binding Image}" Stretch="Fill" Width="38" Height="38"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <!--<DockPanel>
+                        <Label Margin="1" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0" Foreground="White" Content="{Binding HintText}" />
+                    </DockPanel>-->
+                </Label>
+            </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type local:MenuExpanderItem}">
+                <Expander Background="{Binding Color}">
+                    <Expander.Header>
+                        <BulletDecorator Margin="0,0,20,0">
+                            <BulletDecorator.Bullet>
+                                <Image Source="{Binding Image}" Stretch="Fill" Width="64" Height="64" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                            </BulletDecorator.Bullet>
+                            <TextBlock Margin="10,0,0,0" Text="{Binding HintText}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Foreground="White" />
+                        </BulletDecorator>
+                    </Expander.Header>
+                    <WrapPanel>
+                        <ItemsControl ItemsSource="{Binding SubItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"></StackPanel>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </WrapPanel>
+                </Expander>
+            </DataTemplate>
+            
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition MinHeight="50" Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Vertical" Visibility="Collapsed">
-            <Grid>
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5,5,5">
-                    <Button Command="{Binding DocumentWorkCommand}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="New &#xA;Document" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;point" Tag="{x:Static cadController:ApplicationController+Operations.OpPointCreate}" Width="70" />
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;line" Tag="{x:Static cadController:ApplicationController+Operations.OpLineCreate}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;circle" Tag="{x:Static cadController:ApplicationController+Operations.OpCircleCreate}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;contour" Tag="{x:Static cadController:ApplicationController+Operations.OpContourCreate}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Destroy&#xA;contour" Tag="{x:Static cadController:ApplicationController+Operations.OpDestroyContour}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Delete &#xA;element" Tag="{x:Static cadController:ApplicationController+Operations.OpDeleteObject}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Background&#xA;color" Tag="{x:Static cadController:ApplicationController+Operations.OpSetBackgroundColor}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Layers&#xA;manager" Tag="{x:Static cadController:ApplicationController+Operations.OpSetLayersToShow}" Width="70"/>
-                </StackPanel>
-                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,5,5">
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Undo" Tag="{x:Static cadController:ApplicationController+Operations.OpUndo}"/>
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Redo" Tag="{x:Static cadController:ApplicationController+Operations.OpRedo}"/>
-                    <Button Command="{Binding CloseApplicationCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="X" Width="30" Height="30"/>
-                </StackPanel>
-            </Grid>
-        </StackPanel>
-        <GridSplitter Grid.Row="0" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
+        <!--<GridSplitter Grid.Row="0" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>-->
         <Grid Grid.Row="1">
             <Grid.Resources>
                 <ControlTemplate x:Key="CustomHeaderTemplate">
                     <Border BorderThickness="2" CornerRadius="4">
                         <DockPanel LastChildFill="True">
                             <Button Content="X" DockPanel.Dock="Right" 
-                                    IsEnabled="{Binding DataContext.IsActive, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
-                                    Command="{Binding DataContext.CloseDocumentCommand, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
+                                    IsEnabled="{Binding DataContext.IsActive, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                    Command="{Binding DataContext.CloseDocumentCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                     CommandParameter="{Binding}" Style="{StaticResource RoundedButton}" FontWeight="Bold" Width="20" Height="20">
                             </Button>
                             <Label Content="{Binding}" />
@@ -85,15 +133,15 @@
             </TabControl>
         </Grid>
         <Grid Row="0">
-            <ListBox ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListBox ScrollViewer.VerticalScrollBarVisibility="Auto" ItemsSource="{Binding UIMenuElements}">
                 <ListBox.Resources>
-                    <Style TargetType="{x:Type Expander}">
+                    <!--<Style TargetType="{x:Type Expander}">
                         <Setter Property="IsExpanded">
                             <Setter.Value>
                                 <Binding Path="IsSelected" RelativeSource="{RelativeSource AncestorType={x:Type ListBoxItem}}" />
                             </Setter.Value>
                         </Setter>
-                    </Style>
+                    </Style>-->
                 </ListBox.Resources>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -116,79 +164,6 @@
                         </Setter>
                     </Style>
                 </ListBox.ItemContainerStyle>
-
-                <Expander Background="Gray">
-                    <Expander.Header>
-                        <BulletDecorator Margin="0,0,20,0">
-                            <BulletDecorator.Bullet>
-                                <Image Source="Icons/Home.png" Width="64" Height="64" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                            </BulletDecorator.Bullet>
-                            <TextBlock Margin="10,0,0,0" Text="Document" VerticalAlignment="Center" HorizontalAlignment="Stretch" Foreground="White" />
-                        </BulletDecorator>
-                    </Expander.Header>
-                    <WrapPanel>
-                        <Label Margin="20,5,5,5" Foreground="white">
-                            <DockPanel>
-                                <Image Source="Icons/Button Add.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <Label Foreground="White" Content="Create new"></Label>
-                            </DockPanel>
-                        </Label>
-                        <Label Margin="20,5,5,5" Foreground="white" Content="Test1"/>
-                        <Label Margin="20,5,5,5" Foreground="white" Content="Test2"/>
-                    </WrapPanel>
-                </Expander>
-
-                <Expander Background="DarkSlateGray">
-                    <Expander.Header>
-                        <BulletDecorator Margin="0,0,20,0">
-                            <BulletDecorator.Bullet>
-                                <Image Source="Icons/Medal.png" Width="64" Height="64" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                            </BulletDecorator.Bullet>
-                            <TextBlock Margin="10,0,0,0" Text="Honor" VerticalAlignment="Center" HorizontalAlignment="Stretch" Foreground="White" />
-                        </BulletDecorator>
-                    </Expander.Header>
-                    <WrapPanel>
-                        <Label Margin="20,5,5,5" Foreground="white" Content="Label 1"/>
-                        <Label Margin="20,5,5,5" Foreground="white" Content="Operation 2"/>
-                        <Label Margin="20,5,5,5" Foreground="white" Content="Text 3"/>
-                    </WrapPanel>
-                </Expander>
-
-                <Expander Background="DimGray">
-                    <Expander.Header>
-                        <BulletDecorator Margin="0,0,20,0">
-                            <BulletDecorator.Bullet>
-                                <Image Source="Icons/Oscilloscope.png" Width="64" Height="64" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                            </BulletDecorator.Bullet>
-                            <TextBlock Margin="10,0,0,0" Text="Operations" VerticalAlignment="Center" HorizontalAlignment="Stretch" Foreground="White" />
-                        </BulletDecorator>
-                    </Expander.Header>
-                    <WrapPanel Orientation="Vertical">
-                        <Label Margin="20,5,5,5" Foreground="white">
-                            <Label.Style>
-                                <Style TargetType="Label">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True" >
-                                            <Setter Property="BorderBrush" Value="Black"/>
-                                            <Setter Property="BorderThickness" Value="1"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Label.Style>
-                            <DockPanel>
-                                <Image Source="Icons/Paint Brush.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <Label Foreground="White" Content="Line"></Label>
-                            </DockPanel>
-                        </Label>
-                        <Button Margin="20,5,5,5" Foreground="white">
-                            <DockPanel>
-                                <Image Source="Icons/Paint Bucket.png" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <Label Foreground="White" Content="Circle"></Label>
-                            </DockPanel>
-                        </Button>
-                    </WrapPanel>
-                </Expander>
-
             </ListBox>
         </Grid>
     </Grid>
