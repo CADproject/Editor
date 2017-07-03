@@ -183,7 +183,11 @@ namespace CADController
             OpUndo,
             OpRedo,
             OpSetLayersToShow,
-            OpSetBackgroundColor
+            OpSetBackgroundColor,
+
+            //UI
+
+            OpSetTheme = 1000,
         }
 
         #region Private

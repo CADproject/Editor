@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CADView"
         mc:Ignorable="d"
         AllowsTransparency="False"
-        Title="Editor" BorderThickness="2" Height="450" Width="870" MinHeight="450" MinWidth="870" WindowStartupLocation="CenterScreen"
+        Title="Editor" BorderThickness="2" Height="450" Width="870" MinHeight="450" MinWidth="570" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}"
         >
     <Window.BorderBrush>
@@ -17,33 +17,70 @@
             <GradientStop Color="#FF676767" Offset="0.998"/>
         </LinearGradientBrush>
     </Window.BorderBrush>
+    
+    <Window.Resources>
+    </Window.Resources>
+    
     <Grid>
         <Grid.Resources>
-            
+
+            <DataTemplate DataType="{x:Type local:MenuExpanderItem}">
+                <DockPanel LastChildFill="False" Margin="2,2,0,0">
+                    <ItemsControl ItemsSource="{Binding SubItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"></StackPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <Grid Margin="2,2,0,2" Background="Black" Width="3"></Grid>
+                </DockPanel>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type local:MenuSubItem}">
-                <!--<Border BorderBrush="Black" BorderThickness="1">-->
-                    <Expander Width="{Binding Width}" MinHeight="{Binding Height}" Background="{Binding Color}" Margin="0,0,0,0">
+                <Expander Width="{Binding Width}" MinHeight="{Binding Height}" Background="{Binding Color}" Margin="0,0,0,0" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+                    <Expander.Header>
+                        <BulletDecorator Margin="0,0,0,0" MinHeight="26">
+                            <BulletDecorator.Bullet>
+                                <Image Source="{Binding Image}" Stretch="Fill" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </BulletDecorator.Bullet>
+                        </BulletDecorator>
+                    </Expander.Header>
+                    <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding SubItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical"></StackPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Expander>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:MenuButtonItem}">
+                <Button ToolTip="{Binding HintText}" Height="40" 
+                        Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                      CommandParameter="{Binding OperationType}">
+                    <Image Source="{Binding Image}" Stretch="Uniform" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Button>
+            </DataTemplate>
+
+            <!--<DataTemplate DataType="{x:Type local:MenuSubItem}">
+                    <Expander ToolTip="{Binding HintText}" Width="{Binding Width}" MinHeight="{Binding Height}" Background="{Binding Color}"
+                              Margin="0,0,0,0" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
                         <Expander.Header>
-                            <BulletDecorator Margin="0,8,0,0" MinHeight="26">
+                            <BulletDecorator Margin="0,7,0,0" MinHeight="26">
                                 <BulletDecorator.Bullet>
                                 <Image Source="{Binding Image}" Stretch="Fill" Width="25" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </BulletDecorator.Bullet>
-                                <!--<TextBlock Margin="3,0,0,0" Text="{Binding HintText}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Foreground="White" />-->
                             </BulletDecorator>
                         </Expander.Header>
-                        <WrapPanel>
-                            <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding SubItems}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical"></StackPanel>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                        </WrapPanel>
+                        <ItemsControl Margin="0,6,0,0" ItemsSource="{Binding SubItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Margin="0,0,0,0" Orientation="Vertical"></StackPanel>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
                     </Expander>
-                <!--</Border>-->
             </DataTemplate>
-            
             <DataTemplate DataType="{x:Type local:MenuButtonItem}">
                 <Label Width="{Binding Width}" Height="{Binding Height}" Background="#80808080"
                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
@@ -62,16 +99,12 @@
                             </Style.Triggers>
                         </Style>
                     </Label.Style>
-                    <Image Margin="1,1,1,1" Source="{Binding Image}" Stretch="Fill" Width="38" Height="38"
+                    <Image Margin="1,1,1,1" Source="{Binding Image}" Stretch="Uniform" Height="38"
                            HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    <!--<DockPanel>
-                        <Label Margin="1" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="0" Foreground="White" Content="{Binding HintText}" />
-                    </DockPanel>-->
                 </Label>
             </DataTemplate>
-            
             <DataTemplate DataType="{x:Type local:MenuExpanderItem}">
-                <Expander Background="{Binding Color}">
+                <Expander Background="{Binding Color}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
                     <Expander.Header>
                         <BulletDecorator Margin="0,0,20,0">
                             <BulletDecorator.Bullet>
@@ -80,26 +113,23 @@
                             <TextBlock Margin="10,0,0,0" Text="{Binding HintText}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Foreground="White" />
                         </BulletDecorator>
                     </Expander.Header>
-                    <WrapPanel>
-                        <ItemsControl ItemsSource="{Binding SubItems}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"></StackPanel>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </WrapPanel>
+                    <ItemsControl ItemsSource="{Binding SubItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"></StackPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
                 </Expander>
-            </DataTemplate>
+            </DataTemplate>-->
             
         </Grid.Resources>
         <Grid.RowDefinitions>
-            <RowDefinition MinHeight="50" Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2"/>
+            <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <!--<GridSplitter Grid.Row="0" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>-->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.Resources>
                 <ControlTemplate x:Key="CustomHeaderTemplate">
                     <Border BorderThickness="2" CornerRadius="4">
@@ -133,26 +163,33 @@
             </TabControl>
         </Grid>
         <Grid Row="0">
-            <ListBox ScrollViewer.VerticalScrollBarVisibility="Auto" ItemsSource="{Binding UIMenuElements}">
+            <ItemsControl VerticalAlignment="Stretch" ItemsSource="{Binding UIMenuElements}" Margin="0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <!--<ListBox VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto" ItemsSource="{Binding UIMenuElements}">
                 <ListBox.Resources>
-                    <!--<Style TargetType="{x:Type Expander}">
+                    --><!--<Style TargetType="{x:Type Expander}">
                         <Setter Property="IsExpanded">
                             <Setter.Value>
                                 <Binding Path="IsSelected" RelativeSource="{RelativeSource AncestorType={x:Type ListBoxItem}}" />
                             </Setter.Value>
                         </Setter>
-                    </Style>-->
+                    </Style>--><!--
                 </ListBox.Resources>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <DockPanel ></DockPanel>
+                        <WrapPanel Orientation="Horizontal" MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}" ></WrapPanel>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
-                <ListBox.Template>
+                --><!--<ListBox.Template>
                     <ControlTemplate TargetType="{x:Type ListBox}">
                         <ItemsPresenter/>
                     </ControlTemplate>
-                </ListBox.Template>
+                </ListBox.Template>--><!--
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="Template">
@@ -164,7 +201,7 @@
                         </Setter>
                     </Style>
                 </ListBox.ItemContainerStyle>
-            </ListBox>
+            </ListBox>-->
         </Grid>
     </Grid>
 </Window>

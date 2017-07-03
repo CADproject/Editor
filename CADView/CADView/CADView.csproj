@@ -219,43 +219,50 @@
     <Resource Include="Icons\Paint Bucket.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icons\Drawing Tools\_0051_Freehand-SU.png" />
-    <Resource Include="Icons\Drawing Tools\_0052_Polygon.png" />
-    <Resource Include="Icons\Drawing Tools\_0053_Rectangle-SU.png" />
-    <Resource Include="Icons\Drawing Tools\_0054_Line-SU.png" />
-    <Resource Include="Icons\Drawing Tools\_0055_Arc-SU.png" />
-    <Resource Include="Icons\Drawing Tools\_0056_Circle-SU.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\Modification Tools\_0040_Rotate.png" />
-    <Resource Include="Icons\Modification Tools\_0041_Scale.png" />
-    <Resource Include="Icons\Modification Tools\_0042_Offset.png" />
-    <Resource Include="Icons\Modification Tools\_0048_Follow-Me.png" />
-    <Resource Include="Icons\Modification Tools\_0049_Push-Pull.png" />
-    <Resource Include="Icons\Modification Tools\_0050_Move.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\Modification Tools\_0001_Tape-Measure.png" />
-    <Resource Include="Icons\Modification Tools\_0045_Protractor.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\Modification Tools\_0058_Eraser-SU.png" />
-    <Resource Include="Icons\Modification Tools\_0059_Make-Component.png" />
-    <Resource Include="Icons\Modification Tools\_0059_UnMake-Component.png" />
-    <Resource Include="Icons\Modification Tools\_0060_Select-SU.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\Modification Tools\_0065_Trim-SU.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Icons\Modification Tools\_0019_X-Ray-Delete.png" />
-    <Resource Include="Icons\Modification Tools\_0019_X-Ray.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Icons\Question 4.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\Edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\buttons.png" />
+    <Resource Include="Icons\Панель ОБЩЕЕ\Новый_документ.png" />
+    <Resource Include="Icons\Панель ОБЩЕЕ\Открыть_документ.png" />
+    <Resource Include="Icons\Панель ОБЩЕЕ\Сохранить.png" />
+    <Resource Include="Icons\Панель ОБЩЕЕ\Шаг_вперед.png" />
+    <Resource Include="Icons\Панель ОБЩЕЕ\Шаг_назад.png" />
+    <Resource Include="Icons\Панель ОТОБРАЖЕНИЕ\Вспомогательная_сетка.png" />
+    <Resource Include="Icons\Панель ОТОБРАЖЕНИЕ\Отдалить_вид.png" />
+    <Resource Include="Icons\Панель ОТОБРАЖЕНИЕ\Подвинуть_вид.png" />
+    <Resource Include="Icons\Панель ОТОБРАЖЕНИЕ\Показать_все.png" />
+    <Resource Include="Icons\Панель ОТОБРАЖЕНИЕ\Приблизить_вид.png" />
+    <Resource Include="Icons\Панель ОТОБРАЖЕНИЕ\Темы.png" />
+    <Resource Include="Icons\Панель ОТОБРАЖЕНИЕ\Узлы.png" />
+    <Resource Include="Icons\Панель РЕДАКТИРОВАНИЕ\Добавить_узел.png" />
+    <Resource Include="Icons\Панель РЕДАКТИРОВАНИЕ\Корректировать_узел.png" />
+    <Resource Include="Icons\Панель РЕДАКТИРОВАНИЕ\Ластик.png" />
+    <Resource Include="Icons\Панель РЕДАКТИРОВАНИЕ\Линейка.png" />
+    <Resource Include="Icons\Панель РЕДАКТИРОВАНИЕ\Продление.png" />
+    <Resource Include="Icons\Панель РЕДАКТИРОВАНИЕ\Разрезать_ломаную.png" />
+    <Resource Include="Icons\Панель РЕДАКТИРОВАНИЕ\Сшить_ломаную.png" />
+    <Resource Include="Icons\Панель РЕДАКТИРОВАНИЕ\Транспортир.png" />
+    <Resource Include="Icons\Панель РЕДАКТИРОВАНИЕ\Триммирование.png" />
+    <Resource Include="Icons\Панель РЕДАКТИРОВАНИЕ\Удалить_узел.png" />
+    <Resource Include="Icons\Панель РИСОВАНИЕ\Дуга_1.png" />
+    <Resource Include="Icons\Панель РИСОВАНИЕ\Дуга_2.png" />
+    <Resource Include="Icons\Панель РИСОВАНИЕ\Карандаш.png" />
+    <Resource Include="Icons\Панель РИСОВАНИЕ\Ломаная.png" />
+    <Resource Include="Icons\Панель РИСОВАНИЕ\Окружность_1.png" />
+    <Resource Include="Icons\Панель РИСОВАНИЕ\Окружность_2.png" />
+    <Resource Include="Icons\Панель РИСОВАНИЕ\Отрезок_1.png" />
+    <Resource Include="Icons\Панель РИСОВАНИЕ\Отрезок_2.png" />
+    <Resource Include="Icons\Панель РИСОВАНИЕ\Отрезок_3.png" />
+    <Resource Include="Icons\Панель РИСОВАНИЕ\Отрезок_4.png" />
+    <Resource Include="Icons\Панель РИСОВАНИЕ\Сплайн.png" />
+    <Resource Include="Icons\Панель СЛОИ\Добавить_слой.png" />
+    <Resource Include="Icons\Панель СЛОИ\Менеджер_слоев.png" />
+    <Resource Include="Icons\Панель СЛОИ\Удалить_слой.png" />
+    <Resource Include="Icons\Панель СПРАВКА\Справка.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

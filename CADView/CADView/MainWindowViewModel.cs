@@ -47,7 +47,11 @@ namespace CADView
             HintText = hintText;
             Width = width;
             Height = height;
+
+            CreatedUIElements.Add(this);
         }
+
+        public static List<BaseMenuElement> CreatedUIElements { get; } = new List<BaseMenuElement>();
 
         public string Image
         {
@@ -110,10 +114,33 @@ namespace CADView
         }
     }
 
+    public abstract class BaseExpanderItem : BaseMenuElement
+    {
+        public bool IsExpanded
+        {
+            get { return _isExpanded; }
+            set
+            {
+                _isExpanded = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int Index { get; private set; }
+
+        private static int _counter = 0;
+        private bool _isExpanded;
+
+        public BaseExpanderItem(string image, string hintText, int width, int height) : base(image, hintText, width, height)
+        {
+            Index = _counter++;
+        }
+    }
+
     /// <summary>
     /// Панель-экспандер с элементами
     /// </summary>
-    public class MenuExpanderItem : BaseMenuElement
+    public class MenuExpanderItem : BaseExpanderItem
     {
         private IEnumerable<BaseMenuElement> _subItems;
 
@@ -137,7 +164,7 @@ namespace CADView
     /// <summary>
     /// Вертикальный экспандер с элементами
     /// </summary>
-    public class MenuSubItem : BaseMenuElement
+    public class MenuSubItem : BaseExpanderItem
     {
         private IEnumerable<BaseMenuElement> _subItems;
 
@@ -331,49 +358,79 @@ namespace CADView
         #region UI Buttons
 
         public ObservableCollection<BaseMenuElement> UIMenuElements { get; } =
-            new ObservableCollection<BaseMenuElement>(
-                new BaseMenuElement[]
+            new ObservableCollection<BaseMenuElement>( new BaseMenuElement[]
                 {
-                    new MenuExpanderItem("Icons/Home.png", "Документ", null, Brushes.Gray),
-                    new MenuExpanderItem("Icons/Edit.png", "Редактирование", new BaseMenuElement[]
+                    new MenuExpanderItem("Icons/Home.png", "Документ", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Modification Tools/_0058_Eraser-SU.png", "Ластик", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Modification Tools/_0065_Trim-SU.png", "Триммирование", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("", "Продление", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Modification Tools/_0059_Make-Component.png", "Создать ломаную", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Modification Tools/_0059_UnMake-Component.png", "Разрушить ломаную", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Modification Tools/_0060_Select-SU.png", "Корректировка", ApplicationController.Operations.OpCircleCreate),
-                        new MenuSubItem("Icons/Modification Tools/_0019_X-Ray.png", "Узлы", new[]
-                        {
-                            new MenuButtonItem("Icons/Modification Tools/_0019_X-Ray.png", "Добавить узел", ApplicationController.Operations.OpCircleCreate),
-                            new MenuButtonItem("Icons/Modification Tools/_0019_X-Ray-Delete.png", "Удалить узел", ApplicationController.Operations.OpCircleCreate),
-                        }) {Color = Brushes.DimGray},
-                        new MenuButtonItem("Icons/Modification Tools/_0001_Tape-Measure.png", "Линейка", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Modification Tools/_0045_Protractor.png", "Транспортир", ApplicationController.Operations.OpCircleCreate),
-                    }, Brushes.DarkGray),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Новый_документ.png", "Новый документ", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Открыть_документ.png", "Открыть документ", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Сохранить.png", "Сохранить", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Шаг_вперед.png", "Шаг вперёд", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Шаг_назад.png", "Шаг назад", ApplicationController.Operations.OpCircleCreate),
+
+                    }, Brushes.Gray),
                     new MenuExpanderItem("Icons/Paint Brush.png", "Рисование", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("", "Карандаш", ApplicationController.Operations.OpCircleCreate),
-                        new MenuSubItem("Icons/Drawing Tools/_0054_Line-SU.png", "Линия",
+                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Карандаш.png", "Карандаш", ApplicationController.Operations.OpCircleCreate),
+                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Отрезок_1.png", "Линия",
                             new[]
                             {
-                                new MenuButtonItem("", "Тонкая", ApplicationController.Operations.OpCircleCreate),
-                                new MenuButtonItem("", "Средняя", ApplicationController.Operations.OpCircleCreate),
-                                new MenuButtonItem("", "Толстая", ApplicationController.Operations.OpCircleCreate),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_1.png", "Линия", ApplicationController.Operations.OpCircleCreate),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_2.png", "Линия под прямым углом", ApplicationController.Operations.OpCircleCreate),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_3.png", "Параллельная линия", ApplicationController.Operations.OpCircleCreate),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_4.png", "Линия под углом", ApplicationController.Operations.OpCircleCreate),
                             }) {Color = Brushes.DimGray},
-                        new MenuButtonItem("Icons/Drawing Tools/_0055_Arc-SU.png", "Дуга",
-                            ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Drawing Tools/_0056_Circle-SU.png", "Окружность",
-                            ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("", "Ломаная", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("", "Сплайн", ApplicationController.Operations.OpCircleCreate),
+                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Дуга_1.png", "Дуга", new []
+                        {
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_1.png", "Дуга по двум точкам и центру", ApplicationController.Operations.OpCircleCreate),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_2.png", "Дуга по трём точкам", ApplicationController.Operations.OpCircleCreate),
+                        }) {Color = Brushes.DimGray},
+                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность", new []
+                        {
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность по центру и точке", ApplicationController.Operations.OpCircleCreate),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_2.png", "Окружность по трём точкам", ApplicationController.Operations.OpCircleCreate),
+                        }) {Color = Brushes.DimGray},
+                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Ломаная.png", "Ломаная", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Сплайн.png", "Сплайн", ApplicationController.Operations.OpCircleCreate),
                     }, Brushes.DarkSlateGray),
+                    new MenuExpanderItem("Icons/Oscilloscope.png", "Отображение", new BaseMenuElement[]
+                    {
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Подвинуть_вид.png", "Подвинуть изображение", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Приблизить_вид.png", "Увеличить изображение", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Отдалить_вид.png", "Уменьшить изображение", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png", "Показать всё", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png", "Показать узлы", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png", "Показать сетку", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Темы.png", "Сменить тему", ApplicationController.Operations.OpSetTheme),
+
+                    }, Brushes.DarkGray),
                     new MenuExpanderItem("Icons/Question 4.png", "Справка", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("", "Справка",
-                            ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель СПРАВКА/Справка.png", "Справка", ApplicationController.Operations.OpCircleCreate, 61),
                         new MenuButtonItem("", "О программе", ApplicationController.Operations.OpCircleCreate),
                         new MenuButtonItem("", "Документация", ApplicationController.Operations.OpCircleCreate),
+                    }, Brushes.DarkSlateGray),
+                    new MenuExpanderItem("Icons/Edit.png", "Редактирование", new BaseMenuElement[]
+                    {
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Ластик.png", "Ластик", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Триммирование.png", "Триммирование", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Продление.png", "Продление", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Сшить_ломаную.png", "Создать ломаную", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Разрезать_ломаную.png", "Разрушить ломаную", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Корректировать_узел.png", "Корректировка", ApplicationController.Operations.OpCircleCreate),
+                        new MenuSubItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Узлы", new[]
+                        {
+                            new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Добавить узел", ApplicationController.Operations.OpCircleCreate),
+                            new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Удалить_узел.png", "Удалить узел", ApplicationController.Operations.OpCircleCreate),
+                        }) {Color = Brushes.DimGray},
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Линейка.png", "Линейка", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Транспортир.png", "Транспортир", ApplicationController.Operations.OpCircleCreate),
+                    }, Brushes.DarkGray),
+                    new MenuExpanderItem("Icons/Панель СЛОИ/Менеджер_слоев.png", "Слои", new BaseMenuElement[]
+                    {
+                        new MenuButtonItem("Icons/Панель СЛОИ/Добавить_слой.png", "Добавить слой", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель СЛОИ/Удалить_слой.png", "Удалить слой", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель СЛОИ/Менеджер_слоев.png", "Менеджер слоёв", ApplicationController.Operations.OpCircleCreate),
                     }, Brushes.DarkSlateGray),
                 });
 
@@ -404,7 +461,7 @@ namespace CADView
         private RelayCommand _controllerDialogCommand;
         private RelayCommand _closeDocumentCommand;
         private ObservableCollection<TabItem> _documentViewModelsTabs = new ObservableCollection<TabItem>();
-        private int _selectedDocumentIndex;
+        private int _selectedDocumentIndex = -1;
         private DispatcherTimer _timer;
         private double _windowWidth;
         private double _windowHeight;
@@ -479,6 +536,15 @@ namespace CADView
 
         private async void ProcessControllerRaiseDialog(object obj)
         {
+            foreach (var element in BaseMenuElement.CreatedUIElements.OfType<MenuSubItem>())
+            {
+                element.IsExpanded = false;
+            }
+            //ResourceDictionary rd = new ResourceDictionary();
+            //DataTemplate t = new DataTemplate(typeof(MenuExpanderItem));
+            //rd.Add("OpenHand", t);
+            //Application.Current.Resources.MergedDictionaries.Add(rd);
+
             return;
             ApplicationController.Operations type = (ApplicationController.Operations) obj;
 
