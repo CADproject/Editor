@@ -55,11 +55,45 @@
                 </Expander>
             </DataTemplate>
             <DataTemplate DataType="{x:Type local:MenuButtonItem}">
-                <Button ToolTip="{Binding HintText}" Height="40" 
-                        Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                      CommandParameter="{Binding OperationType}">
-                    <Image Source="{Binding Image}" Stretch="Uniform" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Button>
+                <Rectangle Width="{Binding Width}" Height="{Binding Height}" 
+                      VerticalAlignment="Top" Margin="1,1,1,1" ToolTip="{Binding HintText}">
+                    <Rectangle.InputBindings>
+                        <MouseBinding Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                      CommandParameter="{Binding OperationType}" MouseAction="LeftClick" />
+                    </Rectangle.InputBindings>
+
+                    <Rectangle.OpacityMask>
+                        <ImageBrush Stretch="Uniform" ImageSource="{Binding Image}" ></ImageBrush>
+                    </Rectangle.OpacityMask>
+                    <Rectangle.Style>
+                        <Style TargetType="{x:Type Rectangle}">
+                            <Setter Property="Fill" Value="Black" />
+                            <Style.Triggers>
+                                <EventTrigger RoutedEvent="Rectangle.PreviewMouseLeftButtonDown">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="LightGray" Duration="0" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="Rectangle.MouseUp">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource TelegramButtonColor}" Duration="0" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                                <Trigger Property="IsMouseOver" Value="True" >
+                                    <Setter Property="Fill" Value="{StaticResource TelegramButton}"></Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Rectangle.Style>
+                </Rectangle>
             </DataTemplate>
 
             <!--<DataTemplate DataType="{x:Type local:MenuSubItem}">

@@ -19,196 +19,48 @@ using System.Windows.Media;
 
 namespace CADView
 {
-    /// <summary>
-    /// Базовый класс для элементов меню.
-    /// </summary>
-    public abstract class BaseMenuElement : INotifyPropertyChanged
+    public enum ButtonsCommands
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private string _image;
-        private string _hintText;
-        private int _width;
-        private int _height;
-        private Brush _color = Brushes.LightSlateGray;
-        private string _description;
-
-        public const int DefaultWidth = 40;
-        public const int DefaultHeight = 40;
-
-        public BaseMenuElement(string image, string hintText, int width, int height)
-        {
-            Image = image;
-            HintText = hintText;
-            Width = width;
-            Height = height;
-
-            CreatedUIElements.Add(this);
-        }
-
-        public static List<BaseMenuElement> CreatedUIElements { get; } = new List<BaseMenuElement>();
-
-        public string Image
-        {
-            get { return _image; }
-            set
-            {
-                _image = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string HintText
-        {
-            get { return _hintText; }
-            set
-            {
-                _hintText = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string Description
-        {
-            get { return _description; }
-            set
-            {
-                _description = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public int Width
-        {
-            get { return _width; }
-            set
-            {
-                _width = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public int Height
-        {
-            get { return _height; }
-            set
-            {
-                _height = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public System.Windows.Media.Brush Color
-        {
-            get { return _color; }
-            set
-            {
-                _color = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public abstract class BaseExpanderItem : BaseMenuElement
-    {
-        public bool IsExpanded
-        {
-            get { return _isExpanded; }
-            set
-            {
-                _isExpanded = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public int Index { get; private set; }
-
-        private static int _counter = 0;
-        private bool _isExpanded;
-
-        public BaseExpanderItem(string image, string hintText, int width, int height) : base(image, hintText, width, height)
-        {
-            Index = _counter++;
-        }
-    }
-
-    /// <summary>
-    /// Панель-экспандер с элементами
-    /// </summary>
-    public class MenuExpanderItem : BaseExpanderItem
-    {
-        private IEnumerable<BaseMenuElement> _subItems;
-
-        public IEnumerable<BaseMenuElement> SubItems
-        {
-            get { return _subItems; }
-            set
-            {
-                _subItems = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public MenuExpanderItem(string image, string hintText, IEnumerable<BaseMenuElement> subItems, Brush color, int width = 0, int height = 0) : base(image, hintText, width, height)
-        {
-            SubItems = subItems;
-            Color = color;
-        }
-    }
-
-    /// <summary>
-    /// Вертикальный экспандер с элементами
-    /// </summary>
-    public class MenuSubItem : BaseExpanderItem
-    {
-        private IEnumerable<BaseMenuElement> _subItems;
-
-        public MenuSubItem(string image, string hintText, IEnumerable<BaseMenuElement> subItems,
-            int width = DefaultWidth + 14, int height = DefaultHeight) : base(image, hintText, width, height)
-        {
-            SubItems = subItems;
-            Image = image;
-            HintText = hintText;
-        }
-
-        public IEnumerable<BaseMenuElement> SubItems
-        {
-            get { return _subItems; }
-            set
-            {
-                _subItems = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Кнопка в меню
-    /// </summary>
-    public class MenuButtonItem : BaseMenuElement
-    {
-        private ApplicationController.Operations _operationType;
-
-        public MenuButtonItem(string image, string hintText, ApplicationController.Operations operationType, int width = DefaultWidth, int height = DefaultHeight) : base(image, hintText, width, height)
-        {
-            OperationType = operationType;
-            Color = Brushes.Black;
-        }
-
-        public ApplicationController.Operations OperationType
-        {
-            get { return _operationType; }
-            set
-            {
-                _operationType = value;
-                OnPropertyChanged();
-            }
-        }
+        //Core Operations
+        //Controller Operations
+        //View Operations
+        NewDocument = 0,
+        OpenDocument,
+        SaveDocument,
+        StepBackward,
+        StepForward,
+        Pen,
+        Line1,
+        Line2,
+        Line3,
+        Line4,
+        Arc1,
+        Arc2,
+        Circle1,
+        Circle2,
+        BrokenLine,
+        Spline,
+        MoveView,
+        EnlargeView,
+        DiminishView,
+        ShowAll,
+        ShowNodes,
+        ShowGrid,
+        SetTheme,
+        Eraser,
+        Trimming,
+        EnlargeElement,
+        LinkLines,
+        DestroyLine,
+        Correct,
+        CreateNode,
+        DeleteNode,
+        Measure,
+        Protractor,
+        AddLayer,
+        DeleteLayer,
+        LayersManager,
+        Help
     }
 
     public class MainWindowViewModel : INotifyPropertyChanged
@@ -217,7 +69,7 @@ namespace CADView
 
         public MainWindowViewModel()
         {
-            Controller = new ApplicationController();
+            //Controller = new ApplicationController();
             RenderPanel.Loaded += RenderPanelOnLoad;
             RenderPanel.Resized += RenderPanelOnResize;
             RenderPanel.Rendered += RenderPanelOnRender;
@@ -226,21 +78,20 @@ namespace CADView
 
         ~MainWindowViewModel()
         {
-            return;
             var ids = DocumentViewModels.Select(d => d.Key).ToList();
             foreach (var id in ids)
             {
                 DocumentViewModels[id].Dispose();
-                Controller.finalDocument(Session, id);
+                //Controller.finalDocument(Session, id);
             }
-            Controller.finalSession(Session);
+            Controller.CloseSession();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public delegate Task ProcessDataDelegate(object[] o);
 
-        internal ApplicationController Controller { get; private set; }
+        internal IController Controller { get; private set; }
 
         public bool IsActive
         {
@@ -254,8 +105,7 @@ namespace CADView
 
         public void Init()
         {
-            return;
-            Session = Controller.initSession();
+            //Controller.OpenSession();
             _inited = true;
 
             _timer = new DispatcherTimer(DispatcherPriority.Normal, Application.Current.Dispatcher);
@@ -263,7 +113,7 @@ namespace CADView
             _timer.Tick += delegate
             {
                 if (DocumentViewModels.Count == 0) return;
-                Controller.draw(Session, ActiveDocument.DocumentID);
+                //Controller.draw(Session, ActiveDocument.DocumentID);
             };
             _timer.Start();
         }
@@ -301,8 +151,7 @@ namespace CADView
 
                 var size = ((WindowsFormsHost) DocumentViewModelsTabs[SelectedDocumentIndex].Content)
                     .Child.Size;
-                Controller.activateDocement(Session, ActiveDocument.DocumentID, size.Width,
-                    size.Height);
+                Controller.SetActiveDocument(ActiveDocument.DocumentID);
             }
         }
 
@@ -318,8 +167,9 @@ namespace CADView
 
         public Dictionary<uint, Document> DocumentViewModels
         {
-            get { return Controller.Documents; }
-        }
+            get;
+            //get { return Controller.Documents; }
+        } = new Dictionary<uint, Document>();
 
         public double WindowWidth
         {
@@ -362,75 +212,72 @@ namespace CADView
                 {
                     new MenuExpanderItem("Icons/Home.png", "Документ", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Новый_документ.png", "Новый документ", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Открыть_документ.png", "Открыть документ", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Сохранить.png", "Сохранить", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Шаг_вперед.png", "Шаг вперёд", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Шаг_назад.png", "Шаг назад", ApplicationController.Operations.OpCircleCreate),
-
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Новый_документ.png", "Новый документ", ButtonsCommands.NewDocument),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Открыть_документ.png", "Открыть документ", ButtonsCommands.OpenDocument),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Сохранить.png", "Сохранить", ButtonsCommands.SaveDocument),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Шаг_назад.png", "Шаг назад", ButtonsCommands.StepBackward),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Шаг_вперед.png", "Шаг вперёд", ButtonsCommands.StepForward),
                     }, Brushes.Gray),
                     new MenuExpanderItem("Icons/Paint Brush.png", "Рисование", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Карандаш.png", "Карандаш", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Карандаш.png", "Карандаш", ButtonsCommands.Pen),
                         new MenuSubItem("Icons/Панель РИСОВАНИЕ/Отрезок_1.png", "Линия",
                             new[]
                             {
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_1.png", "Линия", ApplicationController.Operations.OpCircleCreate),
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_2.png", "Линия под прямым углом", ApplicationController.Operations.OpCircleCreate),
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_3.png", "Параллельная линия", ApplicationController.Operations.OpCircleCreate),
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_4.png", "Линия под углом", ApplicationController.Operations.OpCircleCreate),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_1.png", "Линия", ButtonsCommands.Line1),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_2.png", "Линия под прямым углом", ButtonsCommands.Line2),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_3.png", "Параллельная линия", ButtonsCommands.Line3),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_4.png", "Линия под углом", ButtonsCommands.Line4),
                             }) {Color = Brushes.DimGray},
                         new MenuSubItem("Icons/Панель РИСОВАНИЕ/Дуга_1.png", "Дуга", new []
                         {
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_1.png", "Дуга по двум точкам и центру", ApplicationController.Operations.OpCircleCreate),
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_2.png", "Дуга по трём точкам", ApplicationController.Operations.OpCircleCreate),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_1.png", "Дуга по двум точкам и центру", ButtonsCommands.Arc1),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_2.png", "Дуга по трём точкам", ButtonsCommands.Arc2),
                         }) {Color = Brushes.DimGray},
                         new MenuSubItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность", new []
                         {
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность по центру и точке", ApplicationController.Operations.OpCircleCreate),
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_2.png", "Окружность по трём точкам", ApplicationController.Operations.OpCircleCreate),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность по центру и точке", ButtonsCommands.Circle1),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_2.png", "Окружность по трём точкам", ButtonsCommands.Circle2),
                         }) {Color = Brushes.DimGray},
-                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Ломаная.png", "Ломаная", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Сплайн.png", "Сплайн", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Ломаная.png", "Ломаная", ButtonsCommands.BrokenLine),
+                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Сплайн.png", "Сплайн", ButtonsCommands.Spline),
                     }, Brushes.DarkSlateGray),
                     new MenuExpanderItem("Icons/Oscilloscope.png", "Отображение", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Подвинуть_вид.png", "Подвинуть изображение", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Приблизить_вид.png", "Увеличить изображение", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Отдалить_вид.png", "Уменьшить изображение", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png", "Показать всё", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png", "Показать узлы", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png", "Показать сетку", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Темы.png", "Сменить тему", ApplicationController.Operations.OpSetTheme),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Подвинуть_вид.png", "Подвинуть изображение", ButtonsCommands.MoveView),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Приблизить_вид.png", "Увеличить изображение", ButtonsCommands.EnlargeView),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Отдалить_вид.png", "Уменьшить изображение", ButtonsCommands.DiminishView),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png", "Показать всё", ButtonsCommands.ShowAll),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png", "Показать узлы", ButtonsCommands.ShowNodes),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png", "Показать сетку", ButtonsCommands.ShowGrid),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Темы.png", "Сменить тему", ButtonsCommands.SetTheme),
 
                     }, Brushes.DarkGray),
-                    new MenuExpanderItem("Icons/Question 4.png", "Справка", new BaseMenuElement[]
-                    {
-                        new MenuButtonItem("Icons/Панель СПРАВКА/Справка.png", "Справка", ApplicationController.Operations.OpCircleCreate, 61),
-                        new MenuButtonItem("", "О программе", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("", "Документация", ApplicationController.Operations.OpCircleCreate),
-                    }, Brushes.DarkSlateGray),
                     new MenuExpanderItem("Icons/Edit.png", "Редактирование", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Ластик.png", "Ластик", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Триммирование.png", "Триммирование", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Продление.png", "Продление", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Сшить_ломаную.png", "Создать ломаную", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Разрезать_ломаную.png", "Разрушить ломаную", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Корректировать_узел.png", "Корректировка", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Ластик.png", "Ластик", ButtonsCommands.Eraser),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Триммирование.png", "Триммирование", ButtonsCommands.Trimming),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Продление.png", "Продление", ButtonsCommands.EnlargeElement),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Сшить_ломаную.png", "Создать ломаную", ButtonsCommands.LinkLines),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Разрезать_ломаную.png", "Разрушить ломаную", ButtonsCommands.DestroyLine),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Корректировать_узел.png", "Корректировка", ButtonsCommands.Correct),
                         new MenuSubItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Узлы", new[]
                         {
-                            new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Добавить узел", ApplicationController.Operations.OpCircleCreate),
-                            new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Удалить_узел.png", "Удалить узел", ApplicationController.Operations.OpCircleCreate),
+                            new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Добавить узел", ButtonsCommands.CreateNode),
+                            new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Удалить_узел.png", "Удалить узел", ButtonsCommands.DeleteNode),
                         }) {Color = Brushes.DimGray},
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Линейка.png", "Линейка", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Транспортир.png", "Транспортир", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Линейка.png", "Линейка", ButtonsCommands.Measure),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Транспортир.png", "Транспортир", ButtonsCommands.Protractor),
                     }, Brushes.DarkGray),
                     new MenuExpanderItem("Icons/Панель СЛОИ/Менеджер_слоев.png", "Слои", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель СЛОИ/Добавить_слой.png", "Добавить слой", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель СЛОИ/Удалить_слой.png", "Удалить слой", ApplicationController.Operations.OpCircleCreate),
-                        new MenuButtonItem("Icons/Панель СЛОИ/Менеджер_слоев.png", "Менеджер слоёв", ApplicationController.Operations.OpCircleCreate),
+                        new MenuButtonItem("Icons/Панель СЛОИ/Добавить_слой.png", "Добавить слой", ButtonsCommands.AddLayer),
+                        new MenuButtonItem("Icons/Панель СЛОИ/Удалить_слой.png", "Удалить слой", ButtonsCommands.DeleteLayer),
+                        new MenuButtonItem("Icons/Панель СЛОИ/Менеджер_слоев.png", "Менеджер слоёв", ButtonsCommands.LayersManager),
+                    }, Brushes.DarkSlateGray),
+                    new MenuExpanderItem("Icons/Question 4.png", "Справка", new BaseMenuElement[]
+                    {
+                        new MenuButtonItem("Icons/Панель СПРАВКА/Справка.png", "Справка", ButtonsCommands.Help, 61),
                     }, Brushes.DarkSlateGray),
                 });
 
@@ -487,28 +334,29 @@ namespace CADView
 
         private void RenderPanelOnLoad(IntPtr hwnd, int w, int h, Document model)
         {
-            var activeDocument = Controller.initDocument(Session, hwnd, model);
-            Controller.activateDocement(Session, activeDocument, w, h);
-            ActiveDocument.Title = "Document # " + activeDocument;
-            ActiveDocument.DocumentID = activeDocument;
-            IsActive = true;
+            //Controller.SetActiveDocument();
+            //var activeDocument = Controller.initDocument(Session, hwnd, model);
+            //Controller.activateDocement(Session, activeDocument, w, h);
+            //ActiveDocument.Title = "Document # " + activeDocument;
+            //ActiveDocument.DocumentID = activeDocument;
+            //IsActive = true;
         }
 
         private void RenderPanelOnResize(int w, int h)
         {
-            Controller.resizeDocument(Session, ActiveDocument.DocumentID, w, h);
+            //Controller.resizeDocument(Session, ActiveDocument.DocumentID, w, h);
         }
 
         private void RenderPanelOnRender()
         {
             if (DocumentViewModels.Count == 0) return;
-            Controller.draw(Session, ActiveDocument.DocumentID);
+            //Controller.draw(Session, ActiveDocument.DocumentID);
         }
 
         private void RenderPanelOnMouseFire(MouseEventArgs args)
         {
-            Controller.eventHendling(ActiveDocument.DocumentID, (int) args.Button, args.X,
-                args.Y, args.Delta);
+            //Controller.eventHendling(ActiveDocument.DocumentID, (int) args.Button, args.X,
+            //    args.Y, args.Delta);
         }
 
         private async Task<bool> ProcessControllerWork(ApplicationController.Operations type, object data)
@@ -518,8 +366,8 @@ namespace CADView
                 IsActive = false;
                 await Task.Run(delegate
                 {
-                    Controller.procOperation(Session, ActiveDocument.DocumentID, type,
-                        (object[]) data);
+                    //Controller.procOperation(Session, ActiveDocument.DocumentID, type,
+                    //    (object[]) data);
                 });
                 return true;
             }
@@ -544,6 +392,88 @@ namespace CADView
             //DataTemplate t = new DataTemplate(typeof(MenuExpanderItem));
             //rd.Add("OpenHand", t);
             //Application.Current.Resources.MergedDictionaries.Add(rd);
+
+            ButtonsCommands button = (ButtonsCommands) obj;
+            switch (button)
+            {
+                case ButtonsCommands.NewDocument:
+                    this.CreateDocument();
+                    break;
+                case ButtonsCommands.OpenDocument:
+                    break;
+                case ButtonsCommands.SaveDocument:
+                    break;
+                case ButtonsCommands.StepBackward:
+                    break;
+                case ButtonsCommands.StepForward:
+                    break;
+                case ButtonsCommands.Pen:
+                    break;
+                case ButtonsCommands.Line1:
+                    break;
+                case ButtonsCommands.Line2:
+                    break;
+                case ButtonsCommands.Line3:
+                    break;
+                case ButtonsCommands.Line4:
+                    break;
+                case ButtonsCommands.Arc1:
+                    break;
+                case ButtonsCommands.Arc2:
+                    break;
+                case ButtonsCommands.Circle1:
+                    break;
+                case ButtonsCommands.Circle2:
+                    break;
+                case ButtonsCommands.BrokenLine:
+                    break;
+                case ButtonsCommands.Spline:
+                    break;
+                case ButtonsCommands.MoveView:
+                    break;
+                case ButtonsCommands.EnlargeView:
+                    break;
+                case ButtonsCommands.DiminishView:
+                    break;
+                case ButtonsCommands.ShowAll:
+                    break;
+                case ButtonsCommands.ShowNodes:
+                    break;
+                case ButtonsCommands.ShowGrid:
+                    break;
+                case ButtonsCommands.SetTheme:
+                    break;
+                case ButtonsCommands.Eraser:
+                    break;
+                case ButtonsCommands.Trimming:
+                    break;
+                case ButtonsCommands.EnlargeElement:
+                    break;
+                case ButtonsCommands.LinkLines:
+                    break;
+                case ButtonsCommands.DestroyLine:
+                    break;
+                case ButtonsCommands.Correct:
+                    break;
+                case ButtonsCommands.CreateNode:
+                    break;
+                case ButtonsCommands.DeleteNode:
+                    break;
+                case ButtonsCommands.Measure:
+                    break;
+                case ButtonsCommands.Protractor:
+                    break;
+                case ButtonsCommands.AddLayer:
+                    break;
+                case ButtonsCommands.DeleteLayer:
+                    break;
+                case ButtonsCommands.LayersManager:
+                    break;
+                case ButtonsCommands.Help:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
             return;
             ApplicationController.Operations type = (ApplicationController.Operations) obj;
@@ -582,7 +512,7 @@ namespace CADView
                     separatedWindow.Title = "Colors";
                     break;
                 case ApplicationController.Operations.OpSetLayersToShow:
-                    separatedWindow = new LayersDialog(Controller, ActiveDocument.DocumentID);
+                    //separatedWindow = new LayersDialog(Controller, ActiveDocument.DocumentID);
                     separatedWindow.Title = "Layers manager";
                     break;
             }
@@ -596,7 +526,6 @@ namespace CADView
                         var data = ((IDataDialog) modalWindow).Data.ToArray();
                         await ProcessControllerWork(type, data);
                     }
-
                 }
             }
             if (separatedWindow is ICallbackDialog)
@@ -613,69 +542,50 @@ namespace CADView
 
         public RelayCommand DocumentWorkCommand
         {
-            get
-            {
-                return _documentWorkCommand ?? (_documentWorkCommand = new RelayCommand(ProcessDocumentWork,
-                    o => (DocumentViewModels.Count > 0 && IsActive) || DocumentViewModels.Count == 0));
-            }
+            get { return _documentWorkCommand ?? (_documentWorkCommand = new RelayCommand(ProcessDocumentWork, o => (DocumentViewModels.Count > 0 && IsActive) || DocumentViewModels.Count == 0)); }
         }
 
         public RelayCommand ControllerWorkCommand
         {
-            get
-            {
-                return _controllerWorkCommand ?? (_controllerWorkCommand = new RelayCommand(async delegate(object o)
-                {
-                    await ProcessControllerWork((ApplicationController.Operations) o, null);
-                }));
-            }
+            get { return _controllerWorkCommand ?? (_controllerWorkCommand = new RelayCommand(async delegate(object o) { await ProcessControllerWork((ApplicationController.Operations) o, null); })); }
         }
 
         public RelayCommand ControllerDialogCommand
         {
-            get
-            {
-                return _controllerDialogCommand ??
-                       (_controllerDialogCommand = new RelayCommand(ProcessControllerRaiseDialog));
-            }
+            get { return _controllerDialogCommand ?? (_controllerDialogCommand = new RelayCommand(ProcessControllerRaiseDialog)); }
         }
 
         public RelayCommand CloseApplicationCommand
         {
-            get
-            {
-                return _closeApplicationCommand ??
-                       (_closeApplicationCommand = new RelayCommand(o => App.Current.Shutdown()));
-            }
+            get { return _closeApplicationCommand ?? (_closeApplicationCommand = new RelayCommand(o => App.Current.Shutdown())); }
         }
 
         public RelayCommand CloseDocumentCommand
         {
             get
             {
-                return _closeDocumentCommand ??
-                       (_closeDocumentCommand = new RelayCommand(delegate(object i)
-                       {
-                           string name = i as string;
-                           if(string.IsNullOrEmpty(name)) return;
+                return _closeDocumentCommand ?? (_closeDocumentCommand = new RelayCommand(delegate(object i)
+                {
+                    string name = i as string;
+                    if (string.IsNullOrEmpty(name)) return;
 
-                           var tab = DocumentViewModelsTabs.ToList().Find(d => d.Header.Equals(name));
-                           var document = _tabsDocuments[tab];
+                    var tab = DocumentViewModelsTabs.ToList().Find(d => d.Header.Equals(name));
+                    var document = _tabsDocuments[tab];
 
-                           if(document == null) return;
+                    if (document == null) return;
 
-                           var host = (WindowsFormsHost) tab.Content;
-                           tab.Content = null;
-                           tab.DataContext = null;
-                           DocumentViewModelsTabs.Remove(tab);
-                           _tabsDocuments.Remove(tab);
-                           host.Child.Dispose();
-                           host.Dispose();
-                           document.Dispose();
-                           Controller.finalDocument(Session, document.DocumentID);
-                           SelectedDocumentIndex = SelectedDocumentIndex;
-                           IsActive = DocumentViewModels.Count > 0;
-                       }));
+                    var host = (WindowsFormsHost) tab.Content;
+                    tab.Content = null;
+                    tab.DataContext = null;
+                    DocumentViewModelsTabs.Remove(tab);
+                    _tabsDocuments.Remove(tab);
+                    host.Child.Dispose();
+                    host.Dispose();
+                    document.Dispose();
+                    //Controller.finalDocument(Session, document.DocumentID);
+                    SelectedDocumentIndex = SelectedDocumentIndex;
+                    IsActive = DocumentViewModels.Count > 0;
+                }));
             }
         }
 
