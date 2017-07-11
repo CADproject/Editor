@@ -84,7 +84,7 @@ namespace CADView
                 DocumentViewModels[id].Dispose();
                 //Controller.finalDocument(Session, id);
             }
-            Controller.CloseSession();
+            //Controller.CloseSession();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

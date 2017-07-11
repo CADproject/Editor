@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView"
+        xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         AllowsTransparency="False"
         Title="Editor" BorderThickness="2" Height="450" Width="870" MinHeight="450" MinWidth="570" WindowStartupLocation="CenterScreen"
@@ -37,7 +38,19 @@
                 </DockPanel>
             </DataTemplate>
             <DataTemplate DataType="{x:Type local:MenuSubItem}">
-                <Expander Width="{Binding Width}" MinHeight="{Binding Height}" Background="{Binding Color}" Margin="0,0,0,0" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+                <toolkit:SplitButton >
+                    <toolkit:SplitButton.DropDownContent>
+                        <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding SubItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical"></StackPanel>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </toolkit:SplitButton.DropDownContent>
+                    <Image Source="{Binding Image}" Stretch="Fill" Width="35" Height="35" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </toolkit:SplitButton>
+                <!--<Expander Width="{Binding Width}" MinHeight="{Binding Height}" Background="{Binding Color}" Margin="0,0,0,0" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
                     <Expander.Header>
                         <BulletDecorator Margin="0,0,0,0" MinHeight="26">
                             <BulletDecorator.Bullet>
@@ -52,7 +65,7 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
-                </Expander>
+                </Expander>-->
             </DataTemplate>
             <DataTemplate DataType="{x:Type local:MenuButtonItem}">
                 <Rectangle Width="{Binding Width}" Height="{Binding Height}" 
