@@ -151,7 +151,7 @@ namespace CADView
 
                 var size = ((WindowsFormsHost) DocumentViewModelsTabs[SelectedDocumentIndex].Content)
                     .Child.Size;
-                Controller.SetActiveDocument(ActiveDocument.DocumentID);
+                //Controller.SetActiveDocument(ActiveDocument.DocumentID);
             }
         }
 
@@ -263,7 +263,7 @@ namespace CADView
                         new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Корректировать_узел.png", "Корректировка", ButtonsCommands.Correct),
                         new MenuSubItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Узлы", new[]
                         {
-                            new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Добавить узел", ButtonsCommands.CreateNode),
+                            new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Добавить узел", ButtonsCommands.CreateNode, 100),
                             new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Удалить_узел.png", "Удалить узел", ButtonsCommands.DeleteNode),
                         }) {Color = Brushes.DimGray},
                         new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Линейка.png", "Линейка", ButtonsCommands.Measure),
@@ -464,6 +464,7 @@ namespace CADView
                 case ButtonsCommands.Protractor:
                     break;
                 case ButtonsCommands.AddLayer:
+                    (new LayersAdd()).ShowDialog();
                     break;
                 case ButtonsCommands.DeleteLayer:
                     break;
