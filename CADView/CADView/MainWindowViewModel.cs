@@ -8,11 +8,9 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using System.Windows.Forms.Integration;
 using System.Windows.Threading;
 using CADView.Dialogs;
 using Application = System.Windows.Application;
-using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using MessageBox = System.Windows.MessageBox;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -47,6 +45,7 @@ namespace CADView
         ShowNodes,
         ShowGrid,
         SetTheme,
+        Console,
         Eraser,
         Trimming,
         EnlargeElement,
@@ -63,12 +62,58 @@ namespace CADView
         Help
     }
 
+    public class LayerModel : Layer, INotifyPropertyChanged
+    {
+        public LayerModel(bool visible = false) : base(visible)
+        {
+        }
+
+        public LayerModel(int id, bool visible = false) : base(id, visible)
+        {
+        }
+
+        public LayerModel(Layer layer) : base(layer)
+        {
+
+        }
+
+        public override int Id
+        {
+            get { return base.Id; }
+        }
+
+        public override bool Visible
+        {
+            get { return base.Visible; }
+            set
+            {
+                base.Visible = value;
+                OnPropertyChanged();
+                VisibleChangedStatic?.Invoke(this, new PropertyChangedEventArgs("Visible"));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public static event PropertyChangedEventHandler VisibleChangedStatic;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         #region Public
 
-        public MainWindowViewModel()
+        public MainWindowViewModel() : this(null)
         {
+
+        }
+
+        public MainWindowViewModel(Window owner)
+        {
+            _owner = owner;
             //Controller = new ApplicationController();
             RenderPanel.Loaded += RenderPanelOnLoad;
             RenderPanel.Resized += RenderPanelOnResize;
@@ -120,21 +165,22 @@ namespace CADView
 
         public void CreateDocument()
         {
-            var model = new DocumentModel(new LayerModel(true));
-            var host = new WindowsFormsHost()
-            {
-                Child = new RenderPanel(model),
-                VerticalAlignment = VerticalAlignment.Stretch,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-            };
+            var model = new DocumentModel(new LayerModel(true)) {DocumentID = (uint) DocumentViewModelsTabs.Count};
+            model.Title = "Document #" + model.DocumentID;
+            //var host = new WindowsFormsHost()
+            //{
+            //    Child = new RenderPanel(model),
+            //    VerticalAlignment = VerticalAlignment.Stretch,
+            //    HorizontalAlignment = HorizontalAlignment.Stretch,
+            //};
 
-            TabItem tab = new TabItem()
-            {
-                Content = host,
-                DataContext = model,
-            };
-            DocumentViewModelsTabs.Add(tab);
-            _tabsDocuments[tab] = model;
+            //TabItem tab = new TabItem()
+            //{
+            //    Content = host,
+            //    DataContext = model,
+            //};
+            DocumentViewModelsTabs.Add(model);
+            //_tabsDocuments[tab] = model;
             _selectedDocumentIndex = DocumentViewModelsTabs.Count - 1;
             OnPropertyChanged("SelectedDocumentIndex");
         }
@@ -149,13 +195,11 @@ namespace CADView
 
                 if (SelectedDocumentIndex < 0 || SelectedDocumentIndex > DocumentViewModelsTabs.Count) return;
 
-                var size = ((WindowsFormsHost) DocumentViewModelsTabs[SelectedDocumentIndex].Content)
-                    .Child.Size;
                 //Controller.SetActiveDocument(ActiveDocument.DocumentID);
             }
         }
 
-        public ObservableCollection<TabItem> DocumentViewModelsTabs
+        public ObservableCollection<DocumentModel> DocumentViewModelsTabs
         {
             get { return _documentViewModelsTabs; }
             set
@@ -180,7 +224,7 @@ namespace CADView
                 OnPropertyChanged();
             }
         }
-
+        
         public double WindowHeight
         {
             get { return _windowHeight; }
@@ -196,14 +240,17 @@ namespace CADView
             get
             {
                 if (SelectedDocumentIndex < 0) return null;
-                return _tabsDocuments[DocumentViewModelsTabs[SelectedDocumentIndex]];
+                return DocumentViewModelsTabs[SelectedDocumentIndex];
             }
             set
             {
                 SelectedDocumentIndex =
-                    DocumentViewModelsTabs.IndexOf(_tabsDocuments.FirstOrDefault(i => i.Value == value).Key);
+                    DocumentViewModelsTabs.IndexOf(DocumentViewModelsTabs.FirstOrDefault(i => i.DocumentID == value.DocumentID));
             }
         }
+
+        public ObservableCollection<string> TabMenuCollection { get; set; } =
+            new ObservableCollection<string>(new[] {"123", "456"});
 
         #region UI Buttons
 
@@ -221,24 +268,23 @@ namespace CADView
                     new MenuExpanderItem("Icons/Paint Brush.png", "Рисование", new BaseMenuElement[]
                     {
                         new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Карандаш.png", "Карандаш", ButtonsCommands.Pen),
-                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Отрезок_1.png", "Линия",
+                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Отрезок_1.png", "Линия", ButtonsCommands.Line1,
                             new[]
                             {
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_1.png", "Линия", ButtonsCommands.Line1),
                                 new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_2.png", "Линия под прямым углом", ButtonsCommands.Line2),
                                 new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_3.png", "Параллельная линия", ButtonsCommands.Line3),
                                 new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_4.png", "Линия под углом", ButtonsCommands.Line4),
                             }) {Color = Brushes.DimGray},
-                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Дуга_1.png", "Дуга", new []
-                        {
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_1.png", "Дуга по двум точкам и центру", ButtonsCommands.Arc1),
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_2.png", "Дуга по трём точкам", ButtonsCommands.Arc2),
-                        }) {Color = Brushes.DimGray},
-                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность", new []
-                        {
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность по центру и точке", ButtonsCommands.Circle1),
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_2.png", "Окружность по трём точкам", ButtonsCommands.Circle2),
-                        }) {Color = Brushes.DimGray},
+                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Дуга_1.png", "Дуга по двум точкам и центру", ButtonsCommands.Arc1,
+                            new []
+                            {
+                                    new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_2.png", "Дуга по трём точкам", ButtonsCommands.Arc2),
+                            }) {Color = Brushes.DimGray},
+                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность по центру и точке", ButtonsCommands.Circle1,
+                            new []
+                            {
+                                    new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_2.png", "Окружность по трём точкам", ButtonsCommands.Circle2),
+                            }) {Color = Brushes.DimGray},
                         new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Ломаная.png", "Ломаная", ButtonsCommands.BrokenLine),
                         new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Сплайн.png", "Сплайн", ButtonsCommands.Spline),
                     }, Brushes.DarkSlateGray),
@@ -250,8 +296,12 @@ namespace CADView
                         new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png", "Показать всё", ButtonsCommands.ShowAll),
                         new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png", "Показать узлы", ButtonsCommands.ShowNodes),
                         new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png", "Показать сетку", ButtonsCommands.ShowGrid),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Темы.png", "Сменить тему", ButtonsCommands.SetTheme),
-
+                        new MenuSubItem("Icons/Панель ОТОБРАЖЕНИЕ/Темы.png", "Сменить тему", null,
+                            new MenuButtonItem[]
+                            {
+                                new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Темы.png", "Сменить тему", null),
+                            }) {Color = Brushes.DimGray},
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Консоль.png", "Консоль", ButtonsCommands.Console),
                     }, Brushes.DarkGray),
                     new MenuExpanderItem("Icons/Edit.png", "Редактирование", new BaseMenuElement[]
                     {
@@ -261,11 +311,11 @@ namespace CADView
                         new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Сшить_ломаную.png", "Создать ломаную", ButtonsCommands.LinkLines),
                         new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Разрезать_ломаную.png", "Разрушить ломаную", ButtonsCommands.DestroyLine),
                         new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Корректировать_узел.png", "Корректировка", ButtonsCommands.Correct),
-                        new MenuSubItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Узлы", new[]
-                        {
-                            new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Добавить узел", ButtonsCommands.CreateNode, 100),
-                            new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Удалить_узел.png", "Удалить узел", ButtonsCommands.DeleteNode),
-                        }) {Color = Brushes.DimGray},
+                        new MenuSubItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Добавить узел", ButtonsCommands.CreateNode,
+                            new[]
+                            {
+                                new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Удалить_узел.png", "Удалить узел", ButtonsCommands.DeleteNode),
+                            }) {Color = Brushes.DimGray},
                         new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Линейка.png", "Линейка", ButtonsCommands.Measure),
                         new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Транспортир.png", "Транспортир", ButtonsCommands.Protractor),
                     }, Brushes.DarkGray),
@@ -277,7 +327,11 @@ namespace CADView
                     }, Brushes.DarkSlateGray),
                     new MenuExpanderItem("Icons/Question 4.png", "Справка", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель СПРАВКА/Справка.png", "Справка", ButtonsCommands.Help, 61),
+                        new MenuSubItem("Icons/Панель СПРАВКА/Справка.png", "Справка", ButtonsCommands.Help,
+                            new[]
+                            {
+                                new MenuButtonItem("Icons/Панель СПРАВКА/Справка.png", "Справка", ButtonsCommands.Help, 71),
+                            }, 71) {Color = Brushes.DimGray},
                     }, Brushes.DarkSlateGray),
                 });
 
@@ -300,6 +354,7 @@ namespace CADView
 
         #region Private
 
+        private readonly Window _owner;
         private uint _session;
         bool _inited;
         private bool _isActive;
@@ -307,7 +362,7 @@ namespace CADView
         private RelayCommand _controllerWorkCommand;
         private RelayCommand _controllerDialogCommand;
         private RelayCommand _closeDocumentCommand;
-        private ObservableCollection<TabItem> _documentViewModelsTabs = new ObservableCollection<TabItem>();
+        private ObservableCollection<DocumentModel> _documentViewModelsTabs = new ObservableCollection<DocumentModel>();
         private int _selectedDocumentIndex = -1;
         private DispatcherTimer _timer;
         private double _windowWidth;
@@ -393,147 +448,98 @@ namespace CADView
             //rd.Add("OpenHand", t);
             //Application.Current.Resources.MergedDictionaries.Add(rd);
 
-            ButtonsCommands button = (ButtonsCommands) obj;
-            switch (button)
+            if (!(obj is ButtonsCommands))
             {
-                case ButtonsCommands.NewDocument:
-                    this.CreateDocument();
-                    break;
-                case ButtonsCommands.OpenDocument:
-                    break;
-                case ButtonsCommands.SaveDocument:
-                    break;
-                case ButtonsCommands.StepBackward:
-                    break;
-                case ButtonsCommands.StepForward:
-                    break;
-                case ButtonsCommands.Pen:
-                    break;
-                case ButtonsCommands.Line1:
-                    break;
-                case ButtonsCommands.Line2:
-                    break;
-                case ButtonsCommands.Line3:
-                    break;
-                case ButtonsCommands.Line4:
-                    break;
-                case ButtonsCommands.Arc1:
-                    break;
-                case ButtonsCommands.Arc2:
-                    break;
-                case ButtonsCommands.Circle1:
-                    break;
-                case ButtonsCommands.Circle2:
-                    break;
-                case ButtonsCommands.BrokenLine:
-                    break;
-                case ButtonsCommands.Spline:
-                    break;
-                case ButtonsCommands.MoveView:
-                    break;
-                case ButtonsCommands.EnlargeView:
-                    break;
-                case ButtonsCommands.DiminishView:
-                    break;
-                case ButtonsCommands.ShowAll:
-                    break;
-                case ButtonsCommands.ShowNodes:
-                    break;
-                case ButtonsCommands.ShowGrid:
-                    break;
-                case ButtonsCommands.SetTheme:
-                    break;
-                case ButtonsCommands.Eraser:
-                    break;
-                case ButtonsCommands.Trimming:
-                    break;
-                case ButtonsCommands.EnlargeElement:
-                    break;
-                case ButtonsCommands.LinkLines:
-                    break;
-                case ButtonsCommands.DestroyLine:
-                    break;
-                case ButtonsCommands.Correct:
-                    break;
-                case ButtonsCommands.CreateNode:
-                    break;
-                case ButtonsCommands.DeleteNode:
-                    break;
-                case ButtonsCommands.Measure:
-                    break;
-                case ButtonsCommands.Protractor:
-                    break;
-                case ButtonsCommands.AddLayer:
-                    (new LayersAdd()).ShowDialog();
-                    break;
-                case ButtonsCommands.DeleteLayer:
-                    break;
-                case ButtonsCommands.LayersManager:
-                    break;
-                case ButtonsCommands.Help:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+
             }
-
-            return;
-            ApplicationController.Operations type = (ApplicationController.Operations) obj;
-
-            Window modalWindow = null;
-            Window separatedWindow = null;
-
-            switch (type)
+            else
             {
-                case ApplicationController.Operations.OpPointCreate:
-                    modalWindow = new OnePointDialog();
-                    modalWindow.Title = "Create Point";
-                    break;
-                case ApplicationController.Operations.OpLineCreate:
-                    modalWindow = new TwoPointDialog();
-                    modalWindow.Title = "Create Line";
-                    break;
-                case ApplicationController.Operations.OpCircleCreate:
-                    modalWindow = new TwoPointDialog();
-                    modalWindow.Title = "Create Circle";
-                    break;
-                case ApplicationController.Operations.OpContourCreate:
-                    modalWindow = new ElementIdInputDialog();
-                    modalWindow.Title = "Create Contour";
-                    break;
-                case ApplicationController.Operations.OpDeleteObject:
-                    modalWindow = new DestroyObjectDialog();
-                    modalWindow.Title = "Delete element";
-                    break;
-                case ApplicationController.Operations.OpDestroyContour:
-                    modalWindow = new DestroyContourDialog();
-                    modalWindow.Title = "Destroy Contour";
-                    break;
-                case ApplicationController.Operations.OpSetBackgroundColor:
-                    separatedWindow = Dialogs.ColorDialog.Instance;
-                    separatedWindow.Title = "Colors";
-                    break;
-                case ApplicationController.Operations.OpSetLayersToShow:
-                    //separatedWindow = new LayersDialog(Controller, ActiveDocument.DocumentID);
-                    separatedWindow.Title = "Layers manager";
-                    break;
-            }
-
-            if (modalWindow is IDataDialog)
-            {
-                modalWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                if (modalWindow.ShowDialog() == true)
+                ButtonsCommands button = (ButtonsCommands) obj;
+                switch (button)
                 {
-                    {
-                        var data = ((IDataDialog) modalWindow).Data.ToArray();
-                        await ProcessControllerWork(type, data);
-                    }
+                    case ButtonsCommands.NewDocument:
+                        this.CreateDocument();
+                        break;
+                    case ButtonsCommands.OpenDocument:
+                        break;
+                    case ButtonsCommands.SaveDocument:
+                        break;
+                    case ButtonsCommands.StepBackward:
+                        break;
+                    case ButtonsCommands.StepForward:
+                        break;
+                    case ButtonsCommands.Pen:
+                        break;
+                    case ButtonsCommands.Line1:
+                        break;
+                    case ButtonsCommands.Line2:
+                        break;
+                    case ButtonsCommands.Line3:
+                        break;
+                    case ButtonsCommands.Line4:
+                        break;
+                    case ButtonsCommands.Arc1:
+                        break;
+                    case ButtonsCommands.Arc2:
+                        break;
+                    case ButtonsCommands.Circle1:
+                        break;
+                    case ButtonsCommands.Circle2:
+                        break;
+                    case ButtonsCommands.BrokenLine:
+                        break;
+                    case ButtonsCommands.Spline:
+                        break;
+                    case ButtonsCommands.MoveView:
+                        break;
+                    case ButtonsCommands.EnlargeView:
+                        break;
+                    case ButtonsCommands.DiminishView:
+                        break;
+                    case ButtonsCommands.ShowAll:
+                        break;
+                    case ButtonsCommands.ShowNodes:
+                        break;
+                    case ButtonsCommands.ShowGrid:
+                        break;
+                    case ButtonsCommands.SetTheme:
+                        break;
+                    case ButtonsCommands.Eraser:
+                        break;
+                    case ButtonsCommands.Trimming:
+                        break;
+                    case ButtonsCommands.EnlargeElement:
+                        break;
+                    case ButtonsCommands.LinkLines:
+                        break;
+                    case ButtonsCommands.DestroyLine:
+                        break;
+                    case ButtonsCommands.Correct:
+                        break;
+                    case ButtonsCommands.CreateNode:
+                        break;
+                    case ButtonsCommands.DeleteNode:
+                        break;
+                    case ButtonsCommands.Measure:
+                        break;
+                    case ButtonsCommands.Protractor:
+                        break;
+                    case ButtonsCommands.AddLayer:
+                        new LayersAdd {Owner = _owner}.ShowDialog();
+                        break;
+                    case ButtonsCommands.DeleteLayer:
+                        new LayersDelete {Owner = _owner}.ShowDialog();
+                        break;
+                    case ButtonsCommands.LayersManager:
+                        new LayersManager {Owner = _owner}.ShowDialog();
+                        break;
+                    case ButtonsCommands.Help:
+                        break;
+                    case ButtonsCommands.Console:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-            }
-            if (separatedWindow is ICallbackDialog)
-            {
-                separatedWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                ((ICallbackDialog) separatedWindow).DataChanged += o => ProcessControllerWork(type, o);
-                separatedWindow.ShowDialog();
             }
         }
 
@@ -570,19 +576,19 @@ namespace CADView
                     string name = i as string;
                     if (string.IsNullOrEmpty(name)) return;
 
-                    var tab = DocumentViewModelsTabs.ToList().Find(d => d.Header.Equals(name));
-                    var document = _tabsDocuments[tab];
+                    var tab = DocumentViewModelsTabs.ToList().Find(d => d.Title.Equals(name));
+                    //var document = _tabsDocuments[tab];
 
-                    if (document == null) return;
+                    //if (document == null) return;
 
-                    var host = (WindowsFormsHost) tab.Content;
-                    tab.Content = null;
-                    tab.DataContext = null;
+                    //var host = (WindowsFormsHost) tab.Content;
+                    //tab.Content = null;
+                    //tab.DataContext = null;
                     DocumentViewModelsTabs.Remove(tab);
-                    _tabsDocuments.Remove(tab);
-                    host.Child.Dispose();
-                    host.Dispose();
-                    document.Dispose();
+                    //_tabsDocuments.Remove(tab);
+                    //host.Child.Dispose();
+                    //host.Dispose();
+                    tab.Dispose();
                     //Controller.finalDocument(Session, document.DocumentID);
                     SelectedDocumentIndex = SelectedDocumentIndex;
                     IsActive = DocumentViewModels.Count > 0;

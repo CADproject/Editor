@@ -157,13 +157,21 @@ namespace CADView
     public class MenuSubItem : BaseExpanderItem
     {
         private IEnumerable<BaseMenuElement> _subItems;
+        private object _parameter;
 
-        public MenuSubItem(string image, string hintText, IEnumerable<BaseMenuElement> subItems,
-            int width = DefaultWidth + 14, int height = DefaultHeight) : base(image, hintText, width, height)
+        public MenuSubItem(string image, string hintText, ButtonsCommands operationType, IEnumerable<BaseMenuElement> subItems,
+            int width = DefaultWidth, int height = DefaultHeight) : this(image, hintText, (object)operationType, subItems, width, height)
+        {
+
+        }
+
+        public MenuSubItem(string image, string hintText, object parameter, IEnumerable<BaseMenuElement> subItems, 
+            int width = DefaultWidth, int height = DefaultHeight) : base(image, hintText, width, height)
         {
             SubItems = subItems;
             Image = image;
             HintText = hintText;
+            Parameter = parameter;
         }
 
         public IEnumerable<BaseMenuElement> SubItems
@@ -175,6 +183,16 @@ namespace CADView
                 OnPropertyChanged();
             }
         }
+
+        public object Parameter
+        {
+            get { return _parameter; }
+            set
+            {
+                _parameter = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
     /// <summary>
@@ -182,20 +200,25 @@ namespace CADView
     /// </summary>
     public class MenuButtonItem : BaseMenuElement
     {
-        private ButtonsCommands _operationType;
+        private object _parameter;
 
-        public MenuButtonItem(string image, string hintText, ButtonsCommands operationType, int width = DefaultWidth, int height = DefaultHeight) : base(image, hintText, width, height)
+        public MenuButtonItem(string image, string hintText, object parameter, int width = DefaultWidth, int height = DefaultHeight) : base(image, hintText, width, height)
         {
-            OperationType = operationType;
+            _parameter = parameter;
             Color = Brushes.Black;
         }
 
-        public ButtonsCommands OperationType
+        public MenuButtonItem(string image, string hintText, ButtonsCommands operationType, int width = DefaultWidth,
+            int height = DefaultHeight) : this(image, hintText, (object) operationType, width, height)
         {
-            get { return _operationType; }
+        }
+
+        public object Parameter
+        {
+            get { return _parameter; }
             set
             {
-                _operationType = value;
+                _parameter = value;
                 OnPropertyChanged();
             }
         }
