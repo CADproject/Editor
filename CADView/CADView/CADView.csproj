@@ -126,6 +126,12 @@
     <Compile Include="Dialogs\LayersDelete.xaml.cs">
       <DependentUpon>LayersDelete.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Properties.xaml.cs">
+      <DependentUpon>Properties.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Statistics.xaml.cs">
+      <DependentUpon>Statistics.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DocumentModel.cs" />
     <Compile Include="MenuItemClasses.cs" />
     <Compile Include="RelayCommand.cs" />
@@ -148,6 +154,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\LayersDelete.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Properties.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Statistics.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -275,6 +289,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\Панель ОТОБРАЖЕНИЕ\Консоль.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Панель СПРАВКА\Статистика.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

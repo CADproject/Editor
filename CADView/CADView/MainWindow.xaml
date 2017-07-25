@@ -8,7 +8,7 @@
         xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
         mc:Ignorable="d"
         AllowsTransparency="False"
-        Title="Editor" BorderThickness="2" Height="450" Width="870" MinHeight="450" MinWidth="570" WindowStartupLocation="CenterScreen"
+        Title="Editor" BorderThickness="2" Height="500" Width="870" MinHeight="500" MinWidth="570" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}"
         >
     <Window.BorderBrush>
@@ -27,7 +27,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    
+
     <Grid>
         <Grid.Resources>
 
@@ -205,13 +205,61 @@
                     </ItemsControl>
                 </Expander>
             </DataTemplate>-->
-            
+
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="2"/>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition MinHeight="140" Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition MinHeight="25" MaxHeight="25" Height="25"/>
         </Grid.RowDefinitions>
+        <Grid Row="0">
+            <ItemsControl VerticalAlignment="Stretch" ItemsSource="{Binding UIMenuElements}" Margin="0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <!--<ListBox VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto" ItemsSource="{Binding UIMenuElements}">
+                <ListBox.Resources>
+                    -->
+            <!--<Style TargetType="{x:Type Expander}">
+                        <Setter Property="IsExpanded">
+                            <Setter.Value>
+                                <Binding Path="IsSelected" RelativeSource="{RelativeSource AncestorType={x:Type ListBoxItem}}" />
+                            </Setter.Value>
+                        </Setter>
+                    </Style>-->
+            <!--
+                </ListBox.Resources>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}" ></WrapPanel>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                -->
+            <!--<ListBox.Template>
+                    <ControlTemplate TargetType="{x:Type ListBox}">
+                        <ItemsPresenter/>
+                    </ControlTemplate>
+                </ListBox.Template>-->
+            <!--
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                    <ContentPresenter Content="{TemplateBinding Content}"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>-->
+        </Grid>
         <Grid Grid.Row="2">
             <Grid.Resources>
                 <ControlTemplate x:Key="CustomHeaderTemplate">
@@ -257,7 +305,11 @@
                                             <MenuItem Header="{Binding}" Command="{Binding}"></MenuItem>
                                         </DataTemplate>
                                     </ContextMenu.ItemTemplate>-->
-                                    <MenuItem Header="Test" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                    <MenuItem Header="Переименовать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                    <MenuItem Header="Копировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                    <MenuItem Header="Новый документ" CommandParameter="{x:Static local:ButtonsCommands.NewDocument}" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                    <MenuItem Header="Закрыть" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                    <MenuItem Header="Закрыть все документы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
                                 </ContextMenu>
                             </Label.ContextMenu>
                         </Label>
@@ -281,9 +333,22 @@
                                         <MenuItem Header="Отобразить симметрично" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
                                         <MenuItem Header="Отобразить по кругу" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
                                         <MenuItem Header="Масштабировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
-                                        <MenuItem Header="Показать узлы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
-                                        <MenuItem Header="Показать сетку" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
-                                        <MenuItem Header="Показать всё" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                        <MenuItem Header="Свойства" CommandParameter="{x:Static local:ButtonsCommands.Properties}" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                        <MenuItem Header="Показать узлы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                            <MenuItem.Icon>
+                                                <Image Height="40" Source="Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Показать сетку" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                            <MenuItem.Icon>
+                                                <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Показать всё" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                            <MenuItem.Icon>
+                                                <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
                                     </ContextMenu>
                                 </Grid.ContextMenu>
                             </Grid>
@@ -301,50 +366,38 @@
                     </DataTemplate>
                 </dragablz:TabablzControl.ContentTemplate>
             </dragablz:TabablzControl>
+            <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,37,0,0">
+                <Label Visibility="{Binding InfoVisible}" Content="{Binding MainInfoText, Mode= OneWay}"></Label>
+                <Label Visibility="{Binding InfoVisible}" Content="{Binding AdditionalInfoText, Mode=OneWay}"></Label>
+            </StackPanel>
+            <Label Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10,0,0,10" Content="{Binding CoordinatesText, Mode=OneWay}"></Label>
         </Grid>
-        <Grid Row="0">
-            <ItemsControl VerticalAlignment="Stretch" ItemsSource="{Binding UIMenuElements}" Margin="0">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-            <!--<ListBox VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto" ItemsSource="{Binding UIMenuElements}">
-                <ListBox.Resources>
-                    -->
-            <!--<Style TargetType="{x:Type Expander}">
-                        <Setter Property="IsExpanded">
-                            <Setter.Value>
-                                <Binding Path="IsSelected" RelativeSource="{RelativeSource AncestorType={x:Type ListBoxItem}}" />
-                            </Setter.Value>
-                        </Setter>
-                    </Style>-->
-            <!--
-                </ListBox.Resources>
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}" ></WrapPanel>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                --><!--<ListBox.Template>
-                    <ControlTemplate TargetType="{x:Type ListBox}">
-                        <ItemsPresenter/>
-                    </ControlTemplate>
-                </ListBox.Template>-->
-            <!--
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListBoxItem}">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                    <ContentPresenter Content="{TemplateBinding Content}"/>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>-->
+        <GridSplitter ShowsPreview="False" Grid.Row="3" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" 
+                      Height="2" Background="Transparent" />
+        <Grid Visibility="{Binding ConsoleVisible}" x:Name="Console" Grid.Row="4">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" BorderThickness="3" BorderBrush="DarkSlateGray">
+                    <TextBox VerticalAlignment="Stretch" Margin="0,0,0,-3" IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible"/>
+                </Border>
+                <Border Grid.Row="1" BorderThickness="3" BorderBrush="DarkSlateGray">
+                    <TextBox></TextBox>
+                </Border>
+                <Image Grid.Row="1" Margin="0,2,2,2" HorizontalAlignment="Right" Height="15" Width="15" Stretch="Fill" Source="Icons/Edit.png"></Image>
+            </Grid>
         </Grid>
+        <Border Grid.Row="5" BorderThickness="1" BorderBrush="Black">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"></ColumnDefinition>
+                    <ColumnDefinition MinWidth="100" Width="1*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <GridSplitter Background="Black" Width="1"></GridSplitter>
+                <Label Visibility="{Binding InfoVisible}" Grid.Column="1" Content="{Binding StatusBarText, Mode=OneWay}" />
+            </Grid>
+        </Border>
     </Grid>
 </Window>

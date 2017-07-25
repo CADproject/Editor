@@ -59,7 +59,11 @@ namespace CADView
         AddLayer,
         DeleteLayer,
         LayersManager,
-        Help
+        Help,
+        Statistics,
+        Properties,
+
+        Count,
     }
 
     public class LayerModel : Layer, INotifyPropertyChanged
@@ -183,6 +187,7 @@ namespace CADView
             //_tabsDocuments[tab] = model;
             _selectedDocumentIndex = DocumentViewModelsTabs.Count - 1;
             OnPropertyChanged("SelectedDocumentIndex");
+            OnPropertyChanged("InfoVisible");
         }
 
         public int SelectedDocumentIndex
@@ -327,6 +332,7 @@ namespace CADView
                     }, Brushes.DarkSlateGray),
                     new MenuExpanderItem("Icons/Question 4.png", "Справка", new BaseMenuElement[]
                     {
+                        new MenuButtonItem("Icons/Панель СПРАВКА/Статистика.png", "Статистика", ButtonsCommands.Statistics),
                         new MenuSubItem("Icons/Панель СПРАВКА/Справка.png", "Справка", ButtonsCommands.Help,
                             new[]
                             {
@@ -369,7 +375,8 @@ namespace CADView
         private double _windowHeight;
         private readonly List<DocumentModel> _documentViewModels = new List<DocumentModel>();
         private RelayCommand _closeApplicationCommand;
-        private readonly Dictionary<TabItem, Document> _tabsDocuments = new Dictionary<TabItem, Document>(); 
+        private readonly Dictionary<TabItem, Document> _tabsDocuments = new Dictionary<TabItem, Document>();
+        private Visibility _consoleVisible;
 
         private uint Session
         {
@@ -461,8 +468,10 @@ namespace CADView
                         this.CreateDocument();
                         break;
                     case ButtonsCommands.OpenDocument:
+                        new OpenFileDialog().ShowDialog();
                         break;
                     case ButtonsCommands.SaveDocument:
+                        new SaveFileDialog().ShowDialog();
                         break;
                     case ButtonsCommands.StepBackward:
                         break;
@@ -536,6 +545,13 @@ namespace CADView
                     case ButtonsCommands.Help:
                         break;
                     case ButtonsCommands.Console:
+                        ConsoleVisible = ConsoleVisible == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                        break;
+                    case ButtonsCommands.Statistics:
+                        new Statistics { Owner = _owner }.ShowDialog();
+                        break;
+                    case ButtonsCommands.Properties:
+                        new Dialogs.Properties { Owner = _owner }.ShowDialog();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -596,6 +612,33 @@ namespace CADView
             }
         }
 
+        #endregion
+
+        #region ScreenInfo
+
+        public Visibility ConsoleVisible
+        {
+            get { return _consoleVisible; }
+            set
+            {
+                _consoleVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility InfoVisible
+        {
+            get { return DocumentViewModelsTabs.Count > 0 ? Visibility.Visible : Visibility.Hidden; }
+        }
+
+        public string StatusBarText => "Active layer Petya: it's time to VZLOM!!!";
+
+        public string MainInfoText => "Document vzlomaning:";
+
+        public string AdditionalInfoText => "privet ot petya!";
+
+        public string CoordinatesText => "X = 50 Y = 100";
+        
         #endregion
     }
 }
