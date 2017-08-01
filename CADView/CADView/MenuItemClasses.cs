@@ -2,10 +2,14 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
-using CADController;
 
 namespace CADView
 {
+    public interface IButtonOperation
+    {
+        object Parameter { get; set; }
+    }
+
     /// <summary>
     /// Базовый класс для элементов меню.
     /// </summary>
@@ -106,6 +110,18 @@ namespace CADView
     /// </summary>
     public abstract class BaseExpanderItem : BaseMenuElement
     {
+        private IEnumerable<BaseMenuElement> _subItems;
+
+        public IEnumerable<BaseMenuElement> SubItems
+        {
+            get { return _subItems; }
+            set
+            {
+                _subItems = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool IsExpanded
         {
             get { return _isExpanded; }
@@ -121,9 +137,10 @@ namespace CADView
         private static int _counter = 0;
         private bool _isExpanded;
 
-        public BaseExpanderItem(string image, string hintText, int width, int height) : base(image, hintText, width, height)
+        public BaseExpanderItem(string image, string hintText, IEnumerable<BaseMenuElement> subItems, int width, int height) : base(image, hintText, width, height)
         {
             Index = _counter++;
+            SubItems = subItems;
         }
     }
 
@@ -132,21 +149,8 @@ namespace CADView
     /// </summary>
     public class MenuExpanderItem : BaseExpanderItem
     {
-        private IEnumerable<BaseMenuElement> _subItems;
-
-        public IEnumerable<BaseMenuElement> SubItems
+        public MenuExpanderItem(string image, string hintText, IEnumerable<BaseMenuElement> subItems, Brush color, int width = 0, int height = 0) : base(image, hintText, subItems, width, height)
         {
-            get { return _subItems; }
-            set
-            {
-                _subItems = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public MenuExpanderItem(string image, string hintText, IEnumerable<BaseMenuElement> subItems, Brush color, int width = 0, int height = 0) : base(image, hintText, width, height)
-        {
-            SubItems = subItems;
             Color = color;
         }
     }
@@ -154,9 +158,8 @@ namespace CADView
     /// <summary>
     /// Вертикальный экспандер с элементами
     /// </summary>
-    public class MenuSubItem : BaseExpanderItem
+    public class MenuSubItem : BaseExpanderItem, IButtonOperation
     {
-        private IEnumerable<BaseMenuElement> _subItems;
         private object _parameter;
 
         public MenuSubItem(string image, string hintText, ButtonsCommands operationType, IEnumerable<BaseMenuElement> subItems,
@@ -166,22 +169,11 @@ namespace CADView
         }
 
         public MenuSubItem(string image, string hintText, object parameter, IEnumerable<BaseMenuElement> subItems, 
-            int width = DefaultWidth, int height = DefaultHeight) : base(image, hintText, width, height)
+            int width = DefaultWidth, int height = DefaultHeight) : base(image, hintText, subItems, width, height)
         {
-            SubItems = subItems;
             Image = image;
             HintText = hintText;
             Parameter = parameter;
-        }
-
-        public IEnumerable<BaseMenuElement> SubItems
-        {
-            get { return _subItems; }
-            set
-            {
-                _subItems = value;
-                OnPropertyChanged();
-            }
         }
 
         public object Parameter
@@ -198,7 +190,7 @@ namespace CADView
     /// <summary>
     /// Кнопка в меню
     /// </summary>
-    public class MenuButtonItem : BaseMenuElement
+    public class MenuButtonItem : BaseMenuElement, IButtonOperation
     {
         private object _parameter;
 
@@ -210,6 +202,34 @@ namespace CADView
 
         public MenuButtonItem(string image, string hintText, ButtonsCommands operationType, int width = DefaultWidth,
             int height = DefaultHeight) : this(image, hintText, (object) operationType, width, height)
+        {
+        }
+
+        public object Parameter
+        {
+            get { return _parameter; }
+            set
+            {
+                _parameter = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public class MenuTextButtonItem : BaseMenuElement
+    {
+        private object _parameter;
+
+        public MenuTextButtonItem(string hintText, object parameter, int width = DefaultWidth, int height = DefaultHeight) : 
+            base(null, hintText, width, height)
+        {
+            _parameter = parameter;
+            Color = Brushes.Black;
+            Description = hintText;
+        }
+
+        public MenuTextButtonItem(string hintText, ButtonsCommands operationType, int width = DefaultWidth,
+            int height = DefaultHeight) : this(hintText, (object)operationType, width, height)
         {
         }
 

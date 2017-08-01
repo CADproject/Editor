@@ -302,11 +302,12 @@ namespace CADView
                         new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png", "Показать узлы", ButtonsCommands.ShowNodes),
                         new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png", "Показать сетку", ButtonsCommands.ShowGrid),
                         new MenuSubItem("Icons/Панель ОТОБРАЖЕНИЕ/Темы.png", "Сменить тему", null,
-                            new MenuButtonItem[]
+                            new MenuTextButtonItem[]
                             {
-                                new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Темы.png", "Сменить тему", null),
+                                new MenuTextButtonItem("Оранжевая", null, 80),
+                                new MenuTextButtonItem("Синяя", null, 80),
+                                new MenuTextButtonItem("Годная", null, 80),
                             }) {Color = Brushes.DimGray},
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Консоль.png", "Консоль", ButtonsCommands.Console),
                     }, Brushes.DarkGray),
                     new MenuExpanderItem("Icons/Edit.png", "Редактирование", new BaseMenuElement[]
                     {
@@ -332,11 +333,13 @@ namespace CADView
                     }, Brushes.DarkSlateGray),
                     new MenuExpanderItem("Icons/Question 4.png", "Справка", new BaseMenuElement[]
                     {
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Консоль.png", "Консоль", ButtonsCommands.Console),
                         new MenuButtonItem("Icons/Панель СПРАВКА/Статистика.png", "Статистика", ButtonsCommands.Statistics),
                         new MenuSubItem("Icons/Панель СПРАВКА/Справка.png", "Справка", ButtonsCommands.Help,
                             new[]
                             {
-                                new MenuButtonItem("Icons/Панель СПРАВКА/Справка.png", "Справка", ButtonsCommands.Help, 71),
+                                new MenuTextButtonItem("О программе", ButtonsCommands.Help, 100),
+                                new MenuTextButtonItem("Документация", ButtonsCommands.Help, 100),
                             }, 71) {Color = Brushes.DimGray},
                     }, Brushes.DarkSlateGray),
                 });
@@ -376,7 +379,7 @@ namespace CADView
         private readonly List<DocumentModel> _documentViewModels = new List<DocumentModel>();
         private RelayCommand _closeApplicationCommand;
         private readonly Dictionary<TabItem, Document> _tabsDocuments = new Dictionary<TabItem, Document>();
-        private Visibility _consoleVisible;
+        private Visibility _consoleVisible = Visibility.Collapsed;
 
         private uint Session
         {
@@ -461,8 +464,33 @@ namespace CADView
             }
             else
             {
-                ButtonsCommands button = (ButtonsCommands) obj;
-                switch (button)
+                var button = BaseMenuElement.CreatedUIElements.Find(
+                    element => element is MenuButtonItem && ((IButtonOperation) element).Parameter == obj);
+                var parent = BaseMenuElement.CreatedUIElements.Find(element =>
+                    element is MenuSubItem && ((BaseExpanderItem) element).SubItems
+                        .ToList().Contains(button));
+                if (parent != null)
+                {
+                    string tmp;
+                    tmp = button.Image;
+                    button.Image = parent.Image;
+                    parent.Image = tmp;
+
+                    tmp = button.HintText;
+                    button.HintText = parent.HintText;
+                    parent.HintText = tmp;
+
+                    tmp = button.Description;
+                    button.Description = parent.Description;
+                    parent.Description = tmp;
+
+                    var brush = button.Color;
+                    button.Color = parent.Color;
+                    parent.Color = brush;
+                }
+
+                ButtonsCommands buttonCommand = (ButtonsCommands) obj;
+                switch (buttonCommand)
                 {
                     case ButtonsCommands.NewDocument:
                         this.CreateDocument();
