@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Media;
 
 namespace CADView
@@ -26,11 +27,11 @@ namespace CADView
         private string _hintText;
         private int _width;
         private int _height;
-        private Brush _color = Brushes.LightSlateGray;
+        private Brush _color = Brushes.Gray;
         private string _description;
 
-        public const int DefaultWidth = 40;
-        public const int DefaultHeight = 40;
+        public const int DefaultWidth = 30;
+        public const int DefaultHeight = 30;
 
         public BaseMenuElement(string image, string hintText, int width, int height)
         {

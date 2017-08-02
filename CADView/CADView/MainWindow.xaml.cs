@@ -19,8 +19,8 @@ namespace CADView
         {
             InitializeComponent();
 
-            Version version = Assembly.GetExecutingAssembly().GetName().Version;
-            Title += " " + version;
+            //Version version = Assembly.GetExecutingAssembly().GetName().Version;
+            //Title += " " + version;
 
             if (DesignerProperties.GetIsInDesignMode(this)) return;
 

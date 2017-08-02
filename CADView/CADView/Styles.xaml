@@ -1,8 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Color x:Key="TelegramButtonColor" A="255" R="49" G="169" B="223"/>
-    <Color x:Key="PressedTelegramButtonColor">#FF808080</Color>
-    <SolidColorBrush x:Key="BackgroundColor" Color="#FFE0E0E0" />
+    <Color x:Key="PressedTelegramButtonColor">#FFA0A0A0</Color>
+    <SolidColorBrush x:Key="StandartButtonColor" Color="#FF606060"/>
+    <SolidColorBrush x:Key="BackgroundColor" Color="#FFFAFAFA" />
     <SolidColorBrush x:Key="TelegramButton" Color="{StaticResource TelegramButtonColor}" />
     <SolidColorBrush x:Key="PressedTelegramButton" Color="{StaticResource PressedTelegramButtonColor}" />
     <Style x:Key="RoundedButton" TargetType="{x:Type Button}">
@@ -59,4 +60,8 @@
         </Setter>
     </Style>
     <!--<Style TargetType="Button" BasedOn="{StaticResource RoundedButton}"></Style>-->
+    <Style TargetType="{x:Type Label}" >
+        <Setter Property="FontFamily" Value="Segoe UI"></Setter>
+        <Setter Property="FontSize" Value="20"></Setter>
+    </Style>
 </ResourceDictionary>

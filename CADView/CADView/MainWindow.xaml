@@ -25,13 +25,14 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/Generic.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+        
     </Window.Resources>
 
     <Grid Background="{StaticResource BackgroundColor}">
         <Grid.Resources>
-
             <DataTemplate DataType="{x:Type local:MenuExpanderItem}">
                 <DockPanel Background="{StaticResource BackgroundColor}" LastChildFill="False" Margin="2,2,0,0">
                     <ItemsControl ItemsSource="{Binding SubItems}">
@@ -41,7 +42,7 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
-                    <Grid Margin="2,2,0,2" Background="Black" Width="3"></Grid>
+                    <Grid Margin="2,2,0,2" Background="#FF505050" Width="3"></Grid>
                 </DockPanel>
             </DataTemplate>
             <DataTemplate DataType="{x:Type local:MenuSubItem}">
@@ -74,7 +75,7 @@
                             </Rectangle.OpacityMask>
                             <Rectangle.Style>
                                 <Style TargetType="{x:Type Rectangle}">
-                                    <Setter Property="Fill" Value="Black" />
+                                    <Setter Property="Fill" Value="{StaticResource StandartButtonColor}" />
                                     <Style.Triggers>
                                         <EventTrigger RoutedEvent="Rectangle.PreviewMouseLeftButtonDown">
                                             <EventTrigger.Actions>
@@ -118,7 +119,7 @@
                     </Rectangle.OpacityMask>
                     <Rectangle.Style>
                         <Style TargetType="{x:Type Rectangle}">
-                            <Setter Property="Fill" Value="Black" />
+                            <Setter Property="Fill" Value="{StaticResource StandartButtonColor}" />
                             <Style.Triggers>
                                 <EventTrigger RoutedEvent="Rectangle.PreviewMouseLeftButtonDown">
                                     <EventTrigger.Actions>
@@ -147,7 +148,8 @@
                 </Rectangle>
             </DataTemplate>
             <DataTemplate DataType="{x:Type local:MenuTextButtonItem}">
-                <Label Background="{StaticResource BackgroundColor}" x:Name="textButton" Content="{Binding Description}" ToolTip="{Binding HintText}" Width="{Binding Width}" Height="{Binding Height}"
+                <Label Background="{StaticResource BackgroundColor}" x:Name="textButton"
+                       Content="{Binding Description}" ToolTip="{Binding HintText}" Width="{Binding Width}" Height="{Binding Height}"
                        VerticalAlignment="Center" HorizontalAlignment="Left">
                     <Label.InputBindings>
                         <MouseBinding Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
@@ -155,7 +157,7 @@
                     </Label.InputBindings>
                     <Label.Style>
                         <Style TargetType="{x:Type Label}">
-                            <Setter Property="Foreground" Value="{Binding Color}"></Setter>
+                            <Setter Property="Foreground" Value="{StaticResource StandartButtonColor}"></Setter>
                             <Style.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource TelegramButton}"></Setter>
@@ -352,7 +354,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <Grid Column="0" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}"
-                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="DarkCyan">
+                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="DarkGray">
                                     <Grid.ContextMenu>
                                         <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
                                             <MenuItem Header="Копировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
@@ -383,7 +385,7 @@
                                     </Grid.ContextMenu>
                                 </Grid>
                                 <Grid Column="1" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}"
-                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="DarkCyan">
+                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="DarkGray">
                                     <Grid.ContextMenu>
                                         <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
                                             <MenuItem Header="Показать узлы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
