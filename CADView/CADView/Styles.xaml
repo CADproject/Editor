@@ -60,8 +60,10 @@
         </Setter>
     </Style>
     <!--<Style TargetType="Button" BasedOn="{StaticResource RoundedButton}"></Style>-->
-    <Style TargetType="{x:Type Label}" >
+    <Style x:Key="GlobalFontStyle"  TargetType="{x:Type Control}" >
         <Setter Property="FontFamily" Value="Segoe UI"></Setter>
-        <Setter Property="FontSize" Value="20"></Setter>
+        <!--<Setter Property="FontSize" Value="20"></Setter>-->
     </Style>
+    <Style TargetType="Button" BasedOn="{StaticResource GlobalFontStyle}"></Style>
+    <Style TargetType="Label" BasedOn="{StaticResource GlobalFontStyle}"></Style>
 </ResourceDictionary>

@@ -33,6 +33,7 @@
 
     <Grid Background="{StaticResource BackgroundColor}">
         <Grid.Resources>
+            
             <DataTemplate DataType="{x:Type local:MenuExpanderItem}">
                 <DockPanel Background="{StaticResource BackgroundColor}" LastChildFill="False" Margin="2,2,0,0">
                     <ItemsControl ItemsSource="{Binding SubItems}">
@@ -156,7 +157,7 @@
                                       CommandParameter="{Binding Parameter}" MouseAction="LeftClick" />
                     </Label.InputBindings>
                     <Label.Style>
-                        <Style TargetType="{x:Type Label}">
+                        <Style BasedOn="{StaticResource GlobalFontStyle}" TargetType="{x:Type Label}">
                             <Setter Property="Foreground" Value="{StaticResource StandartButtonColor}"></Setter>
                             <Style.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
@@ -167,67 +168,6 @@
                     </Label.Style>
                 </Label>
             </DataTemplate>
-
-            <!--<DataTemplate DataType="{x:Type local:MenuSubItem}">
-                    <Expander ToolTip="{Binding HintText}" Width="{Binding Width}" MinHeight="{Binding Height}" Background="{Binding Color}"
-                              Margin="0,0,0,0" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
-                        <Expander.Header>
-                            <BulletDecorator Margin="0,7,0,0" MinHeight="26">
-                                <BulletDecorator.Bullet>
-                                <Image Source="{Binding Image}" Stretch="Fill" Width="25" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                </BulletDecorator.Bullet>
-                            </BulletDecorator>
-                        </Expander.Header>
-                        <ItemsControl Margin="0,6,0,0" ItemsSource="{Binding SubItems}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Margin="0,0,0,0" Orientation="Vertical"></StackPanel>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </Expander>
-            </DataTemplate>
-            <DataTemplate DataType="{x:Type local:MenuButtonItem}">
-                <Label Width="{Binding Width}" Height="{Binding Height}" Background="#80808080"
-                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                       VerticalAlignment="Top" Margin="1,1,1,1" Foreground="White" ToolTip="{Binding HintText}">
-                    <Label.InputBindings>
-                        <MouseBinding Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                                      CommandParameter="{Binding Parameter}" MouseAction="LeftClick" />
-                    </Label.InputBindings>
-                    <Label.Style>
-                        <Style TargetType="Label">
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True" >
-                                    <Setter Property="BorderBrush" Value="Black"/>
-                                    <Setter Property="BorderThickness" Value="1"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Label.Style>
-                    <Image Margin="1,1,1,1" Source="{Binding Image}" Stretch="Uniform" Height="38"
-                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Label>
-            </DataTemplate>
-            <DataTemplate DataType="{x:Type local:MenuExpanderItem}">
-                <Expander Background="{Binding Color}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
-                    <Expander.Header>
-                        <BulletDecorator Margin="0,0,20,0">
-                            <BulletDecorator.Bullet>
-                                <Image Source="{Binding Image}" Stretch="Fill" Width="64" Height="64" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                            </BulletDecorator.Bullet>
-                            <TextBlock Margin="10,0,0,0" Text="{Binding HintText}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Foreground="White" />
-                        </BulletDecorator>
-                    </Expander.Header>
-                    <ItemsControl ItemsSource="{Binding SubItems}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"></StackPanel>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-                </Expander>
-            </DataTemplate>-->
 
         </Grid.Resources>
         <Grid.RowDefinitions>
@@ -246,42 +186,6 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
-            <!--<ListBox VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto" ItemsSource="{Binding UIMenuElements}">
-                <ListBox.Resources>
-                    -->
-            <!--<Style TargetType="{x:Type Expander}">
-                        <Setter Property="IsExpanded">
-                            <Setter.Value>
-                                <Binding Path="IsSelected" RelativeSource="{RelativeSource AncestorType={x:Type ListBoxItem}}" />
-                            </Setter.Value>
-                        </Setter>
-                    </Style>-->
-            <!--
-                </ListBox.Resources>
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}}" ></WrapPanel>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                -->
-            <!--<ListBox.Template>
-                    <ControlTemplate TargetType="{x:Type ListBox}">
-                        <ItemsPresenter/>
-                    </ControlTemplate>
-                </ListBox.Template>-->
-            <!--
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListBoxItem}">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                    <ContentPresenter Content="{TemplateBinding Content}"/>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>-->
         </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
@@ -305,26 +209,10 @@
                         </Border>
                     </ControlTemplate>
                 </Grid.Resources>
-                <!--<TabControl ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
-                        SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <TabControl.ItemContainerStyle>
-                    <Style TargetType="TabItem">
-                        <Setter Property="Header" Value="{Binding Title}" />
-                        <Setter Property="HeaderTemplate">
-                            <Setter.Value>
-                                <DataTemplate>
-                                    <Border BorderThickness="2" CornerRadius="4">
-                                        <Control Template="{StaticResource CustomHeaderTemplate}"></Control>
-                                    </Border>
-                                </DataTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </TabControl.ItemContainerStyle>
-            </TabControl>-->
                 <dragablz:TabablzControl VerticalAlignment="Stretch" ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
                                      SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     ConsolidateOrphanedItems="True" Margin="8" ShowDefaultCloseButton="True">
+                                     ConsolidateOrphanedItems="True" Margin="8" ShowDefaultCloseButton="True"
+                                     ItemContainerStyle="{StaticResource TrapezoidDragableTabItemStyle}">
                     <dragablz:TabablzControl.HeaderItemTemplate>
                         <DataTemplate DataType="local:DocumentModel">
                             <Label Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}" MinWidth="60" Content="{Binding Path=Title}">
@@ -410,7 +298,7 @@
                         </DataTemplate>
                     </dragablz:TabablzControl.ContentTemplate>
                 </dragablz:TabablzControl>
-                <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,37,0,0">
+                <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,40,0,0">
                     <Label Visibility="{Binding InfoVisible}" Content="{Binding MainInfoText, Mode= OneWay}"></Label>
                     <Label Visibility="{Binding InfoVisible}" Content="{Binding AdditionalInfoText, Mode=OneWay}"></Label>
                 </StackPanel>
