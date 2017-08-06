@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Color x:Key="TelegramButtonColor" A="255" R="49" G="169" B="223"/>
+    <Color x:Key="TelegramButtonColor">#FF31A9DF</Color>
     <Color x:Key="PressedTelegramButtonColor">#FFA0A0A0</Color>
     <SolidColorBrush x:Key="StandartButtonColor" Color="#FF606060"/>
     <SolidColorBrush x:Key="BackgroundColor" Color="#FFFAFAFA" />

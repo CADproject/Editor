@@ -220,6 +220,7 @@ namespace CADView
     public class MenuTextButtonItem : BaseMenuElement
     {
         private object _parameter;
+        private bool _isSelected;
 
         public MenuTextButtonItem(string hintText, object parameter, int width = DefaultWidth, int height = DefaultHeight) : 
             base(null, hintText, width, height)
@@ -240,6 +241,16 @@ namespace CADView
             set
             {
                 _parameter = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                _isSelected = value;
                 OnPropertyChanged();
             }
         }

@@ -66,7 +66,7 @@
                     <Label Width="50" Content="5"/>
                 </Border>
             </Grid>
-            <Button Content="Ок" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" Margin="0,15,0,0"></Button>
+            <Button Content="ОК" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" Margin="0,15,0,0"></Button>
         </StackPanel>
     </Grid>
 </Window>

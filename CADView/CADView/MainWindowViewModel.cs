@@ -285,7 +285,7 @@ namespace CADView
                             {
                                     new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_2.png", "Дуга по трём точкам", ButtonsCommands.Arc2),
                             }) {Color = Brushes.DimGray},
-                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность по центру и точке", ButtonsCommands.Circle1,
+                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность по точке и центру", ButtonsCommands.Circle1,
                             new []
                             {
                                     new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_2.png", "Окружность по трём точкам", ButtonsCommands.Circle2),
@@ -304,7 +304,7 @@ namespace CADView
                         new MenuSubItem("Icons/Панель ОТОБРАЖЕНИЕ/Темы.png", "Сменить тему", null,
                             new MenuTextButtonItem[]
                             {
-                                new MenuTextButtonItem("Оранжевая", null, 80),
+                                new MenuTextButtonItem("Оранжевая", null, 80) {Color = Brushes.DarkSeaGreen, IsSelected = true},
                                 new MenuTextButtonItem("Синяя", null, 80),
                                 new MenuTextButtonItem("Годная", null, 80),
                             }) {Color = Brushes.DimGray},
@@ -335,12 +335,12 @@ namespace CADView
                     {
                         new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Консоль.png", "Консоль", ButtonsCommands.Console),
                         new MenuButtonItem("Icons/Панель СПРАВКА/Статистика.png", "Статистика", ButtonsCommands.Statistics),
-                        new MenuSubItem("Icons/Панель СПРАВКА/Справка.png", "Справка", ButtonsCommands.Help,
+                        new MenuSubItem(null, "Справка", ButtonsCommands.Help,
                             new[]
                             {
                                 new MenuTextButtonItem("О программе", ButtonsCommands.Help, 100),
                                 new MenuTextButtonItem("Документация", ButtonsCommands.Help, 100),
-                            }, 71) {Color = Brushes.DimGray},
+                            }, 56) {Description = "Справка"},
                     }, Brushes.DarkSlateGray),
                 });
 
@@ -468,7 +468,7 @@ namespace CADView
                     element => element is MenuButtonItem && ((IButtonOperation) element).Parameter == obj);
                 var parent = BaseMenuElement.CreatedUIElements.Find(element =>
                     element is MenuSubItem && ((BaseExpanderItem) element).SubItems
-                        .ToList().Contains(button));
+                        .ToList().Contains(button)) as BaseExpanderItem;
                 if (parent != null)
                 {
                     string tmp;
@@ -487,6 +487,8 @@ namespace CADView
                     var brush = button.Color;
                     button.Color = parent.Color;
                     parent.Color = brush;
+
+                    parent.IsExpanded = false;
                 }
 
                 ButtonsCommands buttonCommand = (ButtonsCommands) obj;

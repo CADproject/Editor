@@ -52,7 +52,9 @@
                                      Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                      CommandParameter="{Binding Parameter}"
                                      Background="{StaticResource BackgroundColor}"
-                                     BorderThickness="0">
+                                     BorderThickness="0"
+                                     IsOpen="{Binding IsExpanded, Mode=TwoWay}"
+                                     >
                     <toolkit:SplitButton.DropDownContent>
                         <ItemsControl Background="{StaticResource BackgroundColor}" Margin="0,0,0,0" ItemsSource="{Binding SubItems}">
                             <ItemsControl.ItemsPanel>
@@ -63,46 +65,61 @@
                         </ItemsControl>
                     </toolkit:SplitButton.DropDownContent>
                     <toolkit:SplitButton.Content>
-                        <Rectangle Width="{Binding Width}" Height="{Binding Height}"
+                        <Grid>
+                            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Content="{Binding Description}"
+                                   Width="{Binding Width}" Height="{Binding Height}" ToolTip="{Binding HintText}">
+                                <Label.Style>
+                                    <Style BasedOn="{StaticResource GlobalFontStyle}" TargetType="{x:Type Label}">
+                                        <Setter Property="Foreground" Value="{StaticResource StandartButtonColor}"></Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource TelegramButton}"></Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Label.Style>
+                            </Label>
+                            <Rectangle Width="{Binding Width}" Height="{Binding Height}"
                       VerticalAlignment="Top" HorizontalAlignment="Left"
                            Margin="0,-2.5,0,0" ToolTip="{Binding HintText}">
-                            <Rectangle.InputBindings>
-                                <MouseBinding Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                <Rectangle.InputBindings>
+                                    <MouseBinding Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                       CommandParameter="{Binding Parameter}" MouseAction="LeftClick" />
-                            </Rectangle.InputBindings>
+                                </Rectangle.InputBindings>
 
-                            <Rectangle.OpacityMask>
-                                <ImageBrush Stretch="Fill" ImageSource="{Binding Image}" ></ImageBrush>
-                            </Rectangle.OpacityMask>
-                            <Rectangle.Style>
-                                <Style TargetType="{x:Type Rectangle}">
-                                    <Setter Property="Fill" Value="{StaticResource StandartButtonColor}" />
-                                    <Style.Triggers>
-                                        <EventTrigger RoutedEvent="Rectangle.PreviewMouseLeftButtonDown">
-                                            <EventTrigger.Actions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource PressedTelegramButtonColor}" Duration="0" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger.Actions>
-                                        </EventTrigger>
-                                        <EventTrigger RoutedEvent="Rectangle.MouseUp">
-                                            <EventTrigger.Actions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource TelegramButtonColor}" Duration="0" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger.Actions>
-                                        </EventTrigger>
-                                        <Trigger Property="IsMouseOver" Value="True" >
-                                            <Setter Property="Fill" Value="{StaticResource TelegramButton}"></Setter>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
+                                <Rectangle.OpacityMask>
+                                    <ImageBrush Stretch="Fill" ImageSource="{Binding Image}" ></ImageBrush>
+                                </Rectangle.OpacityMask>
+                                <Rectangle.Style>
+                                    <Style TargetType="{x:Type Rectangle}">
+                                        <Setter Property="Fill" Value="{StaticResource StandartButtonColor}" />
+                                        <Style.Triggers>
+                                            <EventTrigger RoutedEvent="Rectangle.PreviewMouseLeftButtonDown">
+                                                <EventTrigger.Actions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource PressedTelegramButtonColor}" Duration="0" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger.Actions>
+                                            </EventTrigger>
+                                            <EventTrigger RoutedEvent="Rectangle.MouseUp">
+                                                <EventTrigger.Actions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource TelegramButtonColor}" Duration="0" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger.Actions>
+                                            </EventTrigger>
+                                            <Trigger Property="IsMouseOver" Value="True" >
+                                                <Setter Property="Fill" Value="{StaticResource TelegramButton}"></Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Rectangle.Style>
+                            </Rectangle>
+                        </Grid>
                     </toolkit:SplitButton.Content>
                 </toolkit:SplitButton>
             </DataTemplate>
@@ -149,7 +166,7 @@
                 </Rectangle>
             </DataTemplate>
             <DataTemplate DataType="{x:Type local:MenuTextButtonItem}">
-                <Label Background="{StaticResource BackgroundColor}" x:Name="textButton"
+                <Label x:Name="textButton"
                        Content="{Binding Description}" ToolTip="{Binding HintText}" Width="{Binding Width}" Height="{Binding Height}"
                        VerticalAlignment="Center" HorizontalAlignment="Left">
                     <Label.InputBindings>
@@ -160,6 +177,9 @@
                         <Style BasedOn="{StaticResource GlobalFontStyle}" TargetType="{x:Type Label}">
                             <Setter Property="Foreground" Value="{StaticResource StandartButtonColor}"></Setter>
                             <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected, Mode=TwoWay}" Value="True">
+                                    <Setter Property="Background" Value="DarkSeaGreen"></Setter>
+                                </DataTrigger>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource TelegramButton}"></Setter>
                                 </Trigger>
@@ -336,9 +356,9 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"></ColumnDefinition>
-                    <ColumnDefinition MinWidth="100" Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <GridSplitter Background="Black" Width="1"></GridSplitter>
+                <Border HorizontalAlignment="Left" Grid.Column="1" BorderThickness="1" BorderBrush="Black" Width="1"></Border>
                 <Label Visibility="{Binding InfoVisible}" Grid.Column="1" Content="{Binding StatusBarText, Mode=OneWay}" />
             </Grid>
         </Border>
