@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:CADView"
         xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+        xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes;assembly=Xceed.Wpf.Toolkit"
         mc:Ignorable="d"
         AllowsTransparency="False"
         Title="Editor" BorderThickness="2" Height="500" Width="870" MinHeight="500" MinWidth="570" WindowStartupLocation="CenterScreen"
@@ -31,11 +32,11 @@
         
     </Window.Resources>
 
-    <Grid Background="{StaticResource BackgroundColor}">
+    <Grid Background="{StaticResource StandartBackground}">
         <Grid.Resources>
             
             <DataTemplate DataType="{x:Type local:MenuExpanderItem}">
-                <DockPanel Background="{StaticResource BackgroundColor}" LastChildFill="False" Margin="2,2,0,0">
+                <DockPanel Background="{StaticResource StandartBackground}" LastChildFill="False" Margin="2,2,0,0">
                     <ItemsControl ItemsSource="{Binding SubItems}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -51,12 +52,23 @@
                                      ToolTip="{Binding HintText}" 
                                      Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                      CommandParameter="{Binding Parameter}"
-                                     Background="{StaticResource BackgroundColor}"
+                                     Background="{StaticResource StandartBackground}"
                                      BorderThickness="0"
                                      IsOpen="{Binding IsExpanded, Mode=TwoWay}"
                                      >
+                    <toolkit:SplitButton.Resources>
+                        <!--<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverOuterBorderKey}"
+                            Color="Red" />-->
+                        <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverBackgroundKey}"
+                                        Color="{StaticResource StandartBackgroundColor}" >
+                        </SolidColorBrush>
+                        <!--<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedOuterBorderKey}"
+                            Color="Orange" />-->
+                        <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedBackgroundKey}"
+                            Color="{StaticResource StandartBackgroundColor}" />
+                    </toolkit:SplitButton.Resources>
                     <toolkit:SplitButton.DropDownContent>
-                        <ItemsControl Background="{StaticResource BackgroundColor}" Margin="0,0,0,0" ItemsSource="{Binding SubItems}">
+                        <ItemsControl Background="{StaticResource StandartBackground}" Margin="0,0,0,0" ItemsSource="{Binding SubItems}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Orientation="Vertical"></StackPanel>
@@ -330,7 +342,7 @@
             <Grid Visibility="{Binding ConsoleVisible}" x:Name="ConsolePart1" Grid.Row="2">
                 <Grid>
                     <Border Grid.Row="0" BorderThickness="1" BorderBrush="DarkSlateGray">
-                        <TextBox Background="{StaticResource BackgroundColor}" VerticalAlignment="Stretch" Margin="0,0,0,-3" IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" Text="wewewefrv"/>
+                        <TextBox Background="{StaticResource StandartBackground}" VerticalAlignment="Stretch" Margin="0,0,0,-3" IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" Text="wewewefrv"/>
                     </Border>
                 </Grid>
             </Grid>
@@ -338,7 +350,7 @@
 
         <Grid Visibility="{Binding ConsoleVisible}" x:Name="ConsolePart2" Grid.Row="4">
             <Border BorderThickness="1" BorderBrush="DarkSlateGray">
-                <TextBox Background="{StaticResource BackgroundColor}"></TextBox>
+                <TextBox Background="{StaticResource StandartBackground}"></TextBox>
             </Border>
             <Image Margin="0,2,2,2" HorizontalAlignment="Right" Height="15" Width="15" Stretch="Fill" Source="Icons/arrow.png" RenderTransformOrigin="0.5,0.5" >
                 <Image.RenderTransform>

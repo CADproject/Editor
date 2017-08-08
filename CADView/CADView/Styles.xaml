@@ -2,8 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Color x:Key="TelegramButtonColor">#FF31A9DF</Color>
     <Color x:Key="PressedTelegramButtonColor">#FFA0A0A0</Color>
+    <Color x:Key="StandartBackgroundColor">#FFFAFAFA</Color>
     <SolidColorBrush x:Key="StandartButtonColor" Color="#FF606060"/>
-    <SolidColorBrush x:Key="BackgroundColor" Color="#FFFAFAFA" />
+    <SolidColorBrush x:Key="StandartBackground" Color="{StaticResource StandartBackgroundColor}" />
     <SolidColorBrush x:Key="TelegramButton" Color="{StaticResource TelegramButtonColor}" />
     <SolidColorBrush x:Key="PressedTelegramButton" Color="{StaticResource PressedTelegramButtonColor}" />
     <Style x:Key="RoundedButton" TargetType="{x:Type Button}">
