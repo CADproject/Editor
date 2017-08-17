@@ -341,7 +341,7 @@ namespace CADView
                                 new MenuTextButtonItem("О программе", ButtonsCommands.Help, 100),
                                 new MenuTextButtonItem("Документация", ButtonsCommands.Help, 100),
                             }, 56) {Description = "Справка"},
-                    }, Brushes.DarkSlateGray),
+                    }, Brushes.DarkSlateGray, Visibility.Hidden),
                 });
 
         #endregion
@@ -380,6 +380,7 @@ namespace CADView
         private RelayCommand _closeApplicationCommand;
         private readonly Dictionary<TabItem, Document> _tabsDocuments = new Dictionary<TabItem, Document>();
         private Visibility _consoleVisible = Visibility.Collapsed;
+        private double _consoleHeight;
 
         private uint Session
         {
@@ -646,6 +647,25 @@ namespace CADView
 
         #region ScreenInfo
 
+        #region Console height helpers
+
+        public GridLength DocumentsHeight
+        {
+            get { return new GridLength(0, GridUnitType.Star); }
+            set { OnPropertyChanged(); }
+        }
+
+        private double consoleHeight = 0;
+        private double lastConsoleHeight = 100;
+
+        public GridLength ConsoleHeight
+        {
+            get { return new GridLength(this.consoleHeight, GridUnitType.Star); }
+            set { this.consoleHeight = value.Value; OnPropertyChanged(); }
+        }
+
+        #endregion
+
         public Visibility ConsoleVisible
         {
             get { return _consoleVisible; }
@@ -653,6 +673,13 @@ namespace CADView
             {
                 _consoleVisible = value;
                 OnPropertyChanged();
+                if (value != Visibility.Visible)
+                {
+                    lastConsoleHeight = ConsoleHeight.Value;
+                    ConsoleHeight = new GridLength(0, GridUnitType.Star);
+                }
+                else
+                    ConsoleHeight = new GridLength(lastConsoleHeight, GridUnitType.Star);
             }
         }
 
@@ -661,14 +688,16 @@ namespace CADView
             get { return DocumentViewModelsTabs.Count > 0 ? Visibility.Visible : Visibility.Hidden; }
         }
 
-        public string StatusBarText => "Active layer Petya: it's time to VZLOM!!!";
+        public string StatusBarTextFirst => "Active document: Abcde";
+        public string StatusBarTextSecond => "Active layer Petya: it's time to VZLOM!!!";
 
         public string MainInfoText => "Document vzlomaning:";
 
         public string AdditionalInfoText => "privet ot petya!";
 
-        public string CoordinatesText => "X = 50 Y = 100";
-        
+        public string CoordinatesTextX => "X = 50";
+        public string CoordinatesTextY => "Y = 100";
+
         #endregion
     }
 }

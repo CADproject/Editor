@@ -150,9 +150,21 @@ namespace CADView
     /// </summary>
     public class MenuExpanderItem : BaseExpanderItem
     {
-        public MenuExpanderItem(string image, string hintText, IEnumerable<BaseMenuElement> subItems, Brush color, int width = 0, int height = 0) : base(image, hintText, subItems, width, height)
+        private Visibility _separatorVisibility = Visibility.Visible;
+        public Visibility SeparatorVisibility
+        {
+            get { return _separatorVisibility; }
+            set
+            {
+                _separatorVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public MenuExpanderItem(string image, string hintText, IEnumerable<BaseMenuElement> subItems, Brush color, Visibility separator = Visibility.Visible, int width = 0, int height = 0) : base(image, hintText, subItems, width, height)
         {
             Color = color;
+            SeparatorVisibility = separator;
         }
     }
 

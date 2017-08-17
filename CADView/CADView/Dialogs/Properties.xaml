@@ -12,45 +12,36 @@
         </Grid.ColumnDefinitions>
         <StackPanel Margin="20,20,20,10" Orientation="Vertical">
             <Label Margin="10,0,0,0" HorizontalAlignment="Left" Content="Цвет"></Label>
-            <ComboBox HorizontalAlignment="Stretch">
+            <ComboBox HorizontalAlignment="Stretch" SelectedIndex="0">
                 <ComboBox.Items>
                     <ComboBoxItem>
-                        <DockPanel>
-                            <Grid HorizontalAlignment="Left" Width="20" Background="Blue"></Grid>
-                            <Label Margin="5,0,0,0" Padding="0" VerticalAlignment="Center" Content="Синий" HorizontalAlignment="Right"></Label>
-                        </DockPanel>
+                        <Grid Margin="0,0,0,2" HorizontalAlignment="Stretch" Height="17" Width="224" Background="Blue"></Grid>
                     </ComboBoxItem>
                     <ComboBoxItem>
-                        <DockPanel>
-                            <Grid HorizontalAlignment="Left" Width="20" Background="Red"></Grid>
-                            <Label Margin="5,0,0,0" Padding="0" VerticalAlignment="Center" Content="Красный" HorizontalAlignment="Right"></Label>
-                        </DockPanel>
+                        <Grid Margin="0,0,0,2" HorizontalAlignment="Left" Width="224" Height="17" Background="Red"></Grid>
                     </ComboBoxItem>
                     <ComboBoxItem>
-                        <DockPanel>
-                            <Grid HorizontalAlignment="Left" Width="20" Background="Green"></Grid>
-                            <Label Margin="5,0,0,0" Padding="0" VerticalAlignment="Center" Content="Зелёный" HorizontalAlignment="Right"></Label>
-                        </DockPanel>
+                        <Grid Margin="0,0,0,2" HorizontalAlignment="Left" Width="224" Height="17" Background="Green"></Grid>
                     </ComboBoxItem>
                 </ComboBox.Items>
             </ComboBox>
             <Label Margin="10,15,0,0" HorizontalAlignment="Left" Content="Стиль"></Label>
-            <ComboBox HorizontalAlignment="Stretch">
+            <ComboBox HorizontalAlignment="Stretch" SelectedIndex="0">
                 <ComboBox.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightGray" />
                 </ComboBox.Resources>
                 <ComboBoxItem>
                     <Viewbox>
-                        <Image  Height="18" Width="70">
+                        <Image Height="18" Width="224">
                             <Image.Source>
                                 <DrawingImage>
                                     <DrawingImage.Drawing>
                                         <GeometryDrawing Brush="Black">
                                             <GeometryDrawing.Geometry>
-                                                <LineGeometry StartPoint="0,9" EndPoint="38,9" />
+                                                <LineGeometry StartPoint="0,9" EndPoint="60,9" />
                                             </GeometryDrawing.Geometry>
                                             <GeometryDrawing.Pen>
-                                                <Pen Brush="Blue"  Thickness="1"  DashStyle="{x:Static DashStyles.Solid}"/>
+                                                <Pen Brush="DimGray"  Thickness="1"  DashStyle="{x:Static DashStyles.Solid}"/>
                                             </GeometryDrawing.Pen>
                                         </GeometryDrawing>
                                     </DrawingImage.Drawing>
@@ -61,16 +52,16 @@
                 </ComboBoxItem>
                 <ComboBoxItem>
                     <Viewbox>
-                        <Image  Height="18" Width="70">
+                        <Image  Height="18" Width="224">
                             <Image.Source>
                                 <DrawingImage>
                                     <DrawingImage.Drawing>
                                         <GeometryDrawing Brush="Black">
                                             <GeometryDrawing.Geometry>
-                                                <LineGeometry StartPoint="0,9" EndPoint="38,9" />
+                                                <LineGeometry StartPoint="0,9" EndPoint="60,9" />
                                             </GeometryDrawing.Geometry>
                                             <GeometryDrawing.Pen>
-                                                <Pen Brush="Blue"  Thickness="1"  DashStyle="{x:Static DashStyles.Dash}"/>
+                                                <Pen Brush="DimGray"  Thickness="1"  DashStyle="{x:Static DashStyles.Dash}"/>
                                             </GeometryDrawing.Pen>
                                         </GeometryDrawing>
                                     </DrawingImage.Drawing>
@@ -81,16 +72,16 @@
                 </ComboBoxItem>
                 <ComboBoxItem>
                     <Viewbox>
-                        <Image  Height="18" Width="70">
+                        <Image  Height="18" Width="224">
                             <Image.Source>
                                 <DrawingImage>
                                     <DrawingImage.Drawing>
                                         <GeometryDrawing Brush="Black">
                                             <GeometryDrawing.Geometry>
-                                                <LineGeometry StartPoint="0,9" EndPoint="38,9" />
+                                                <LineGeometry StartPoint="0,9" EndPoint="60,9" />
                                             </GeometryDrawing.Geometry>
                                             <GeometryDrawing.Pen>
-                                                <Pen Brush="Blue"  Thickness="1"  DashStyle="{x:Static DashStyles.DashDot}"/>
+                                                <Pen Brush="DimGray"  Thickness="1"  DashStyle="{x:Static DashStyles.DashDot}"/>
                                             </GeometryDrawing.Pen>
                                         </GeometryDrawing>
                                     </DrawingImage.Drawing>
@@ -101,16 +92,16 @@
                 </ComboBoxItem>
                 <ComboBoxItem>
                     <Viewbox>
-                        <Image  Height="18" Width="70">
+                        <Image  Height="18" Width="224">
                             <Image.Source>
                                 <DrawingImage>
                                     <DrawingImage.Drawing>
                                         <GeometryDrawing Brush="Black">
                                             <GeometryDrawing.Geometry>
-                                                <LineGeometry StartPoint="0,9" EndPoint="38,9" />
+                                                <LineGeometry StartPoint="0,9" EndPoint="60,9" />
                                             </GeometryDrawing.Geometry>
                                             <GeometryDrawing.Pen>
-                                                <Pen Brush="Blue"  Thickness="1"  DashStyle="{x:Static DashStyles.DashDotDot}"/>
+                                                <Pen Brush="DimGray"  Thickness="1"  DashStyle="{x:Static DashStyles.DashDotDot}"/>
                                             </GeometryDrawing.Pen>
                                         </GeometryDrawing>
                                     </DrawingImage.Drawing>
@@ -121,16 +112,16 @@
                 </ComboBoxItem>
                 <ComboBoxItem>
                     <Viewbox>
-                        <Image  Height="18" Width="70">
+                        <Image  Height="18" Width="224">
                             <Image.Source>
                                 <DrawingImage>
                                     <DrawingImage.Drawing>
                                         <GeometryDrawing Brush="Black">
                                             <GeometryDrawing.Geometry>
-                                                <LineGeometry StartPoint="0,9" EndPoint="38,9" />
+                                                <LineGeometry StartPoint="0,9" EndPoint="60,9" />
                                             </GeometryDrawing.Geometry>
                                             <GeometryDrawing.Pen>
-                                                <Pen Brush="Blue"  Thickness="1"  DashStyle="{x:Static DashStyles.Dot}"/>
+                                                <Pen Brush="DimGray"  Thickness="1"  DashStyle="{x:Static DashStyles.Dot}"/>
                                             </GeometryDrawing.Pen>
                                         </GeometryDrawing>
                                     </DrawingImage.Drawing>
@@ -141,28 +132,28 @@
                 </ComboBoxItem>
                 <ComboBoxItem>
                     <Viewbox>
-                        <Image  Height="18" Width="70">
+                        <Image  Height="18" Width="224">
                         </Image>
                     </Viewbox>
                 </ComboBoxItem>
             </ComboBox>
             <Label Margin="10,15,0,0" HorizontalAlignment="Left" Content="Толщина"></Label>
-            <ComboBox HorizontalAlignment="Stretch">
+            <ComboBox HorizontalAlignment="Stretch" SelectedIndex="0">
                 <ComboBox.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightGray" />
                 </ComboBox.Resources>
                 <ComboBoxItem>
                     <Viewbox>
-                        <Image  Height="18" Width="70">
+                        <Image  Height="18" Width="224">
                             <Image.Source>
                                 <DrawingImage>
                                     <DrawingImage.Drawing>
                                         <GeometryDrawing Brush="Black">
                                             <GeometryDrawing.Geometry>
-                                                <LineGeometry StartPoint="0,9" EndPoint="38,9" />
+                                                <LineGeometry StartPoint="0,1" EndPoint="150,1" />
                                             </GeometryDrawing.Geometry>
                                             <GeometryDrawing.Pen>
-                                                <Pen Brush="Blue"  Thickness="1"  DashStyle="{x:Static DashStyles.Solid}"/>
+                                                <Pen Brush="DimGray"  Thickness="1"  DashStyle="{x:Static DashStyles.Solid}"/>
                                             </GeometryDrawing.Pen>
                                         </GeometryDrawing>
                                     </DrawingImage.Drawing>
@@ -173,16 +164,16 @@
                 </ComboBoxItem>
                 <ComboBoxItem>
                     <Viewbox>
-                        <Image  Height="18" Width="70">
+                        <Image  Height="18" Width="224">
                             <Image.Source>
                                 <DrawingImage>
                                     <DrawingImage.Drawing>
                                         <GeometryDrawing Brush="Black">
                                             <GeometryDrawing.Geometry>
-                                                <LineGeometry StartPoint="0,9" EndPoint="38,9" />
+                                                <LineGeometry StartPoint="0,1" EndPoint="150,1" />
                                             </GeometryDrawing.Geometry>
                                             <GeometryDrawing.Pen>
-                                                <Pen Brush="Blue"  Thickness="3"  DashStyle="{x:Static DashStyles.Solid}"/>
+                                                <Pen Brush="DimGray"  Thickness="3"  DashStyle="{x:Static DashStyles.Solid}"/>
                                             </GeometryDrawing.Pen>
                                         </GeometryDrawing>
                                     </DrawingImage.Drawing>
@@ -193,16 +184,16 @@
                 </ComboBoxItem>
                 <ComboBoxItem>
                     <Viewbox>
-                        <Image  Height="18" Width="70">
+                        <Image  Height="18" Width="224">
                             <Image.Source>
                                 <DrawingImage>
                                     <DrawingImage.Drawing>
                                         <GeometryDrawing Brush="Black">
                                             <GeometryDrawing.Geometry>
-                                                <LineGeometry StartPoint="0,9" EndPoint="38,9" />
+                                                <LineGeometry StartPoint="0,1" EndPoint="150,1" />
                                             </GeometryDrawing.Geometry>
                                             <GeometryDrawing.Pen>
-                                                <Pen Brush="Blue"  Thickness="5"  DashStyle="{x:Static DashStyles.Solid}"/>
+                                                <Pen Brush="DimGray"  Thickness="5"  DashStyle="{x:Static DashStyles.Solid}"/>
                                             </GeometryDrawing.Pen>
                                         </GeometryDrawing>
                                     </DrawingImage.Drawing>

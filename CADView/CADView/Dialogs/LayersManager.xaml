@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView.Dialogs"
         mc:Ignorable="d"
-        Title="Менеджер слоёв" Height="350" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="Менеджер слоёв" Height="360" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <StackPanel VerticalAlignment="Stretch" Orientation="Vertical">
             <DockPanel Height="230" Margin="10,0,10,0">

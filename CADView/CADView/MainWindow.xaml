@@ -29,12 +29,12 @@
                 <ResourceDictionary Source="pack://application:,,,/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-        
+
     </Window.Resources>
 
     <Grid Background="{StaticResource StandartBackground}">
         <Grid.Resources>
-            
+
             <DataTemplate DataType="{x:Type local:MenuExpanderItem}">
                 <DockPanel Background="{StaticResource StandartBackground}" LastChildFill="False" Margin="2,2,0,0">
                     <ItemsControl ItemsSource="{Binding SubItems}">
@@ -44,7 +44,7 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
-                    <Grid Margin="2,2,0,2" Background="#FF505050" Width="3"></Grid>
+                    <Grid Visibility="{Binding SeparatorVisibility}" Margin="2,2,0,2" Background="#FF505050" Width="3"></Grid>
                 </DockPanel>
             </DataTemplate>
             <DataTemplate DataType="{x:Type local:MenuSubItem}">
@@ -221,9 +221,9 @@
         </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
-                <RowDefinition MinHeight="100"/>
+                <RowDefinition MinHeight="200" />
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="{Binding ConsoleHeight, Mode=TwoWay}"/>
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0" VerticalAlignment="Stretch">
@@ -334,17 +334,19 @@
                     <Label Visibility="{Binding InfoVisible}" Content="{Binding MainInfoText, Mode= OneWay}"></Label>
                     <Label Visibility="{Binding InfoVisible}" Content="{Binding AdditionalInfoText, Mode=OneWay}"></Label>
                 </StackPanel>
-                <Label Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10,0,0,10" Content="{Binding CoordinatesText, Mode=OneWay}"></Label>
+                <Label Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10,0,0,10" Content="{Binding CoordinatesTextX, Mode=OneWay}"></Label>
+                <Label Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="60,0,0,10" Content="{Binding CoordinatesTextY, Mode=OneWay}"></Label>
             </Grid>
             <GridSplitter ShowsPreview="True" Grid.Row="1" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" 
                           VerticalAlignment="Center" HorizontalAlignment="Stretch" 
-                      Height="2" Background="Transparent" />
-            <Grid Visibility="{Binding ConsoleVisible}" x:Name="ConsolePart1" Grid.Row="2">
-                <Grid>
-                    <Border Grid.Row="0" BorderThickness="1" BorderBrush="DarkSlateGray">
-                        <TextBox Background="{StaticResource StandartBackground}" VerticalAlignment="Stretch" Margin="0,0,0,-3" IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" Text="wewewefrv"/>
-                    </Border>
-                </Grid>
+                      Height="4" Background="Transparent" Visibility="{Binding ConsoleVisible}"  />
+            <Grid Visibility="{Binding ConsoleVisible}" x:Name="ConsolePart1" Grid.Row="2"
+                  Height="{Binding ConsoleHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True}">
+                <Border Grid.Row="0" BorderThickness="1" BorderBrush="DarkSlateGray">
+                    <TextBox Background="{StaticResource StandartBackground}" 
+                             VerticalAlignment="Stretch" Margin="0,0,0,-3" IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" Text="test console text" >
+                    </TextBox>
+                </Border>
             </Grid>
         </Grid>
 
@@ -367,11 +369,13 @@
         <Border Grid.Row="5" BorderThickness="1" BorderBrush="Black">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"></ColumnDefinition>
-                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="148*"></ColumnDefinition>
+                    <ColumnDefinition Width="423*"/>
+                    <ColumnDefinition Width="285*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Border HorizontalAlignment="Left" Grid.Column="1" BorderThickness="1" BorderBrush="Black" Width="1"></Border>
-                <Label Visibility="{Binding InfoVisible}" Grid.Column="1" Content="{Binding StatusBarText, Mode=OneWay}" />
+                <Label Padding="5,2,0,0" Visibility="{Binding InfoVisible}" Grid.Column="0" Content="{Binding StatusBarTextFirst, Mode=OneWay}" Grid.ColumnSpan="2" />
+                <Border HorizontalAlignment="Left" Grid.Column="2" BorderThickness="1" BorderBrush="Black" Width="1"></Border>
+                <Label Padding="5,2,0,0" Visibility="{Binding InfoVisible}" Grid.Column="2" Content="{Binding StatusBarTextSecond, Mode=OneWay}" />
             </Grid>
         </Border>
     </Grid>
