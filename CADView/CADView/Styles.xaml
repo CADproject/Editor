@@ -63,8 +63,12 @@
     <!--<Style TargetType="Button" BasedOn="{StaticResource RoundedButton}"></Style>-->
     <Style x:Key="GlobalFontStyle"  TargetType="{x:Type Control}" >
         <Setter Property="FontFamily" Value="Segoe UI"></Setter>
-        <!--<Setter Property="FontSize" Value="20"></Setter>-->
+        <!--<Setter Property="FontSize" Value="26"></Setter>-->
+    </Style>
+    <Style x:Key="BigFontStyle"  TargetType="{x:Type Control}" BasedOn="{StaticResource GlobalFontStyle}" >
+        <Setter Property="FontSize" Value="18"></Setter>
     </Style>
     <Style TargetType="Button" BasedOn="{StaticResource GlobalFontStyle}"></Style>
     <Style TargetType="Label" BasedOn="{StaticResource GlobalFontStyle}"></Style>
+    <Style TargetType="TextBox" BasedOn="{StaticResource BigFontStyle}"></Style>
 </ResourceDictionary>

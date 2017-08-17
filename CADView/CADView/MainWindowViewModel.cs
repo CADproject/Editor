@@ -186,8 +186,8 @@ namespace CADView
             DocumentViewModelsTabs.Add(model);
             //_tabsDocuments[tab] = model;
             _selectedDocumentIndex = DocumentViewModelsTabs.Count - 1;
-            OnPropertyChanged("SelectedDocumentIndex");
-            OnPropertyChanged("InfoVisible");
+            OnPropertyChanged(nameof(SelectedDocumentIndex));
+            OnPropertyChanged(nameof(InfoVisible));
         }
 
         public int SelectedDocumentIndex
@@ -380,7 +380,9 @@ namespace CADView
         private RelayCommand _closeApplicationCommand;
         private readonly Dictionary<TabItem, Document> _tabsDocuments = new Dictionary<TabItem, Document>();
         private Visibility _consoleVisible = Visibility.Collapsed;
-        private double _consoleHeight;
+        private double _consoleHeight = 0;
+        private double _lastConsoleHeight = 150;
+        private const double _minConsoleHeight = 25;
 
         private uint Session
         {
@@ -496,7 +498,7 @@ namespace CADView
                 switch (buttonCommand)
                 {
                     case ButtonsCommands.NewDocument:
-                        this.CreateDocument();
+                        CreateDocument();
                         break;
                     case ButtonsCommands.OpenDocument:
                         new OpenFileDialog().ShowDialog();
@@ -611,7 +613,7 @@ namespace CADView
 
         public RelayCommand CloseApplicationCommand
         {
-            get { return _closeApplicationCommand ?? (_closeApplicationCommand = new RelayCommand(o => App.Current.Shutdown())); }
+            get { return _closeApplicationCommand ?? (_closeApplicationCommand = new RelayCommand(o => Application.Current.Shutdown())); }
         }
 
         public RelayCommand CloseDocumentCommand
@@ -649,19 +651,17 @@ namespace CADView
 
         #region Console height helpers
 
-        public GridLength DocumentsHeight
-        {
-            get { return new GridLength(0, GridUnitType.Star); }
-            set { OnPropertyChanged(); }
-        }
-
-        private double consoleHeight = 0;
-        private double lastConsoleHeight = 100;
-
         public GridLength ConsoleHeight
         {
-            get { return new GridLength(this.consoleHeight, GridUnitType.Star); }
-            set { this.consoleHeight = value.Value; OnPropertyChanged(); }
+            get { return new GridLength(_consoleHeight, GridUnitType.Pixel); }
+            set
+            {
+                if (ConsoleVisible == Visibility.Visible && value.Value < _minConsoleHeight)
+                    _consoleHeight = _minConsoleHeight;
+                else
+                    _consoleHeight = value.Value;
+                OnPropertyChanged();
+            }
         }
 
         #endregion
@@ -675,11 +675,11 @@ namespace CADView
                 OnPropertyChanged();
                 if (value != Visibility.Visible)
                 {
-                    lastConsoleHeight = ConsoleHeight.Value;
+                    _lastConsoleHeight = ConsoleHeight.Value;
                     ConsoleHeight = new GridLength(0, GridUnitType.Star);
                 }
                 else
-                    ConsoleHeight = new GridLength(lastConsoleHeight, GridUnitType.Star);
+                    ConsoleHeight = new GridLength(_lastConsoleHeight, GridUnitType.Star);
             }
         }
 
@@ -688,12 +688,12 @@ namespace CADView
             get { return DocumentViewModelsTabs.Count > 0 ? Visibility.Visible : Visibility.Hidden; }
         }
 
-        public string StatusBarTextFirst => "Active document: Abcde";
-        public string StatusBarTextSecond => "Active layer Petya: it's time to VZLOM!!!";
+        public string StatusBarTextFirst => "имя документа";
+        public string StatusBarTextSecond => "Активный слой: имя активного слоя";
 
-        public string MainInfoText => "Document vzlomaning:";
+        public string MainInfoText => "Главное инфо:";
 
-        public string AdditionalInfoText => "privet ot petya!";
+        public string AdditionalInfoText => "Дополнительное инфо";
 
         public string CoordinatesTextX => "X = 50";
         public string CoordinatesTextY => "Y = 100";

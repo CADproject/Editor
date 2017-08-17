@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView.Dialogs"
         mc:Ignorable="d"
-        Title="Статистика" Height="430" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="Статистика" Height="425" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+        Icon="../Icons/Панель СПРАВКА/Статистика.png">
     <Grid>
         <StackPanel Margin="20,10,20,0" Orientation="Vertical">
             <Grid Margin="0,0,0,5">
@@ -49,7 +50,7 @@
                 </Border>
             </Grid>
             <Grid Margin="0,0,0,5">
-                <Label HorizontalAlignment="Left" Content="Всегшо узлов" />
+                <Label HorizontalAlignment="Left" Content="Всего узлов" />
                 <Border HorizontalAlignment="Right" BorderThickness="1" BorderBrush="Black">
                     <Label Width="50" Content="5"/>
                 </Border>
@@ -61,7 +62,7 @@
                 </Border>
             </Grid>
             <Grid Margin="0,0,0,5">
-                <Label HorizontalAlignment="Left" Content="Размер(байты)" />
+                <Label HorizontalAlignment="Left" Content="Размер (байт)" />
                 <Border HorizontalAlignment="Right" BorderThickness="1" BorderBrush="Black">
                     <Label Width="50" Content="5"/>
                 </Border>

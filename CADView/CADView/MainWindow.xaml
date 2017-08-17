@@ -53,17 +53,24 @@
                                      Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                      CommandParameter="{Binding Parameter}"
                                      Background="{StaticResource StandartBackground}"
-                                     BorderThickness="0"
+                                     BorderThickness="1"
+                                     BorderBrush="{StaticResource StandartButtonColor}"
                                      IsOpen="{Binding IsExpanded, Mode=TwoWay}"
                                      >
                     <toolkit:SplitButton.Resources>
                         <!--<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverOuterBorderKey}"
                             Color="Red" />-->
+                        <!--<Style TargetType="Button">
+                            <Setter Property="Width" Value="20"></Setter>
+                        </Style>-->
+
                         <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverBackgroundKey}"
                                         Color="{StaticResource StandartBackgroundColor}" >
                         </SolidColorBrush>
+
                         <!--<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedOuterBorderKey}"
                             Color="Orange" />-->
+                        
                         <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedBackgroundKey}"
                             Color="{StaticResource StandartBackgroundColor}" />
                     </toolkit:SplitButton.Resources>
@@ -190,7 +197,7 @@
                             <Setter Property="Foreground" Value="{StaticResource StandartButtonColor}"></Setter>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsSelected, Mode=TwoWay}" Value="True">
-                                    <Setter Property="Background" Value="DarkSeaGreen"></Setter>
+                                    <Setter Property="Background" Value="LightBlue"></Setter>
                                 </DataTrigger>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Foreground" Value="{StaticResource TelegramButton}"></Setter>
@@ -221,7 +228,7 @@
         </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
-                <RowDefinition MinHeight="200" />
+                <RowDefinition MinHeight="155" />
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="{Binding ConsoleHeight, Mode=TwoWay}"/>
             </Grid.RowDefinitions>
@@ -244,7 +251,7 @@
                 <dragablz:TabablzControl VerticalAlignment="Stretch" ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
                                      SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      ConsolidateOrphanedItems="True" Margin="8" ShowDefaultCloseButton="True"
-                                     ItemContainerStyle="{StaticResource TrapezoidDragableTabItemStyle}">
+                                     ItemContainerStyle="{StaticResource TrapezoidDragableTabItemStyle}" AdjacentHeaderItemOffset="-15">
                     <dragablz:TabablzControl.HeaderItemTemplate>
                         <DataTemplate DataType="local:DocumentModel">
                             <Label Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}" MinWidth="60" Content="{Binding Path=Title}">
@@ -331,20 +338,29 @@
                     </dragablz:TabablzControl.ContentTemplate>
                 </dragablz:TabablzControl>
                 <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,40,0,0">
-                    <Label Visibility="{Binding InfoVisible}" Content="{Binding MainInfoText, Mode= OneWay}"></Label>
-                    <Label Visibility="{Binding InfoVisible}" Content="{Binding AdditionalInfoText, Mode=OneWay}"></Label>
+                    <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" Content="{Binding MainInfoText, Mode= OneWay}"></Label>
+                    <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" Content="{Binding AdditionalInfoText, Mode=OneWay}"></Label>
                 </StackPanel>
-                <Label Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10,0,0,10" Content="{Binding CoordinatesTextX, Mode=OneWay}"></Label>
-                <Label Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="60,0,0,10" Content="{Binding CoordinatesTextY, Mode=OneWay}"></Label>
+                <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10,0,0,10" Content="{Binding CoordinatesTextX, Mode=OneWay}"></Label>
+                <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="80,0,0,10" Content="{Binding CoordinatesTextY, Mode=OneWay}"></Label>
             </Grid>
             <GridSplitter ShowsPreview="True" Grid.Row="1" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" 
                           VerticalAlignment="Center" HorizontalAlignment="Stretch" 
-                      Height="4" Background="Transparent" Visibility="{Binding ConsoleVisible}"  />
+                      Height="8" Background="Transparent" Visibility="{Binding ConsoleVisible}"  />
             <Grid Visibility="{Binding ConsoleVisible}" x:Name="ConsolePart1" Grid.Row="2"
                   Height="{Binding ConsoleHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True}">
                 <Border Grid.Row="0" BorderThickness="1" BorderBrush="DarkSlateGray">
-                    <TextBox Background="{StaticResource StandartBackground}" 
-                             VerticalAlignment="Stretch" Margin="0,0,0,-3" IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" Text="test console text" >
+                    <TextBox Background="DimGray" Foreground="LightGray"
+                             VerticalAlignment="Stretch" Margin="0,0,0,-3" 
+                             IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" Text="test console text" >
+                        <TextBox.Resources>
+                            <Style TargetType="ScrollBar">
+                                <Setter Property="Background" Value="DimGray"></Setter>
+                            </Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="DimGray"></Setter>
+                            </Style>
+                        </TextBox.Resources>
                     </TextBox>
                 </Border>
             </Grid>
@@ -352,7 +368,7 @@
 
         <Grid Visibility="{Binding ConsoleVisible}" x:Name="ConsolePart2" Grid.Row="4">
             <Border BorderThickness="1" BorderBrush="DarkSlateGray">
-                <TextBox Background="{StaticResource StandartBackground}"></TextBox>
+                <TextBox Background="DimGray" Foreground="LightGray"></TextBox>
             </Border>
             <Image Margin="0,2,2,2" HorizontalAlignment="Right" Height="15" Width="15" Stretch="Fill" Source="Icons/arrow.png" RenderTransformOrigin="0.5,0.5" >
                 <Image.RenderTransform>

@@ -14,7 +14,7 @@
             </LinearGradientBrush>
         </Grid.Background>-->
         <Label Content="EDITOR" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center"
-               FontSize="40" FontStyle="Italic" FontFamily="Kalinga" FontWeight="Normal" RenderTransformOrigin="0.5,0.5" Background="#00000000" />
+               FontSize="40" FontFamily="Segoe UI" FontWeight="Normal" RenderTransformOrigin="0.5,0.5" Background="#00000000" />
 
     </Grid>
 </Window>
