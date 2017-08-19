@@ -169,7 +169,7 @@ namespace CADView
 
         public void CreateDocument()
         {
-            var model = new DocumentModel(new LayerModel(true)) {DocumentID = (uint) DocumentViewModelsTabs.Count};
+            var model = new DocumentModel(new LayerModel(true)) { DocumentID = (uint)DocumentViewModelsTabs.Count };
             model.Title = "Document #" + model.DocumentID;
             //var host = new WindowsFormsHost()
             //{
@@ -229,7 +229,7 @@ namespace CADView
                 OnPropertyChanged();
             }
         }
-        
+
         public double WindowHeight
         {
             get { return _windowHeight; }
@@ -255,12 +255,12 @@ namespace CADView
         }
 
         public ObservableCollection<string> TabMenuCollection { get; set; } =
-            new ObservableCollection<string>(new[] {"123", "456"});
+            new ObservableCollection<string>(new[] { "123", "456" });
 
         #region UI Buttons
 
         public ObservableCollection<BaseMenuElement> UIMenuElements { get; } =
-            new ObservableCollection<BaseMenuElement>( new BaseMenuElement[]
+            new ObservableCollection<BaseMenuElement>(new BaseMenuElement[]
                 {
                     new MenuExpanderItem("Icons/Home.png", "Документ", new BaseMenuElement[]
                     {
@@ -380,7 +380,7 @@ namespace CADView
         private RelayCommand _closeApplicationCommand;
         private readonly Dictionary<TabItem, Document> _tabsDocuments = new Dictionary<TabItem, Document>();
         private Visibility _consoleVisible = Visibility.Collapsed;
-        private double _consoleHeight = 0;
+        private double _consoleHeight = 8;
         private double _lastConsoleHeight = 150;
         private const double _minConsoleHeight = 25;
 
@@ -468,9 +468,9 @@ namespace CADView
             else
             {
                 var button = BaseMenuElement.CreatedUIElements.Find(
-                    element => element is MenuButtonItem && ((IButtonOperation) element).Parameter == obj);
+                    element => element is MenuButtonItem && ((IButtonOperation)element).Parameter == obj);
                 var parent = BaseMenuElement.CreatedUIElements.Find(element =>
-                    element is MenuSubItem && ((BaseExpanderItem) element).SubItems
+                    element is MenuSubItem && ((BaseExpanderItem)element).SubItems
                         .ToList().Contains(button)) as BaseExpanderItem;
                 if (parent != null)
                 {
@@ -494,7 +494,7 @@ namespace CADView
                     parent.IsExpanded = false;
                 }
 
-                ButtonsCommands buttonCommand = (ButtonsCommands) obj;
+                ButtonsCommands buttonCommand = (ButtonsCommands)obj;
                 switch (buttonCommand)
                 {
                     case ButtonsCommands.NewDocument:
@@ -567,13 +567,13 @@ namespace CADView
                     case ButtonsCommands.Protractor:
                         break;
                     case ButtonsCommands.AddLayer:
-                        new LayersAdd {Owner = _owner}.ShowDialog();
+                        new LayersAdd { Owner = _owner }.ShowDialog();
                         break;
                     case ButtonsCommands.DeleteLayer:
-                        new LayersDelete {Owner = _owner}.ShowDialog();
+                        new LayersDelete { Owner = _owner }.ShowDialog();
                         break;
                     case ButtonsCommands.LayersManager:
-                        new LayersManager {Owner = _owner}.ShowDialog();
+                        new LayersManager { Owner = _owner }.ShowDialog();
                         break;
                     case ButtonsCommands.Help:
                         break;
@@ -603,7 +603,7 @@ namespace CADView
 
         public RelayCommand ControllerWorkCommand
         {
-            get { return _controllerWorkCommand ?? (_controllerWorkCommand = new RelayCommand(async delegate(object o) { await ProcessControllerWork((ApplicationController.Operations) o, null); })); }
+            get { return _controllerWorkCommand ?? (_controllerWorkCommand = new RelayCommand(async delegate (object o) { await ProcessControllerWork((ApplicationController.Operations)o, null); })); }
         }
 
         public RelayCommand ControllerDialogCommand
@@ -620,7 +620,7 @@ namespace CADView
         {
             get
             {
-                return _closeDocumentCommand ?? (_closeDocumentCommand = new RelayCommand(delegate(object i)
+                return _closeDocumentCommand ?? (_closeDocumentCommand = new RelayCommand(delegate (object i)
                 {
                     string name = i as string;
                     if (string.IsNullOrEmpty(name)) return;
@@ -651,6 +651,20 @@ namespace CADView
 
         #region Console height helpers
 
+        GridLength _documentsHeight = new GridLength(1, GridUnitType.Star);
+
+        public GridLength DocumentsHeight
+        {
+            get { return _documentsHeight; }
+            //get { return new GridLength(1, GridUnitType.Star); }
+            set
+            {
+                
+                _documentsHeight = value;
+                OnPropertyChanged();
+            }
+        }
+
         public GridLength ConsoleHeight
         {
             get { return new GridLength(_consoleHeight, GridUnitType.Pixel); }
@@ -676,10 +690,14 @@ namespace CADView
                 if (value != Visibility.Visible)
                 {
                     _lastConsoleHeight = ConsoleHeight.Value;
-                    ConsoleHeight = new GridLength(0, GridUnitType.Star);
+                    ConsoleHeight = new GridLength(8, GridUnitType.Pixel);
+                    DocumentsHeight = new GridLength(1, GridUnitType.Auto);
                 }
                 else
+                {
                     ConsoleHeight = new GridLength(_lastConsoleHeight, GridUnitType.Star);
+                    DocumentsHeight = new GridLength(1, GridUnitType.Pixel);
+                }
             }
         }
 

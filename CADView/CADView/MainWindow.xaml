@@ -44,7 +44,7 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
-                    <Grid Visibility="{Binding SeparatorVisibility}" Margin="2,2,0,2" Background="#FF505050" Width="3"></Grid>
+                    <Grid Visibility="{Binding SeparatorVisibility}" Margin="2,2,0,2" Background="DarkGray" Width="1.5"></Grid>
                 </DockPanel>
             </DataTemplate>
             <DataTemplate DataType="{x:Type local:MenuSubItem}">
@@ -60,9 +60,13 @@
                     <toolkit:SplitButton.Resources>
                         <!--<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverOuterBorderKey}"
                             Color="Red" />-->
-                        <!--<Style TargetType="Button">
-                            <Setter Property="Width" Value="20"></Setter>
-                        </Style>-->
+                        <Style TargetType="Path">
+                            <Setter Property="Stretch" Value="Fill"></Setter>
+                            <Setter Property="Width" Value="3"></Setter>
+                        </Style>
+                        <Style TargetType="ToggleButton">
+                            <!--<Setter Property="Width" Value="10"></Setter>-->
+                        </Style>
 
                         <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverBackgroundKey}"
                                         Color="{StaticResource StandartBackgroundColor}" >
@@ -228,7 +232,7 @@
         </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
-                <RowDefinition MinHeight="155" />
+                <RowDefinition MinHeight="155" Height="{Binding DocumentsHeight, Mode=TwoWay}"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="{Binding ConsoleHeight, Mode=TwoWay}"/>
             </Grid.RowDefinitions>
@@ -250,7 +254,7 @@
                 </Grid.Resources>
                 <dragablz:TabablzControl VerticalAlignment="Stretch" ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
                                      SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     ConsolidateOrphanedItems="True" Margin="8" ShowDefaultCloseButton="True"
+                                     ConsolidateOrphanedItems="True" Margin="8,8,8,0" ShowDefaultCloseButton="True"
                                      ItemContainerStyle="{StaticResource TrapezoidDragableTabItemStyle}" AdjacentHeaderItemOffset="-15">
                     <dragablz:TabablzControl.HeaderItemTemplate>
                         <DataTemplate DataType="local:DocumentModel">
@@ -341,8 +345,10 @@
                     <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" Content="{Binding MainInfoText, Mode= OneWay}"></Label>
                     <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" Content="{Binding AdditionalInfoText, Mode=OneWay}"></Label>
                 </StackPanel>
-                <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10,0,0,10" Content="{Binding CoordinatesTextX, Mode=OneWay}"></Label>
-                <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="80,0,0,10" Content="{Binding CoordinatesTextY, Mode=OneWay}"></Label>
+                <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                       Margin="10,0,0,0" Content="{Binding CoordinatesTextX, Mode=OneWay}"></Label>
+                <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                       Margin="80,0,0,0" Content="{Binding CoordinatesTextY, Mode=OneWay}"></Label>
             </Grid>
             <GridSplitter ShowsPreview="True" Grid.Row="1" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" 
                           VerticalAlignment="Center" HorizontalAlignment="Stretch" 
@@ -356,9 +362,7 @@
                         <TextBox.Resources>
                             <Style TargetType="ScrollBar">
                                 <Setter Property="Background" Value="DimGray"></Setter>
-                            </Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Background" Value="DimGray"></Setter>
+                                <Setter Property="BorderBrush" Value="#FF272727"></Setter>
                             </Style>
                         </TextBox.Resources>
                     </TextBox>
@@ -382,7 +386,7 @@
             </Image>
         </Grid>
 
-        <Border Grid.Row="5" BorderThickness="1" BorderBrush="Black">
+        <Border Grid.Row="5" BorderThickness="1" BorderBrush="DarkGray">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="148*"></ColumnDefinition>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView.Dialogs"
         mc:Ignorable="d"
-        Title="Свойства" Height="310" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+        Title="Свойства" Height="309" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
         Icon="../Icons/Oscilloscope.png">
     <Grid>
         <Grid.ColumnDefinitions>
