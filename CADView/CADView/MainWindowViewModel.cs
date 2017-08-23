@@ -110,13 +110,16 @@ namespace CADView
     {
         #region Public
 
-        public MainWindowViewModel() : this(null)
+        Grid _helperSpace;
+
+        public MainWindowViewModel() : this(null, null)
         {
 
         }
 
-        public MainWindowViewModel(Window owner)
+        public MainWindowViewModel(Window owner, Grid space)
         {
+            _helperSpace = space;
             _owner = owner;
             //Controller = new ApplicationController();
             RenderPanel.Loaded += RenderPanelOnLoad;
@@ -383,6 +386,8 @@ namespace CADView
         private double _consoleHeight = 8;
         private double _lastConsoleHeight = 150;
         private const double _minConsoleHeight = 25;
+        private const double _minDocumentHeight = 152.5;
+        private Thickness _documentMargin = new Thickness(0, 0, 0, 8);
 
         private uint Session
         {
@@ -651,20 +656,6 @@ namespace CADView
 
         #region Console height helpers
 
-        GridLength _documentsHeight = new GridLength(1, GridUnitType.Star);
-
-        public GridLength DocumentsHeight
-        {
-            get { return _documentsHeight; }
-            //get { return new GridLength(1, GridUnitType.Star); }
-            set
-            {
-                
-                _documentsHeight = value;
-                OnPropertyChanged();
-            }
-        }
-
         public GridLength ConsoleHeight
         {
             get { return new GridLength(_consoleHeight, GridUnitType.Pixel); }
@@ -672,8 +663,20 @@ namespace CADView
             {
                 if (ConsoleVisible == Visibility.Visible && value.Value < _minConsoleHeight)
                     _consoleHeight = _minConsoleHeight;
+                else if (ConsoleVisible == Visibility.Visible && this._helperSpace.ActualHeight - value.Value < _minDocumentHeight)
+                    _consoleHeight = this._helperSpace.ActualHeight - _minDocumentHeight;
                 else
                     _consoleHeight = value.Value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Thickness DocumentMargin
+        {
+            get { return _documentMargin; }
+            set
+            {
+                _documentMargin = value;
                 OnPropertyChanged();
             }
         }
@@ -691,12 +694,14 @@ namespace CADView
                 {
                     _lastConsoleHeight = ConsoleHeight.Value;
                     ConsoleHeight = new GridLength(8, GridUnitType.Pixel);
-                    DocumentsHeight = new GridLength(1, GridUnitType.Auto);
+                    DocumentMargin = new Thickness(0, 0, 0, 8);
+                    //DocumentsHeight = new GridLength(1, GridUnitType.Star);
                 }
                 else
                 {
                     ConsoleHeight = new GridLength(_lastConsoleHeight, GridUnitType.Star);
-                    DocumentsHeight = new GridLength(1, GridUnitType.Pixel);
+                    DocumentMargin = new Thickness(0);
+                    //DocumentsHeight = new GridLength(1, GridUnitType.Pixel);
                 }
             }
         }

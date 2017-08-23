@@ -230,14 +230,13 @@
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
         </Grid>
-        <Grid Grid.Row="2">
+        <Grid Name="MainSpace" Grid.Row="2">
             <Grid.RowDefinitions>
-                <RowDefinition MinHeight="155" Height="{Binding DocumentsHeight, Mode=TwoWay}"/>
+                <RowDefinition />
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="{Binding ConsoleHeight, Mode=TwoWay}"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" VerticalAlignment="Stretch">
+            <Grid Grid.Row="0" VerticalAlignment="Stretch" Margin="{Binding DocumentMargin}">
                 <Grid.Resources>
                     <ControlTemplate x:Key="CustomHeaderTemplate">
                         <Border BorderThickness="2" CornerRadius="4">
@@ -350,23 +349,33 @@
                 <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                        Margin="80,0,0,0" Content="{Binding CoordinatesTextY, Mode=OneWay}"></Label>
             </Grid>
-            <GridSplitter ShowsPreview="True" Grid.Row="1" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" 
-                          VerticalAlignment="Center" HorizontalAlignment="Stretch" 
+
+            <Grid Grid.Row="1"
+                Visibility="{Binding ConsoleVisible}" >
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="{Binding ConsoleHeight, Mode=TwoWay}"
+                              MinHeight="25"
+                              />
+                </Grid.RowDefinitions>
+                <GridSplitter Grid.Row="0" ShowsPreview="False" ResizeDirection="Rows" ResizeBehavior="CurrentAndNext" 
+                          VerticalAlignment="Top" HorizontalAlignment="Stretch" 
                       Height="8" Background="Transparent" Visibility="{Binding ConsoleVisible}"  />
-            <Grid Visibility="{Binding ConsoleVisible}" x:Name="ConsolePart1" Grid.Row="2"
+                <Grid x:Name="ConsolePart1" Grid.Row="1"
                   Height="{Binding ConsoleHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True}">
-                <Border Grid.Row="0" BorderThickness="1" BorderBrush="DarkSlateGray">
-                    <TextBox Background="DimGray" Foreground="LightGray"
+                    <Border Grid.Row="0" BorderThickness="1" BorderBrush="DarkSlateGray">
+                        <TextBox Background="DimGray" Foreground="LightGray"
                              VerticalAlignment="Stretch" Margin="0,0,0,-3" 
                              IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" Text="test console text" >
-                        <TextBox.Resources>
-                            <Style TargetType="ScrollBar">
-                                <Setter Property="Background" Value="DimGray"></Setter>
-                                <Setter Property="BorderBrush" Value="#FF272727"></Setter>
-                            </Style>
-                        </TextBox.Resources>
-                    </TextBox>
-                </Border>
+                            <TextBox.Resources>
+                                <Style TargetType="ScrollBar">
+                                    <Setter Property="Background" Value="DimGray"></Setter>
+                                    <Setter Property="BorderBrush" Value="#FF272727"></Setter>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                    </Border>
+                </Grid>
             </Grid>
         </Grid>
 
@@ -374,16 +383,63 @@
             <Border BorderThickness="1" BorderBrush="DarkSlateGray">
                 <TextBox Background="DimGray" Foreground="LightGray"></TextBox>
             </Border>
-            <Image Margin="0,2,2,2" HorizontalAlignment="Right" Height="15" Width="15" Stretch="Fill" Source="Icons/arrow.png" RenderTransformOrigin="0.5,0.5" >
-                <Image.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform/>
-                        <SkewTransform/>
-                        <RotateTransform Angle="180"/>
-                        <TranslateTransform/>
-                    </TransformGroup>
-                </Image.RenderTransform>
-            </Image>
+            <ComboBox Margin="2,2,3.5,2" HorizontalAlignment="Right" Height="14" Width="14" >
+                <ComboBox.Resources>
+                    
+                    <Style TargetType="{x:Type ComboBox}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ComboBox">
+                                    <Grid>
+                                        <ToggleButton Background="DimGray" x:Name="DropDownToggle"
+                                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  
+                                              Margin="-2.5" HorizontalContentAlignment="Center"
+                                              IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,
+                                                          RelativeSource={RelativeSource TemplatedParent}}">
+                                            <Image x:Name="BtnArrow" Margin="0" HorizontalAlignment="Right" Height="15" Width="15" Stretch="Fill" Source="Icons/arrow.png" RenderTransformOrigin="0.5,0.5" >
+                                                <Image.RenderTransform>
+                                                    <TransformGroup>
+                                                        <ScaleTransform/>
+                                                        <SkewTransform/>
+                                                        <RotateTransform Angle="180"/>
+                                                        <TranslateTransform/>
+                                                    </TransformGroup>
+                                                </Image.RenderTransform>
+                                            </Image>
+                                            <ToggleButton.Style>
+                                                <Style TargetType="{x:Type ToggleButton}">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="DarkSeaGreen"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ToggleButton.Style>
+                                        </ToggleButton>
+                                        <Popup x:Name="PART_Popup" Placement="Top"
+                                      IsOpen="{TemplateBinding IsDropDownOpen}">
+                                            <Border Background="DimGray" x:Name="PopupBorder" 
+                                        HorizontalAlignment="Stretch" Height="Auto"                                                                         
+                                        MinWidth="{TemplateBinding ActualWidth}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                        BorderThickness="{TemplateBinding BorderThickness}" 
+                                        BorderBrush="Black" CornerRadius="3">
+                                                <ScrollViewer x:Name="ScrollViewer" BorderThickness="0" Padding="1">
+                                                    <ItemsPresenter/>
+                                                </ScrollViewer>
+                                            </Border>
+                                        </Popup>
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ComboBox.Resources>
+                <ComboBoxItem >123445364t34</ComboBoxItem>
+                <ComboBoxItem >12344t34</ComboBoxItem>
+                <ComboBoxItem >12344wdrbgerbvg5364t34</ComboBoxItem>
+                <ComboBoxItem >we123445364t34</ComboBoxItem>
+            </ComboBox>
         </Grid>
 
         <Border Grid.Row="5" BorderThickness="1" BorderBrush="DarkGray">

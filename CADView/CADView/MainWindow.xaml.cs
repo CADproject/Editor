@@ -24,7 +24,7 @@ namespace CADView
 
             if (DesignerProperties.GetIsInDesignMode(this)) return;
 
-            MainWindowViewModel vm = new MainWindowViewModel(this);
+            MainWindowViewModel vm = new MainWindowViewModel(this, MainSpace);
             DataContext = vm;
             Application.Current.MainWindow = this;
 
