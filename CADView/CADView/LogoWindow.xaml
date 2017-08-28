@@ -6,14 +6,15 @@
         xmlns:local="clr-namespace:CADView"
         mc:Ignorable="d"
         Title="LogoWindow" Height="350" Width="525" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Loaded="OnLoad" FontWeight="Bold">
-    <Grid>
-        <Grid.Background>
+    <Grid Background="DarkGray">
+        <!--<Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                 <GradientStop Color="Black" Offset="0"/>
                 <GradientStop Color="White" Offset="1"/>
             </LinearGradientBrush>
-        </Grid.Background>
-        <Label Content="EDITOR" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" FontSize="40" FontStyle="Italic" FontWeight="ExtraBold" RenderTransformOrigin="0.5,0.5" Background="#00000000" />
+        </Grid.Background>-->
+        <Label Content="EDITOR" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center"
+               FontSize="40" FontFamily="Segoe UI" FontWeight="Normal" RenderTransformOrigin="0.5,0.5" Background="#00000000" />
 
     </Grid>
 </Window>

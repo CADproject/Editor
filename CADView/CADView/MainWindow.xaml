@@ -4,10 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CADView"
-        xmlns:cadController="clr-namespace:CADController;assembly=CADController"
+        xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+        xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes;assembly=Xceed.Wpf.Toolkit"
         mc:Ignorable="d"
         AllowsTransparency="False"
-        Title="Editor" BorderThickness="2" Height="450" Width="870" MinHeight="450" MinWidth="870" WindowStartupLocation="CenterScreen"
+        Title="Editor" BorderThickness="2" Height="500" Width="870" MinHeight="500" MinWidth="570" WindowStartupLocation="CenterScreen"
+        HorizontalContentAlignment="Left"
         d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel, IsDesignTimeCreatable=True}"
         >
     <Window.BorderBrush>
@@ -18,70 +21,438 @@
             <GradientStop Color="#FF676767" Offset="0.998"/>
         </LinearGradientBrush>
     </Window.BorderBrush>
+
     <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/Generic.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
     </Window.Resources>
-    <Grid>
+
+    <Grid Background="{StaticResource StandartBackground}">
+        <Grid.Resources>
+
+            <DataTemplate DataType="{x:Type local:MenuExpanderItem}">
+                <DockPanel Background="{StaticResource StandartBackground}" LastChildFill="False" Margin="2,2,0,0">
+                    <ItemsControl ItemsSource="{Binding SubItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"></StackPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <Grid Visibility="{Binding SeparatorVisibility}" Margin="2,2,0,2" Background="DarkGray" Width="1.5"></Grid>
+                </DockPanel>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:MenuSubItem}">
+                <toolkit:SplitButton Height="{Binding Height}"
+                                     ToolTip="{Binding HintText}" 
+                                     Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                     CommandParameter="{Binding Parameter}"
+                                     Background="{StaticResource StandartBackground}"
+                                     BorderThickness="1"
+                                     BorderBrush="{StaticResource StandartButtonColor}"
+                                     IsOpen="{Binding IsExpanded, Mode=TwoWay}"
+                                     >
+                    <toolkit:SplitButton.Resources>
+                        <!--<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverOuterBorderKey}"
+                            Color="Red" />-->
+                        <Style TargetType="Path">
+                            <Setter Property="Stretch" Value="Fill"></Setter>
+                            <Setter Property="Width" Value="3"></Setter>
+                        </Style>
+                        <Style TargetType="ToggleButton">
+                            <!--<Setter Property="Width" Value="10"></Setter>-->
+                        </Style>
+
+                        <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverBackgroundKey}"
+                                        Color="{StaticResource StandartBackgroundColor}" >
+                        </SolidColorBrush>
+
+                        <!--<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedOuterBorderKey}"
+                            Color="Orange" />-->
+                        
+                        <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedBackgroundKey}"
+                            Color="{StaticResource StandartBackgroundColor}" />
+                    </toolkit:SplitButton.Resources>
+                    <toolkit:SplitButton.DropDownContent>
+                        <ItemsControl Background="{StaticResource StandartBackground}" Margin="0,0,0,0" ItemsSource="{Binding SubItems}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical"></StackPanel>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </toolkit:SplitButton.DropDownContent>
+                    <toolkit:SplitButton.Content>
+                        <Grid>
+                            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Content="{Binding Description}"
+                                   Width="{Binding Width}" Height="{Binding Height}" ToolTip="{Binding HintText}">
+                                <Label.Style>
+                                    <Style BasedOn="{StaticResource GlobalFontStyle}" TargetType="{x:Type Label}">
+                                        <Setter Property="Foreground" Value="{StaticResource StandartButtonColor}"></Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource TelegramButton}"></Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Label.Style>
+                            </Label>
+                            <Rectangle Width="{Binding Width}" Height="{Binding Height}"
+                      VerticalAlignment="Top" HorizontalAlignment="Left"
+                           Margin="0,-2.5,0,0" ToolTip="{Binding HintText}">
+                                <Rectangle.InputBindings>
+                                    <MouseBinding Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                      CommandParameter="{Binding Parameter}" MouseAction="LeftClick" />
+                                </Rectangle.InputBindings>
+
+                                <Rectangle.OpacityMask>
+                                    <ImageBrush Stretch="Fill" ImageSource="{Binding Image}" ></ImageBrush>
+                                </Rectangle.OpacityMask>
+                                <Rectangle.Style>
+                                    <Style TargetType="{x:Type Rectangle}">
+                                        <Setter Property="Fill" Value="{StaticResource StandartButtonColor}" />
+                                        <Style.Triggers>
+                                            <EventTrigger RoutedEvent="Rectangle.PreviewMouseLeftButtonDown">
+                                                <EventTrigger.Actions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource PressedTelegramButtonColor}" Duration="0" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger.Actions>
+                                            </EventTrigger>
+                                            <EventTrigger RoutedEvent="Rectangle.MouseUp">
+                                                <EventTrigger.Actions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource TelegramButtonColor}" Duration="0" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger.Actions>
+                                            </EventTrigger>
+                                            <Trigger Property="IsMouseOver" Value="True" >
+                                                <Setter Property="Fill" Value="{StaticResource TelegramButton}"></Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Rectangle.Style>
+                            </Rectangle>
+                        </Grid>
+                    </toolkit:SplitButton.Content>
+                </toolkit:SplitButton>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:MenuButtonItem}">
+                <Rectangle Width="{Binding Width}" Height="{Binding Height}" 
+                      VerticalAlignment="Top" HorizontalAlignment="Left"
+                           Margin="1,1,1,1" ToolTip="{Binding HintText}">
+                    <Rectangle.InputBindings>
+                        <MouseBinding Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                      CommandParameter="{Binding Parameter}" MouseAction="LeftClick" />
+                    </Rectangle.InputBindings>
+
+                    <Rectangle.OpacityMask>
+                        <ImageBrush Stretch="Fill" ImageSource="{Binding Image}" ></ImageBrush>
+                    </Rectangle.OpacityMask>
+                    <Rectangle.Style>
+                        <Style TargetType="{x:Type Rectangle}">
+                            <Setter Property="Fill" Value="{StaticResource StandartButtonColor}" />
+                            <Style.Triggers>
+                                <EventTrigger RoutedEvent="Rectangle.PreviewMouseLeftButtonDown">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource PressedTelegramButtonColor}" Duration="0" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="Rectangle.MouseUp">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource TelegramButtonColor}" Duration="0" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                                <Trigger Property="IsMouseOver" Value="True" >
+                                    <Setter Property="Fill" Value="{StaticResource TelegramButton}"></Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Rectangle.Style>
+                </Rectangle>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:MenuTextButtonItem}">
+                <Label x:Name="textButton"
+                       Content="{Binding Description}" ToolTip="{Binding HintText}" Width="{Binding Width}" Height="{Binding Height}"
+                       VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <Label.InputBindings>
+                        <MouseBinding Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                                      CommandParameter="{Binding Parameter}" MouseAction="LeftClick" />
+                    </Label.InputBindings>
+                    <Label.Style>
+                        <Style BasedOn="{StaticResource GlobalFontStyle}" TargetType="{x:Type Label}">
+                            <Setter Property="Foreground" Value="{StaticResource StandartButtonColor}"></Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected, Mode=TwoWay}" Value="True">
+                                    <Setter Property="Background" Value="LightBlue"></Setter>
+                                </DataTrigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource TelegramButton}"></Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Label.Style>
+                </Label>
+            </DataTemplate>
+
+        </Grid.Resources>
         <Grid.RowDefinitions>
-            <RowDefinition MinHeight="50" Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition MinHeight="25" MaxHeight="25" Height="25"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Vertical">
-            <Grid>
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5,5,5">
-                    <Button Command="{Binding DocumentWorkCommand}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="New &#xA;Document" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;point" Tag="{x:Static cadController:ApplicationController+Operations.OpPointCreate}" Width="70" />
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;line" Tag="{x:Static cadController:ApplicationController+Operations.OpLineCreate}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;circle" Tag="{x:Static cadController:ApplicationController+Operations.OpCircleCreate}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Create &#xA;contour" Tag="{x:Static cadController:ApplicationController+Operations.OpContourCreate}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Destroy&#xA;contour" Tag="{x:Static cadController:ApplicationController+Operations.OpDestroyContour}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Delete &#xA;element" Tag="{x:Static cadController:ApplicationController+Operations.OpDeleteObject}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Background&#xA;color" Tag="{x:Static cadController:ApplicationController+Operations.OpSetBackgroundColor}" Width="70"/>
-                    <Button Command="{Binding ControllerDialogCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Content="Layers&#xA;manager" Tag="{x:Static cadController:ApplicationController+Operations.OpSetLayersToShow}" Width="70"/>
-                </StackPanel>
-                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,5,5">
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Undo" Tag="{x:Static cadController:ApplicationController+Operations.OpUndo}"/>
-                    <Button Command="{Binding ControllerWorkCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" IsEnabled="{Binding IsActive}" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Redo" Tag="{x:Static cadController:ApplicationController+Operations.OpRedo}"/>
-                    <Button Command="{Binding CloseApplicationCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="X" Width="30" Height="30"/>
-                </StackPanel>
-            </Grid>
-        </StackPanel>
-        <GridSplitter Grid.Row="0" ResizeBehavior="BasedOnAlignment" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="Black" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,0"/>
-        <Grid Grid.Row="1">
-            <Grid.Resources>
-                <ControlTemplate x:Key="CustomHeaderTemplate">
-                    <Border BorderThickness="2" CornerRadius="4">
-                        <DockPanel LastChildFill="True">
-                            <Button Content="X" DockPanel.Dock="Right" 
-                                    IsEnabled="{Binding DataContext.IsActive, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
-                                    Command="{Binding DataContext.CloseDocumentCommand, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}"
+        <Grid Row="0">
+            <ItemsControl VerticalAlignment="Stretch" ItemsSource="{Binding UIMenuElements}" Margin="0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Grid>
+        <Grid Name="MainSpace" Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" VerticalAlignment="Stretch" Margin="{Binding DocumentMargin}">
+                <Grid.Resources>
+                    <ControlTemplate x:Key="CustomHeaderTemplate">
+                        <Border BorderThickness="2" CornerRadius="4">
+                            <DockPanel LastChildFill="True">
+                                <Button Content="X" DockPanel.Dock="Right" 
+                                    IsEnabled="{Binding DataContext.IsActive, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                    Command="{Binding DataContext.CloseDocumentCommand, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                                     CommandParameter="{Binding}" Style="{StaticResource RoundedButton}" FontWeight="Bold" Width="20" Height="20">
-                            </Button>
-                            <Label Content="{Binding}" />
-                        </DockPanel>
+                                </Button>
+                                <Label Content="{Binding}" />
+                            </DockPanel>
+                        </Border>
+                    </ControlTemplate>
+                </Grid.Resources>
+                <dragablz:TabablzControl VerticalAlignment="Stretch" ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
+                                     SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     ConsolidateOrphanedItems="True" Margin="8,8,8,0" ShowDefaultCloseButton="True"
+                                     ItemContainerStyle="{StaticResource TrapezoidDragableTabItemStyle}" AdjacentHeaderItemOffset="-15">
+                    <dragablz:TabablzControl.HeaderItemTemplate>
+                        <DataTemplate DataType="local:DocumentModel">
+                            <Label Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}" MinWidth="60" Content="{Binding Path=Title}">
+                                <Label.ContextMenu>
+                                    <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                        <!--<ContextMenu.ItemTemplate>
+                                        <DataTemplate DataType="MenuItem">
+                                            <MenuItem Header="{Binding}" Command="{Binding}"></MenuItem>
+                                        </DataTemplate>
+                                    </ContextMenu.ItemTemplate>-->
+                                        <MenuItem Header="Переименовать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                        <MenuItem Header="Копировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                        <MenuItem Header="Новый документ" CommandParameter="{x:Static local:ButtonsCommands.NewDocument}" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                        <MenuItem Header="Закрыть" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                        <MenuItem Header="Закрыть все документы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                    </ContextMenu>
+                                </Label.ContextMenu>
+                            </Label>
+                        </DataTemplate>
+                    </dragablz:TabablzControl.HeaderItemTemplate>
+                    <dragablz:TabablzControl.ContentTemplate>
+                        <DataTemplate DataType="local:DocumentModel">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid Column="0" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}"
+                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="DarkGray">
+                                    <Grid.ContextMenu>
+                                        <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                            <MenuItem Header="Копировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                            <MenuItem Header="Переместить" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                            <MenuItem Header="Повернуть" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                            <MenuItem Header="Отобразить симметрично" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                            <MenuItem Header="Отобразить по кругу" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                            <MenuItem Header="Масштабировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                            <Separator />
+                                            <MenuItem Header="Свойства" CommandParameter="{x:Static local:ButtonsCommands.Properties}" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                            <Separator />
+                                            <MenuItem Header="Показать узлы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                <MenuItem.Icon>
+                                                    <Image Height="40" Source="Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Показать сетку" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Показать всё" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Grid.ContextMenu>
+                                </Grid>
+                                <Grid Column="1" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}"
+                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="DarkGray">
+                                    <Grid.ContextMenu>
+                                        <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                            <MenuItem Header="Показать узлы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                <MenuItem.Icon>
+                                                    <Image Height="40" Source="Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Показать сетку" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Показать всё" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Grid.ContextMenu>
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </dragablz:TabablzControl.ContentTemplate>
+                </dragablz:TabablzControl>
+                <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,40,0,0">
+                    <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" Content="{Binding MainInfoText, Mode= OneWay}"></Label>
+                    <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" Content="{Binding AdditionalInfoText, Mode=OneWay}"></Label>
+                </StackPanel>
+                <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                       Margin="10,0,0,0" Content="{Binding CoordinatesTextX, Mode=OneWay}"></Label>
+                <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                       Margin="80,0,0,0" Content="{Binding CoordinatesTextY, Mode=OneWay}"></Label>
+            </Grid>
+
+            <Grid Grid.Row="1"
+                Visibility="{Binding ConsoleVisible}" >
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="{Binding ConsoleHeight, Mode=TwoWay}"
+                              MinHeight="25"
+                              />
+                </Grid.RowDefinitions>
+                <GridSplitter Grid.Row="0" ShowsPreview="False" ResizeDirection="Rows" ResizeBehavior="CurrentAndNext" 
+                          VerticalAlignment="Top" HorizontalAlignment="Stretch" 
+                      Height="8" Background="Transparent" Visibility="{Binding ConsoleVisible}"  />
+                <Grid x:Name="ConsolePart1" Grid.Row="1"
+                  Height="{Binding ConsoleHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True}">
+                    <Border Grid.Row="0" BorderThickness="1" BorderBrush="DarkSlateGray">
+                        <TextBox Background="DimGray" Foreground="LightGray"
+                             VerticalAlignment="Stretch" Margin="0,0,0,-3" 
+                             IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" Text="test console text" >
+                            <TextBox.Resources>
+                                <Style TargetType="ScrollBar">
+                                    <Setter Property="Background" Value="DimGray"></Setter>
+                                    <Setter Property="BorderBrush" Value="#FF272727"></Setter>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
                     </Border>
-                </ControlTemplate>
-            </Grid.Resources>
-            <TabControl ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
-                        SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <TabControl.ItemContainerStyle>
-                    <Style TargetType="TabItem">
-                        <Setter Property="Header" Value="{Binding Title}" />
-                        <Setter Property="HeaderTemplate">
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <Grid Visibility="{Binding ConsoleVisible}" x:Name="ConsolePart2" Grid.Row="4">
+            <Border BorderThickness="1" BorderBrush="DarkSlateGray">
+                <TextBox Background="DimGray" Foreground="LightGray"></TextBox>
+            </Border>
+            <ComboBox Margin="2,2,3.5,2" HorizontalAlignment="Right" Height="14" Width="14" >
+                <ComboBox.Resources>
+                    
+                    <Style TargetType="{x:Type ComboBox}">
+                        <Setter Property="Template">
                             <Setter.Value>
-                                <DataTemplate>
-                                    <Border BorderThickness="2" CornerRadius="4">
-                                        <Control Template="{StaticResource CustomHeaderTemplate}"></Control>
-                                    </Border>
-                                </DataTemplate>
+                                <ControlTemplate TargetType="ComboBox">
+                                    <Grid>
+                                        <ToggleButton Background="DimGray" x:Name="DropDownToggle"
+                                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  
+                                              Margin="-2.5" HorizontalContentAlignment="Center"
+                                              IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,
+                                                          RelativeSource={RelativeSource TemplatedParent}}">
+                                            <Image x:Name="BtnArrow" Margin="0" HorizontalAlignment="Right" Height="15" Width="15" Stretch="Fill" Source="Icons/arrow.png" RenderTransformOrigin="0.5,0.5" >
+                                                <Image.RenderTransform>
+                                                    <TransformGroup>
+                                                        <ScaleTransform/>
+                                                        <SkewTransform/>
+                                                        <RotateTransform Angle="180"/>
+                                                        <TranslateTransform/>
+                                                    </TransformGroup>
+                                                </Image.RenderTransform>
+                                            </Image>
+                                            <ToggleButton.Style>
+                                                <Style TargetType="{x:Type ToggleButton}">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="DarkSeaGreen"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ToggleButton.Style>
+                                        </ToggleButton>
+                                        <Popup x:Name="PART_Popup" Placement="Top"
+                                      IsOpen="{TemplateBinding IsDropDownOpen}">
+                                            <Border Background="DimGray" x:Name="PopupBorder" 
+                                        HorizontalAlignment="Stretch" Height="Auto"                                                                         
+                                        MinWidth="{TemplateBinding ActualWidth}"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                        BorderThickness="{TemplateBinding BorderThickness}" 
+                                        BorderBrush="Black" CornerRadius="3">
+                                                <ScrollViewer x:Name="ScrollViewer" BorderThickness="0" Padding="1">
+                                                    <ItemsPresenter/>
+                                                </ScrollViewer>
+                                            </Border>
+                                        </Popup>
+                                    </Grid>
+                                </ControlTemplate>
                             </Setter.Value>
                         </Setter>
                     </Style>
-                </TabControl.ItemContainerStyle>
-            </TabControl>
+                </ComboBox.Resources>
+                <ComboBoxItem >123445364t34</ComboBoxItem>
+                <ComboBoxItem >12344t34</ComboBoxItem>
+                <ComboBoxItem >12344wdrbgerbvg5364t34</ComboBoxItem>
+                <ComboBoxItem >we123445364t34</ComboBoxItem>
+            </ComboBox>
         </Grid>
+
+        <Border Grid.Row="5" BorderThickness="1" BorderBrush="DarkGray">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="148*"></ColumnDefinition>
+                    <ColumnDefinition Width="423*"/>
+                    <ColumnDefinition Width="285*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label Padding="5,2,0,0" Visibility="{Binding InfoVisible}" Grid.Column="0" Content="{Binding StatusBarTextFirst, Mode=OneWay}" Grid.ColumnSpan="2" />
+                <Border HorizontalAlignment="Left" Grid.Column="2" BorderThickness="1" BorderBrush="Black" Width="1"></Border>
+                <Label Padding="5,2,0,0" Visibility="{Binding InfoVisible}" Grid.Column="2" Content="{Binding StatusBarTextSecond, Mode=OneWay}" />
+            </Grid>
+        </Border>
     </Grid>
 </Window>

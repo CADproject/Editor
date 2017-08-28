@@ -1,5 +1,12 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="TelegramButtonColor">#FF31A9DF</Color>
+    <Color x:Key="PressedTelegramButtonColor">#FFA0A0A0</Color>
+    <Color x:Key="StandartBackgroundColor">#FFFAFAFA</Color>
+    <SolidColorBrush x:Key="StandartButtonColor" Color="#FF606060"/>
+    <SolidColorBrush x:Key="StandartBackground" Color="{StaticResource StandartBackgroundColor}" />
+    <SolidColorBrush x:Key="TelegramButton" Color="{StaticResource TelegramButtonColor}" />
+    <SolidColorBrush x:Key="PressedTelegramButton" Color="{StaticResource PressedTelegramButtonColor}" />
     <Style x:Key="RoundedButton" TargetType="{x:Type Button}">
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -53,5 +60,15 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style TargetType="Button" BasedOn="{StaticResource RoundedButton}"></Style>
+    <!--<Style TargetType="Button" BasedOn="{StaticResource RoundedButton}"></Style>-->
+    <Style x:Key="GlobalFontStyle"  TargetType="{x:Type Control}" >
+        <Setter Property="FontFamily" Value="Segoe UI"></Setter>
+        <!--<Setter Property="FontSize" Value="26"></Setter>-->
+    </Style>
+    <Style x:Key="BigFontStyle"  TargetType="{x:Type Control}" BasedOn="{StaticResource GlobalFontStyle}" >
+        <Setter Property="FontSize" Value="18"></Setter>
+    </Style>
+    <Style TargetType="Button" BasedOn="{StaticResource GlobalFontStyle}"></Style>
+    <Style TargetType="Label" BasedOn="{StaticResource GlobalFontStyle}"></Style>
+    <Style TargetType="TextBox" BasedOn="{StaticResource BigFontStyle}"></Style>
 </ResourceDictionary>

@@ -19,12 +19,12 @@ namespace CADView
         {
             InitializeComponent();
 
-            Version version = Assembly.GetExecutingAssembly().GetName().Version;
-            Title += " " + version;
+            //Version version = Assembly.GetExecutingAssembly().GetName().Version;
+            //Title += " " + version;
 
             if (DesignerProperties.GetIsInDesignMode(this)) return;
 
-            MainWindowViewModel vm = new MainWindowViewModel();
+            MainWindowViewModel vm = new MainWindowViewModel(this, MainSpace);
             DataContext = vm;
             Application.Current.MainWindow = this;
 
