@@ -120,6 +120,10 @@ namespace CADView
         public MainWindowViewModel(Window owner, Grid space)
         {
             _helperSpace = space;
+            _helperSpace.SizeChanged += delegate
+            {
+                ConsoleHeight = ConsoleHeight;
+            };
             _owner = owner;
             //Controller = new ApplicationController();
             RenderPanel.Loaded += RenderPanelOnLoad;
