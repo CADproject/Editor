@@ -69,14 +69,14 @@
                         </Style>
 
                         <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverBackgroundKey}"
-                                        Color="{StaticResource StandartBackgroundColor}" >
+                                        Color="{StaticResource Theme1_StandartBackgroundColor}" >
                         </SolidColorBrush>
 
                         <!--<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedOuterBorderKey}"
                             Color="Orange" />-->
-                        
+
                         <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedBackgroundKey}"
-                            Color="{StaticResource StandartBackgroundColor}" />
+                            Color="{StaticResource Theme1_StandartBackgroundColor}" />
                     </toolkit:SplitButton.Resources>
                     <toolkit:SplitButton.DropDownContent>
                         <ItemsControl Background="{StaticResource StandartBackground}" Margin="0,0,0,0" ItemsSource="{Binding SubItems}">
@@ -93,10 +93,10 @@
                                    Width="{Binding Width}" Height="{Binding Height}" ToolTip="{Binding HintText}">
                                 <Label.Style>
                                     <Style BasedOn="{StaticResource GlobalFontStyle}" TargetType="{x:Type Label}">
-                                        <Setter Property="Foreground" Value="{StaticResource StandartButtonColor}"></Setter>
+                                        <Setter Property="Foreground" Value="{DynamicResource StandartButtonColor}"></Setter>
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Foreground" Value="{StaticResource TelegramButton}"></Setter>
+                                                <Setter Property="Foreground" Value="{DynamicResource TelegramButton}"></Setter>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -115,13 +115,13 @@
                                 </Rectangle.OpacityMask>
                                 <Rectangle.Style>
                                     <Style TargetType="{x:Type Rectangle}">
-                                        <Setter Property="Fill" Value="{StaticResource StandartButtonColor}" />
+                                        <Setter Property="Fill" Value="{DynamicResource StandartButtonColor}" />
                                         <Style.Triggers>
                                             <EventTrigger RoutedEvent="Rectangle.PreviewMouseLeftButtonDown">
                                                 <EventTrigger.Actions>
                                                     <BeginStoryboard>
                                                         <Storyboard>
-                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource PressedTelegramButtonColor}" Duration="0" />
+                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme1_PressedTelegramButtonColor}" Duration="0" />
                                                         </Storyboard>
                                                     </BeginStoryboard>
                                                 </EventTrigger.Actions>
@@ -130,13 +130,13 @@
                                                 <EventTrigger.Actions>
                                                     <BeginStoryboard>
                                                         <Storyboard>
-                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource TelegramButtonColor}" Duration="0" />
+                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme1_TelegramButtonColor}" Duration="0" />
                                                         </Storyboard>
                                                     </BeginStoryboard>
                                                 </EventTrigger.Actions>
                                             </EventTrigger>
                                             <Trigger Property="IsMouseOver" Value="True" >
-                                                <Setter Property="Fill" Value="{StaticResource TelegramButton}"></Setter>
+                                                <Setter Property="Fill" Value="{DynamicResource TelegramButton}"></Setter>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -166,7 +166,7 @@
                                     <EventTrigger.Actions>
                                         <BeginStoryboard>
                                             <Storyboard>
-                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource PressedTelegramButtonColor}" Duration="0" />
+                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme1_PressedTelegramButtonColor}" Duration="0" />
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </EventTrigger.Actions>
@@ -175,7 +175,7 @@
                                     <EventTrigger.Actions>
                                         <BeginStoryboard>
                                             <Storyboard>
-                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource TelegramButtonColor}" Duration="0" />
+                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme1_TelegramButtonColor}" Duration="0" />
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </EventTrigger.Actions>
@@ -222,13 +222,30 @@
             <RowDefinition MinHeight="25" MaxHeight="25" Height="25"/>
         </Grid.RowDefinitions>
         <Grid Row="0">
-            <ItemsControl VerticalAlignment="Stretch" ItemsSource="{Binding UIMenuElements}" Margin="0">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <ItemsControl VerticalAlignment="Stretch" ItemsSource="{Binding UIMenuElements}" Margin="0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <CheckBox Grid.Column="1" Style="{StaticResource OrangeSwitchStyle}" VerticalAlignment="Top" HorizontalAlignment="Right" RenderTransformOrigin="0.5,0.5"
+                          Command="{Binding ChangeThemeCommand}" CommandParameter="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}">
+                    <CheckBox.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleY="0.5" ScaleX="0.6"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </CheckBox.RenderTransform>
+                </CheckBox>
+            </Grid>
         </Grid>
         <Grid Name="MainSpace" Grid.Row="2">
             <Grid.RowDefinitions>
@@ -385,7 +402,7 @@
             </Border>
             <ComboBox Margin="2,2,3.5,2" HorizontalAlignment="Right" Height="14" Width="14" >
                 <ComboBox.Resources>
-                    
+
                     <Style TargetType="{x:Type ComboBox}">
                         <Setter Property="Template">
                             <Setter.Value>

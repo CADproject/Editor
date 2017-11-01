@@ -385,6 +385,7 @@ namespace CADView
         private double _windowHeight;
         private readonly List<DocumentModel> _documentViewModels = new List<DocumentModel>();
         private RelayCommand _closeApplicationCommand;
+        private RelayCommand _changeThemeCommand;
         private readonly Dictionary<TabItem, Document> _tabsDocuments = new Dictionary<TabItem, Document>();
         private Visibility _consoleVisible = Visibility.Collapsed;
         private double _consoleHeight = 8;
@@ -654,6 +655,34 @@ namespace CADView
             }
         }
 
+        public RelayCommand ChangeThemeCommand
+        {
+            get
+            {
+                return _changeThemeCommand ?? (_changeThemeCommand = new RelayCommand(
+                           delegate(object o)
+                           {
+                               var resources = this._owner.Resources;
+                               var second = resources.MergedDictionaries[1];
+                               var isTheme1 = !(bool) o;
+                               if (isTheme1)
+                               {
+                                   second["Theme1_TelegramButtonColor"] = ColorConverter.ConvertFromString("#FF31A9DF");
+                                   second["Theme1_PressedTelegramButtonColor"] = ColorConverter.ConvertFromString("#FFA0A0A0");
+                                   second["Theme1_StandartBackgroundColor"] = ColorConverter.ConvertFromString("#FFFAFAFA");
+                                   second["Theme1_StandartButtonColor"] = ColorConverter.ConvertFromString("#FF606060");
+                               }
+                               else
+                               {
+                                   second["Theme1_TelegramButtonColor"] = ColorConverter.ConvertFromString("#FF31A9DF");
+                                   second["Theme1_PressedTelegramButtonColor"] = ColorConverter.ConvertFromString("#FFA0A0A0");
+                                   second["Theme1_StandartBackgroundColor"] = ColorConverter.ConvertFromString("#FF4A4A4A");
+                                   second["Theme1_StandartButtonColor"] = ColorConverter.ConvertFromString("#FFCCCCCC");
+                               }
+                           }));
+            }
+        }
+        
         #endregion
 
         #region ScreenInfo
