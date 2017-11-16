@@ -662,23 +662,36 @@ namespace CADView
                 return _changeThemeCommand ?? (_changeThemeCommand = new RelayCommand(
                            delegate(object o)
                            {
-                               var resources = this._owner.Resources;
-                               var second = resources.MergedDictionaries[1];
-                               var isTheme1 = !(bool) o;
-                               if (isTheme1)
+                               ResourceDictionary resources;
+                               ResourceDictionary second;
+                               List<ResourceDictionary> resourcesToChange = new List<ResourceDictionary>();
+                               resources = this._owner.Resources;
+                               resources = App.Instance.Resources;
+                               second = resources.MergedDictionaries[1];
+                               resourcesToChange.Add(second);
+                               var isLight = !(bool) o;
+                               if (isLight)
                                {
-                                   second["Theme1_TelegramButtonColor"] = ColorConverter.ConvertFromString("#FF31A9DF");
-                                   second["Theme1_PressedTelegramButtonColor"] = ColorConverter.ConvertFromString("#FFA0A0A0");
-                                   second["Theme1_StandartBackgroundColor"] = ColorConverter.ConvertFromString("#FFFAFAFA");
-                                   second["Theme1_StandartButtonColor"] = ColorConverter.ConvertFromString("#FF606060");
+                                   foreach (var res in resourcesToChange)
+                                   {
+                                       res["Theme_TelegramButtonColor"]        = res["ThemeL_TelegramButtonColor"];
+                                       res["Theme_PressedTelegramButtonColor"] = res["ThemeL_PressedTelegramButtonColor"];
+                                       res["Theme_StandartBackgroundColor"]    = res["ThemeL_StandartBackgroundColor"];
+                                       res["Theme_StandartButtonColor"]        = res["ThemeL_StandartButtonColor"];
+                                   }
                                }
                                else
                                {
-                                   second["Theme1_TelegramButtonColor"] = ColorConverter.ConvertFromString("#FF31A9DF");
-                                   second["Theme1_PressedTelegramButtonColor"] = ColorConverter.ConvertFromString("#FFA0A0A0");
-                                   second["Theme1_StandartBackgroundColor"] = ColorConverter.ConvertFromString("#FF4A4A4A");
-                                   second["Theme1_StandartButtonColor"] = ColorConverter.ConvertFromString("#FFCCCCCC");
+                                   foreach (var res in resourcesToChange)
+                                   {
+                                       res["Theme_TelegramButtonColor"]        = res["ThemeD_TelegramButtonColor"];
+                                       res["Theme_PressedTelegramButtonColor"] = res["ThemeD_PressedTelegramButtonColor"];
+                                       res["Theme_StandartBackgroundColor"]    = res["ThemeD_StandartBackgroundColor"];
+                                       res["Theme_StandartButtonColor"]        = res["ThemeD_StandartButtonColor"];
+                                   }
                                }
+
+                               this._owner.UpdateDefaultStyle();
                            }));
             }
         }

@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         Title="Добавить слой" Height="142" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
         Icon="../Icons/Панель СЛОИ/Добавить_слой.png">
-    <Grid>
+
+    <Grid Background="{DynamicResource StandartBackground}">
         <StackPanel Orientation="Vertical" Margin="10,0,10,0">
             <Label HorizontalAlignment="Stretch" Margin="0,0,0,0">Назовите слой</Label>
             <TextBox Margin="0,0,0,10"></TextBox>
@@ -16,8 +17,8 @@
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Button Content="Создать" Margin="0,0,10,0" HorizontalAlignment="Stretch"></Button>
-                <Button Grid.Column="1" Content="Отменить" Margin="10,0,0,0" HorizontalAlignment="Stretch"></Button>
+                <Button Background="{DynamicResource StandartBackground}" Foreground="{DynamicResource StandartButtonColor}" Content="Создать" Margin="0,0,10,0" HorizontalAlignment="Stretch"></Button>
+                <Button Background="{DynamicResource StandartBackground}" Foreground="{DynamicResource StandartButtonColor}" Grid.Column="1" Content="Отменить" Margin="10,0,0,0" HorizontalAlignment="Stretch"></Button>
             </Grid>
         </StackPanel>
 

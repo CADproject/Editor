@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Удалить слой" Height="360" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
         Icon="../Icons/Панель СЛОИ/Удалить_слой.png">
-    <Grid>
+    <Grid Background="{DynamicResource StandartBackground}">
         <StackPanel VerticalAlignment="Stretch" Orientation="Vertical">
             <DockPanel Height="250" Margin="10,0,10,0">
                 <Label DockPanel.Dock="Top" Content="Выберите слой"/>
@@ -26,9 +26,9 @@
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                     <ColumnDefinition Width="1*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Button Margin="0,0,10,10" Content="Выбрать все" HorizontalAlignment="Stretch" ></Button>
-                <Button Grid.Row="1" Grid.Column="0" Content="Удалить" Margin="0,0,10,0" HorizontalAlignment="Stretch"></Button>
-                <Button Grid.Row="1" Grid.Column="1" Content="Отменить" Margin="10,0,0,0" HorizontalAlignment="Stretch"></Button>
+                <Button Background="{DynamicResource StandartBackground}" Foreground="{DynamicResource StandartButtonColor}" Margin="0,0,10,10" Content="Выбрать все" HorizontalAlignment="Stretch" ></Button>
+                <Button Background="{DynamicResource StandartBackground}" Foreground="{DynamicResource StandartButtonColor}" Grid.Row="1" Grid.Column="0" Content="Удалить" Margin="0,0,10,0" HorizontalAlignment="Stretch"></Button>
+                <Button Background="{DynamicResource StandartBackground}" Foreground="{DynamicResource StandartButtonColor}" Grid.Row="1" Grid.Column="1" Content="Отменить" Margin="10,0,0,0" HorizontalAlignment="Stretch"></Button>
             </Grid>
         </StackPanel>
     </Grid>
