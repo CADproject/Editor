@@ -22,21 +22,11 @@
         </LinearGradientBrush>
     </Window.BorderBrush>
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/Generic.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Styles.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-
-    </Window.Resources>
-
-    <Grid Background="{StaticResource StandartBackground}">
+    <Grid Background="{DynamicResource StandartBackground}">
         <Grid.Resources>
 
             <DataTemplate DataType="{x:Type local:MenuExpanderItem}">
-                <DockPanel Background="{StaticResource StandartBackground}" LastChildFill="False" Margin="2,2,0,0">
+                <DockPanel Background="{DynamicResource StandartBackground}" LastChildFill="False" Margin="2,2,0,0">
                     <ItemsControl ItemsSource="{Binding SubItems}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -52,9 +42,9 @@
                                      ToolTip="{Binding HintText}" 
                                      Command="{Binding DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                      CommandParameter="{Binding Parameter}"
-                                     Background="{StaticResource StandartBackground}"
+                                     Background="{DynamicResource StandartBackground}"
                                      BorderThickness="1"
-                                     BorderBrush="{StaticResource StandartButtonColor}"
+                                     BorderBrush="{DynamicResource StandartButtonColor}"
                                      IsOpen="{Binding IsExpanded, Mode=TwoWay}"
                                      >
                     <toolkit:SplitButton.Resources>
@@ -69,17 +59,17 @@
                         </Style>
 
                         <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonMouseOverBackgroundKey}"
-                                        Color="{StaticResource Theme1_StandartBackgroundColor}" >
+                                        Color="{DynamicResource Theme_StandartBackgroundColor}" >
                         </SolidColorBrush>
 
                         <!--<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedOuterBorderKey}"
                             Color="Orange" />-->
 
                         <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type themes:ResourceKeys}, ResourceId=ButtonPressedBackgroundKey}"
-                            Color="{StaticResource Theme1_StandartBackgroundColor}" />
+                            Color="{DynamicResource Theme_StandartBackgroundColor}" />
                     </toolkit:SplitButton.Resources>
                     <toolkit:SplitButton.DropDownContent>
-                        <ItemsControl Background="{StaticResource StandartBackground}" Margin="0,0,0,0" ItemsSource="{Binding SubItems}">
+                        <ItemsControl Background="{DynamicResource StandartBackground}" Margin="0,0,0,0" ItemsSource="{Binding SubItems}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Orientation="Vertical"></StackPanel>
@@ -117,11 +107,14 @@
                                     <Style TargetType="{x:Type Rectangle}">
                                         <Setter Property="Fill" Value="{DynamicResource StandartButtonColor}" />
                                         <Style.Triggers>
+                                            <!--<Trigger Property="local:MouseDownHelper.IsMouseLeftButtonDown" Value="True">
+                                                <Setter Property="Fill" Value="{DynamicResource Theme_PressedTelegramButtonColor}"></Setter>
+                                            </Trigger>-->
                                             <EventTrigger RoutedEvent="Rectangle.PreviewMouseLeftButtonDown">
                                                 <EventTrigger.Actions>
                                                     <BeginStoryboard>
                                                         <Storyboard>
-                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme1_PressedTelegramButtonColor}" Duration="0" />
+                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme_PressedTelegramButtonColor}" Duration="0" />
                                                         </Storyboard>
                                                     </BeginStoryboard>
                                                 </EventTrigger.Actions>
@@ -130,7 +123,7 @@
                                                 <EventTrigger.Actions>
                                                     <BeginStoryboard>
                                                         <Storyboard>
-                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme1_TelegramButtonColor}" Duration="0" />
+                                                            <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme_TelegramButtonColor}" Duration="0" />
                                                         </Storyboard>
                                                     </BeginStoryboard>
                                                 </EventTrigger.Actions>
@@ -160,13 +153,16 @@
                     </Rectangle.OpacityMask>
                     <Rectangle.Style>
                         <Style TargetType="{x:Type Rectangle}">
-                            <Setter Property="Fill" Value="{StaticResource StandartButtonColor}" />
+                            <Setter Property="Fill" Value="{DynamicResource StandartButtonColor}" />
                             <Style.Triggers>
+                                <!--<Trigger Property="local:MouseDownHelper.IsMouseLeftButtonDown" Value="True">
+                                    <Setter Property="Fill" Value="{DynamicResource Theme_PressedTelegramButtonColor}"></Setter>
+                                </Trigger>-->
                                 <EventTrigger RoutedEvent="Rectangle.PreviewMouseLeftButtonDown">
                                     <EventTrigger.Actions>
                                         <BeginStoryboard>
                                             <Storyboard>
-                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme1_PressedTelegramButtonColor}" Duration="0" />
+                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme_PressedTelegramButtonColor}" Duration="0" />
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </EventTrigger.Actions>
@@ -175,13 +171,13 @@
                                     <EventTrigger.Actions>
                                         <BeginStoryboard>
                                             <Storyboard>
-                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme1_TelegramButtonColor}" Duration="0" />
+                                                <ColorAnimation Storyboard.TargetProperty="(Fill).(SolidColorBrush.Color)" To="{StaticResource Theme_TelegramButtonColor}" Duration="0" />
                                             </Storyboard>
                                         </BeginStoryboard>
                                     </EventTrigger.Actions>
                                 </EventTrigger>
                                 <Trigger Property="IsMouseOver" Value="True" >
-                                    <Setter Property="Fill" Value="{StaticResource TelegramButton}"></Setter>
+                                    <Setter Property="Fill" Value="{DynamicResource TelegramButton}"></Setter>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
@@ -198,13 +194,13 @@
                     </Label.InputBindings>
                     <Label.Style>
                         <Style BasedOn="{StaticResource GlobalFontStyle}" TargetType="{x:Type Label}">
-                            <Setter Property="Foreground" Value="{StaticResource StandartButtonColor}"></Setter>
+                            <Setter Property="Foreground" Value="{DynamicResource StandartButtonColor}"></Setter>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsSelected, Mode=TwoWay}" Value="True">
                                     <Setter Property="Background" Value="LightBlue"></Setter>
                                 </DataTrigger>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Foreground" Value="{StaticResource TelegramButton}"></Setter>
+                                    <Setter Property="Foreground" Value="{DynamicResource TelegramButton}"></Setter>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
@@ -272,6 +268,13 @@
                                      SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      ConsolidateOrphanedItems="True" Margin="8,8,8,0" ShowDefaultCloseButton="True"
                                      ItemContainerStyle="{StaticResource TrapezoidDragableTabItemStyle}" AdjacentHeaderItemOffset="-15">
+                    <dragablz:TabablzControl.Resources>
+                        <!--не сработало-->
+                        <Style TargetType="{x:Type dragablz:Trapezoid}">
+                            <Setter Property="Background" Value="Blue"></Setter>
+                            <Setter Property="Foreground" Value="Blue"></Setter>
+                        </Style>
+                    </dragablz:TabablzControl.Resources>
                     <dragablz:TabablzControl.HeaderItemTemplate>
                         <DataTemplate DataType="local:DocumentModel">
                             <Label Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}" MinWidth="60" Content="{Binding Path=Title}">
@@ -400,9 +403,8 @@
             <Border BorderThickness="1" BorderBrush="DarkSlateGray">
                 <TextBox Background="DimGray" Foreground="LightGray"></TextBox>
             </Border>
-            <ComboBox Margin="2,2,3.5,2" HorizontalAlignment="Right" Height="14" Width="14" >
+            <ComboBox Margin="2,2,3.5,2" HorizontalAlignment="Right" Height="14" Width="14" Foreground="LightGray">
                 <ComboBox.Resources>
-
                     <Style TargetType="{x:Type ComboBox}">
                         <Setter Property="Template">
                             <Setter.Value>

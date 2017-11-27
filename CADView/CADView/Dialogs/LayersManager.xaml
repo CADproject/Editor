@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Менеджер слоёв" Height="358" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
         Icon="../Icons/Панель СЛОИ/Менеджер_слоев.png">
-    <Grid>
+    <Grid Background="{DynamicResource StandartBackground}">
         <StackPanel VerticalAlignment="Stretch" Orientation="Vertical">
             <DockPanel Height="230" Margin="10,0,10,0">
                 <Label DockPanel.Dock="Top" Content="Выберите слои для отображения"/>
@@ -29,8 +29,8 @@
                 </Grid.ColumnDefinitions>
                 <Label Grid.Row="0" Grid.Column="0" Content="Активный слой"></Label>
                 <ComboBox Margin="0,0,0,10" Grid.Row="1" Grid.ColumnSpan="2"></ComboBox>
-                <Button Grid.Row="2" Grid.Column="0" Content="Подтвердить" Margin="0,0,10,0" HorizontalAlignment="Stretch"></Button>
-                <Button Grid.Row="2" Grid.Column="1" Content="Отменить" Margin="10,0,0,0" HorizontalAlignment="Stretch"></Button>
+                <Button Background="{DynamicResource StandartBackground}" Foreground="{DynamicResource StandartButtonColor}" Grid.Row="2" Grid.Column="0" Content="Подтвердить" Margin="0,0,10,0" HorizontalAlignment="Stretch"></Button>
+                <Button Background="{DynamicResource StandartBackground}" Foreground="{DynamicResource StandartButtonColor}" Grid.Row="2" Grid.Column="1" Content="Отменить" Margin="10,0,0,0" HorizontalAlignment="Stretch"></Button>
             </Grid>
         </StackPanel>
     </Grid>

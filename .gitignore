@@ -14,3 +14,11 @@ Bin Editor x64/
 *.opensdf
 CADEditor.VC.VC.opendb
 CADEditor.VC.db
+# NuGet Packages
+packages/
+*.nupkg
+## TODO: If the tool you use requires repositories.config
+## uncomment the next line
+#!packages/repositories.config
+*.vc.db*
+*.vc.opendb
