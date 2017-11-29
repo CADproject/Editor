@@ -230,7 +230,7 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
-                <CheckBox Grid.Column="1" Style="{StaticResource OrangeSwitchStyle}" VerticalAlignment="Top" HorizontalAlignment="Right" RenderTransformOrigin="0.5,0.5"
+                <CheckBox Grid.Column="1" Style="{StaticResource OrangeSwitchStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" RenderTransformOrigin="0.5,0.5"
                           Command="{Binding ChangeThemeCommand}" CommandParameter="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}">
                     <CheckBox.RenderTransform>
                         <TransformGroup>

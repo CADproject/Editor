@@ -125,6 +125,7 @@ namespace CADView
                 ConsoleHeight = ConsoleHeight;
             };
             _owner = owner;
+            Controller = FakeController.CreateController();
             //Controller = new ApplicationController();
             RenderPanel.Loaded += RenderPanelOnLoad;
             RenderPanel.Resized += RenderPanelOnResize;
@@ -140,7 +141,7 @@ namespace CADView
                 DocumentViewModels[id].Dispose();
                 //Controller.finalDocument(Session, id);
             }
-            //Controller.CloseSession();
+            Controller.CloseSession();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -161,7 +162,7 @@ namespace CADView
 
         public void Init()
         {
-            //Controller.OpenSession();
+            Controller.OpenSession();
             _inited = true;
 
             _timer = new DispatcherTimer(DispatcherPriority.Normal, Application.Current.Dispatcher);

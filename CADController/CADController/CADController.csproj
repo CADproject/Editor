@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoreWrapper.cs" />
+    <Compile Include="FakeController.cs" />
     <Compile Include="IController.cs" />
     <Compile Include="Operations.cs" />
     <Compile Include="Program.cs" />
