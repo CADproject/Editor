@@ -295,7 +295,7 @@ namespace CADView
     {
         private object _parameter;
 
-        public MenuSubItem(string image, string hintText, ButtonsCommands operationType, IEnumerable<BaseMenuElement> subItems,
+        public MenuSubItem(string image, string hintText, UniversalCommands operationType, IEnumerable<BaseMenuElement> subItems,
             int width = DefaultWidth, int height = DefaultHeight) : this(image, hintText, (object)operationType, subItems, width, height)
         {
 
@@ -333,7 +333,7 @@ namespace CADView
             Color = Brushes.Black;
         }
 
-        public MenuButtonItem(string image, string hintText, ButtonsCommands operationType, int width = DefaultWidth,
+        public MenuButtonItem(string image, string hintText, UniversalCommands operationType, int width = DefaultWidth,
             int height = DefaultHeight) : this(image, hintText, (object) operationType, width, height)
         {
         }
@@ -362,7 +362,7 @@ namespace CADView
             Description = hintText;
         }
 
-        public MenuTextButtonItem(string hintText, ButtonsCommands operationType, int width = DefaultWidth,
+        public MenuTextButtonItem(string hintText, UniversalCommands operationType, int width = DefaultWidth,
             int height = DefaultHeight) : this(hintText, (object)operationType, width, height)
         {
         }

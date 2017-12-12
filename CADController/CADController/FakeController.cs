@@ -45,12 +45,12 @@ namespace CADController
 
         public void SetActiveDocument(uint docId)
         {
-            Console.WriteLine(GetCurrentMethod());
+            Console.WriteLine($"{GetCurrentMethod()}, {docId}");
         }
 
         public void Event(int evId)
         {
-            Console.WriteLine(GetCurrentMethod());
+            Console.WriteLine($"{GetCurrentMethod()}, {evId}");
         }
 
         public void MouseMove(double x, double y)
@@ -60,23 +60,24 @@ namespace CADController
 
         public Status Operation(int opId)
         {
-            Console.WriteLine(GetCurrentMethod());
+            Console.WriteLine($"{GetCurrentMethod()}, {opId}");
             return Status.Success;
         }
 
         public void SendInt(int value)
         {
-            Console.WriteLine(GetCurrentMethod());
+            string method = GetCurrentMethod();
+            Console.WriteLine($"{method}, {value}");
         }
 
         public void SendDouble(double value)
         {
-            Console.WriteLine(GetCurrentMethod());
+            Console.WriteLine($"{GetCurrentMethod()}, {value}");
         }
 
         public void SendString(string value)
         {
-            Console.WriteLine(GetCurrentMethod());
+            Console.WriteLine($"{GetCurrentMethod()}, {value}");
         }
     }
 }

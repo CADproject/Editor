@@ -287,7 +287,7 @@
                                     </ContextMenu.ItemTemplate>-->
                                         <MenuItem Header="Переименовать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
                                         <MenuItem Header="Копировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
-                                        <MenuItem Header="Новый документ" CommandParameter="{x:Static local:ButtonsCommands.NewDocument}" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                        <MenuItem Header="Новый документ" CommandParameter="{x:Static local:UniversalCommands.NewDocument}" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
                                         <MenuItem Header="Закрыть" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
                                         <MenuItem Header="Закрыть все документы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
                                     </ContextMenu>
@@ -314,7 +314,7 @@
                                             <MenuItem Header="Отобразить по кругу" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
                                             <MenuItem Header="Масштабировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
                                             <Separator />
-                                            <MenuItem Header="Свойства" CommandParameter="{x:Static local:ButtonsCommands.Properties}" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                            <MenuItem Header="Свойства" CommandParameter="{x:Static local:UniversalCommands.Properties}" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
                                             <Separator />
                                             <MenuItem Header="Показать узлы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
                                                 <MenuItem.Icon>

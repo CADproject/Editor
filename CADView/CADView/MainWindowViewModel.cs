@@ -17,52 +17,94 @@ using System.Windows.Media;
 
 namespace CADView
 {
-    public enum ButtonsCommands
+    public enum UniversalInputEvents
     {
-        //Core Operations
-        //Controller Operations
-        //View Operations
-        NewDocument = 0,
-        OpenDocument,
-        SaveDocument,
-        StepBackward,
-        StepForward,
-        Pen,
-        Line1,
-        Line2,
-        Line3,
-        Line4,
-        Arc1,
-        Arc2,
-        Circle1,
-        Circle2,
-        BrokenLine,
-        Spline,
-        MoveView,
-        EnlargeView,
-        DiminishView,
-        ShowAll,
-        ShowNodes,
-        ShowGrid,
-        SetTheme,
-        Console,
-        Eraser,
-        Trimming,
-        EnlargeElement,
-        LinkLines,
-        DestroyLine,
-        Correct,
-        CreateNode,
-        DeleteNode,
-        Measure,
-        Protractor,
-        AddLayer,
-        DeleteLayer,
+        //общие события
+        ok_event,
+        cancel_event,
+        //события мыши
+        mouse_right_button,
+        mouse_left_button_pressed,
+        mouse_left_button_released,
+        mouse_left_button_double_click,
+        mouse_middle_button,
+        mouse_wheel,
+        //события клавиатуры
+        key_ctrl_pressed,
+        key_ctrl_released,
+        key_shift_pressed,
+        key_shift_released,
+
+        Count,
+    }
+
+    public enum UniversalCommands
+    {
+                                                                ////операции с документами
+        NewDocument = 0,                                        //create_document,
+        OpenDocument,                                           //open_document,
+        SaveDocument,                                           //save_document,
+        rename_document,                                        //rename_document,
+        copy_document,                                          //copy_document,
+        close_document,                                         //close_document,
+        close_all_docs,                                         //close_all_docs,
+        StepBackward,                                           //undo,
+        StepForward,                                            //redo,
+                                                                ////геометрические операции
+        Pen,                                                    //draw_curve,
+        Line1,                                                  //draw_line,
+        Line2,                                                  //draw_line_parallel,
+        Line3,                                                  //draw_line_normal,
+        Line4,                                                  //draw_line_at_angle,
+        Arc1,                                                   //draw_arc_center_two_points,
+        Arc2,                                                   //draw_arc_three_points,
+        Circle1,                                                //draw_circle_center_point,
+        Circle2,                                                //draw_circle_three_points,
+        BrokenLine,                                             //draw_polygonal,
+        Spline,                                                 //draw_spline,
+                                                                ////операции с объектами
+        Eraser,                                                 //delete_object,
+        Trimming,                                               //trim_object,
+        EnlargeElement,                                         //lengthen_object,
+        LinkLines,                                              //sew_polygonal,
+        DestroyLine,                                            //destroy_polygonal,
+        Correct,                                                //correct_object,
+        CreateNode,                                             //add_node_to_object,
+        DeleteNode,                                             //remove_node_from_object,
+        Measure,                                                //measure_distance,
+        Protractor,                                             //measure_angle,
+        copy_object,                                            //copy_object,
+        cut_object,                                             //cut_object,
+        paste_object,                                           //paste_object,
+        move_object,                                            //move_object,
+        rotate_object,                                          //rotate_object,
+        display_in_circle_object,                               //display_in_circle_object,      
+        display_symmetyrically_object,                          //display_symmetyrically_object,
+        scale_object,                                           //scale_object,
+                                                                ////операции с видом
+        MoveView,                                               //move_camera_position,
+        EnlargeView,                                            //zoom_in_camera,
+        DiminishView,                                           //zoom_out_camera,
+        ShowAll,                                                //show_all_objects,
+                                                                ////операции со слоями
+        AddLayer,                                               //add_layer,
+        rename_layer,                                            //rename_layer,
+        DeleteLayer,                                            //remove_layer,
         LayersManager,
-        Help,
+        set_active_layer,                                       //set_active_layer,
+        set_visible_layers,                                     //set_visible_layers,
+        set_invisible_layers,                                   //set_invisible_layers,
+                                                                ////операции оформления
+        ShowNodes,                                              //show_hide_nodes,
+        ShowGrid,                                               //show_hide_mesh,               
+        SetTheme,                                               //change_theme,         
+        change_object_proporties,                               //change_object_proporties,
+
+                                                                ////общие операции
+        Help,                                                   //show_help_info,
         Statistics,
         Properties,
-
+        Console,
         Count,
     }
 
@@ -106,7 +148,7 @@ namespace CADView
         }
     }
 
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : INotifyPropertyChanged, IViewCallback
     {
         #region Public
 
@@ -126,7 +168,6 @@ namespace CADView
             };
             _owner = owner;
             Controller = FakeController.CreateController();
-            //Controller = new ApplicationController();
             RenderPanel.Loaded += RenderPanelOnLoad;
             RenderPanel.Resized += RenderPanelOnResize;
             RenderPanel.Rendered += RenderPanelOnRender;
@@ -139,8 +180,8 @@ namespace CADView
             foreach (var id in ids)
             {
                 DocumentViewModels[id].Dispose();
-                //Controller.finalDocument(Session, id);
             }
+            Controller.Operation((int)UniversalCommands.close_all_docs);
             Controller.CloseSession();
         }
 
@@ -177,6 +218,9 @@ namespace CADView
 
         public void CreateDocument()
         {
+            Controller.Operation((int)UniversalCommands.NewDocument);
+            //Заметка: мы обновляем весь список документов после создания нового по событию?
+
             var model = new DocumentModel(new LayerModel(true)) { DocumentID = (uint)DocumentViewModelsTabs.Count };
             model.Title = "Document #" + model.DocumentID;
             //var host = new WindowsFormsHost()
@@ -198,6 +242,13 @@ namespace CADView
             OnPropertyChanged(nameof(InfoVisible));
         }
 
+        public void CloseDocument(int id)
+        {
+            Controller.Operation((int) UniversalCommands.close_document);
+            Controller.SendInt(id);
+            //Заметка: потому что мы можем закрыть и не активный документ
+        }
+
         public int SelectedDocumentIndex
         {
             get { return _selectedDocumentIndex; }
@@ -208,7 +259,7 @@ namespace CADView
 
                 if (SelectedDocumentIndex < 0 || SelectedDocumentIndex > DocumentViewModelsTabs.Count) return;
 
-                //Controller.SetActiveDocument(ActiveDocument.DocumentID);
+                Controller.SetActiveDocument(DocumentViewModelsTabs[value].DocumentID);
             }
         }
 
@@ -272,43 +323,43 @@ namespace CADView
                 {
                     new MenuExpanderItem("Icons/Home.png", "Документ", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Новый_документ.png", "Новый документ", ButtonsCommands.NewDocument),
-                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Открыть_документ.png", "Открыть документ", ButtonsCommands.OpenDocument),
-                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Сохранить.png", "Сохранить", ButtonsCommands.SaveDocument),
-                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Шаг_назад.png", "Шаг назад", ButtonsCommands.StepBackward),
-                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Шаг_вперед.png", "Шаг вперёд", ButtonsCommands.StepForward),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Новый_документ.png", "Новый документ", UniversalCommands.NewDocument),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Открыть_документ.png", "Открыть документ", UniversalCommands.OpenDocument),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Сохранить.png", "Сохранить", UniversalCommands.SaveDocument),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Шаг_назад.png", "Шаг назад", UniversalCommands.StepBackward),
+                        new MenuButtonItem("Icons/Панель ОБЩЕЕ/Шаг_вперед.png", "Шаг вперёд", UniversalCommands.StepForward),
                     }, Brushes.Gray),
                     new MenuExpanderItem("Icons/Paint Brush.png", "Рисование", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Карандаш.png", "Карандаш", ButtonsCommands.Pen),
-                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Отрезок_1.png", "Линия", ButtonsCommands.Line1,
+                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Карандаш.png", "Карандаш", UniversalCommands.Pen),
+                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Отрезок_1.png", "Линия", UniversalCommands.Line1,
                             new[]
                             {
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_2.png", "Линия под прямым углом", ButtonsCommands.Line2),
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_3.png", "Параллельная линия", ButtonsCommands.Line3),
-                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_4.png", "Линия под углом", ButtonsCommands.Line4),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_2.png", "Линия под прямым углом", UniversalCommands.Line2),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_3.png", "Параллельная линия", UniversalCommands.Line3),
+                                new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Отрезок_4.png", "Линия под углом", UniversalCommands.Line4),
                             }) {Color = Brushes.DimGray},
-                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Дуга_1.png", "Дуга по двум точкам и центру", ButtonsCommands.Arc1,
+                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Дуга_1.png", "Дуга по двум точкам и центру", UniversalCommands.Arc1,
                             new []
                             {
-                                    new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_2.png", "Дуга по трём точкам", ButtonsCommands.Arc2),
+                                    new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Дуга_2.png", "Дуга по трём точкам", UniversalCommands.Arc2),
                             }) {Color = Brushes.DimGray},
-                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность по точке и центру", ButtonsCommands.Circle1,
+                        new MenuSubItem("Icons/Панель РИСОВАНИЕ/Окружность_1.png", "Окружность по точке и центру", UniversalCommands.Circle1,
                             new []
                             {
-                                    new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_2.png", "Окружность по трём точкам", ButtonsCommands.Circle2),
+                                    new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Окружность_2.png", "Окружность по трём точкам", UniversalCommands.Circle2),
                             }) {Color = Brushes.DimGray},
-                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Ломаная.png", "Ломаная", ButtonsCommands.BrokenLine),
-                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Сплайн.png", "Сплайн", ButtonsCommands.Spline),
+                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Ломаная.png", "Ломаная", UniversalCommands.BrokenLine),
+                        new MenuButtonItem("Icons/Панель РИСОВАНИЕ/Сплайн.png", "Сплайн", UniversalCommands.Spline),
                     }, Brushes.DarkSlateGray),
                     new MenuExpanderItem("Icons/Oscilloscope.png", "Отображение", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Подвинуть_вид.png", "Подвинуть изображение", ButtonsCommands.MoveView),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Приблизить_вид.png", "Увеличить изображение", ButtonsCommands.EnlargeView),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Отдалить_вид.png", "Уменьшить изображение", ButtonsCommands.DiminishView),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png", "Показать всё", ButtonsCommands.ShowAll),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png", "Показать узлы", ButtonsCommands.ShowNodes),
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png", "Показать сетку", ButtonsCommands.ShowGrid),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Подвинуть_вид.png", "Подвинуть изображение", UniversalCommands.MoveView),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Приблизить_вид.png", "Увеличить изображение", UniversalCommands.EnlargeView),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Отдалить_вид.png", "Уменьшить изображение", UniversalCommands.DiminishView),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png", "Показать всё", UniversalCommands.ShowAll),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png", "Показать узлы", UniversalCommands.ShowNodes),
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png", "Показать сетку", UniversalCommands.ShowGrid),
                         new MenuSubItem("Icons/Панель ОТОБРАЖЕНИЕ/Темы.png", "Сменить тему", null,
                             new MenuTextButtonItem[]
                             {
@@ -319,35 +370,35 @@ namespace CADView
                     }, Brushes.DarkGray),
                     new MenuExpanderItem("Icons/Edit.png", "Редактирование", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Ластик.png", "Ластик", ButtonsCommands.Eraser),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Триммирование.png", "Триммирование", ButtonsCommands.Trimming),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Продление.png", "Продление", ButtonsCommands.EnlargeElement),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Сшить_ломаную.png", "Создать ломаную", ButtonsCommands.LinkLines),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Разрезать_ломаную.png", "Разрушить ломаную", ButtonsCommands.DestroyLine),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Корректировать_узел.png", "Корректировка", ButtonsCommands.Correct),
-                        new MenuSubItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Добавить узел", ButtonsCommands.CreateNode,
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Ластик.png", "Ластик", UniversalCommands.Eraser),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Триммирование.png", "Триммирование", UniversalCommands.Trimming),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Продление.png", "Продление", UniversalCommands.EnlargeElement),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Сшить_ломаную.png", "Создать ломаную", UniversalCommands.LinkLines),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Разрезать_ломаную.png", "Разрушить ломаную", UniversalCommands.DestroyLine),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Корректировать_узел.png", "Корректировка", UniversalCommands.Correct),
+                        new MenuSubItem("Icons/Панель РЕДАКТИРОВАНИЕ/Добавить_узел.png", "Добавить узел", UniversalCommands.CreateNode,
                             new[]
                             {
-                                new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Удалить_узел.png", "Удалить узел", ButtonsCommands.DeleteNode),
+                                new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Удалить_узел.png", "Удалить узел", UniversalCommands.DeleteNode),
                             }) {Color = Brushes.DimGray},
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Линейка.png", "Линейка", ButtonsCommands.Measure),
-                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Транспортир.png", "Транспортир", ButtonsCommands.Protractor),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Линейка.png", "Линейка", UniversalCommands.Measure),
+                        new MenuButtonItem("Icons/Панель РЕДАКТИРОВАНИЕ/Транспортир.png", "Транспортир", UniversalCommands.Protractor),
                     }, Brushes.DarkGray),
                     new MenuExpanderItem("Icons/Панель СЛОИ/Менеджер_слоев.png", "Слои", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель СЛОИ/Добавить_слой.png", "Добавить слой", ButtonsCommands.AddLayer),
-                        new MenuButtonItem("Icons/Панель СЛОИ/Удалить_слой.png", "Удалить слой", ButtonsCommands.DeleteLayer),
-                        new MenuButtonItem("Icons/Панель СЛОИ/Менеджер_слоев.png", "Менеджер слоёв", ButtonsCommands.LayersManager),
+                        new MenuButtonItem("Icons/Панель СЛОИ/Добавить_слой.png", "Добавить слой", UniversalCommands.AddLayer),
+                        new MenuButtonItem("Icons/Панель СЛОИ/Удалить_слой.png", "Удалить слой", UniversalCommands.DeleteLayer),
+                        new MenuButtonItem("Icons/Панель СЛОИ/Менеджер_слоев.png", "Менеджер слоёв", UniversalCommands.LayersManager),
                     }, Brushes.DarkSlateGray),
                     new MenuExpanderItem("Icons/Question 4.png", "Справка", new BaseMenuElement[]
                     {
-                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Консоль.png", "Консоль", ButtonsCommands.Console),
-                        new MenuButtonItem("Icons/Панель СПРАВКА/Статистика.png", "Статистика", ButtonsCommands.Statistics),
-                        new MenuSubItem(null, "Справка", ButtonsCommands.Help,
+                        new MenuButtonItem("Icons/Панель ОТОБРАЖЕНИЕ/Консоль.png", "Консоль", UniversalCommands.Console),
+                        new MenuButtonItem("Icons/Панель СПРАВКА/Статистика.png", "Статистика", UniversalCommands.Statistics),
+                        new MenuSubItem(null, "Справка", UniversalCommands.Help,
                             new[]
                             {
-                                new MenuTextButtonItem("О программе", ButtonsCommands.Help, 100),
-                                new MenuTextButtonItem("Документация", ButtonsCommands.Help, 100),
+                                new MenuTextButtonItem("О программе", UniversalCommands.Help, 100),
+                                new MenuTextButtonItem("Документация", UniversalCommands.Help, 100),
                             }, 56) {Description = "Справка"},
                     }, Brushes.DarkSlateGray, Visibility.Hidden),
                 });
@@ -432,10 +483,38 @@ namespace CADView
             //Controller.draw(Session, ActiveDocument.DocumentID);
         }
 
-        private void RenderPanelOnMouseFire(MouseEventArgs args)
+        private void RenderPanelOnMouseFire(RenderPanel.MouseEventArgsExtended args)
         {
-            //Controller.eventHendling(ActiveDocument.DocumentID, (int) args.Button, args.X,
-            //    args.Y, args.Delta);
+            UniversalInputEvents ev = UniversalInputEvents.Count;
+            switch (args.Button)
+            {
+                case MouseButtons.Left:
+                    ev = args.Clicks > 1
+                        ? UniversalInputEvents.mouse_left_button_double_click
+                        : UniversalInputEvents.mouse_left_button_pressed;
+                    if (args.State == RenderPanel.MouseEventArgsExtended.PressedState.Released)
+                        ev = UniversalInputEvents.mouse_left_button_released;
+                    break;
+                case MouseButtons.None:
+                    break;
+                case MouseButtons.Right:
+                    ev = UniversalInputEvents.mouse_right_button;
+                    break;
+                case MouseButtons.Middle:
+                    ev = UniversalInputEvents.mouse_middle_button;
+                    break;
+                case MouseButtons.XButton1:
+                    break;
+                case MouseButtons.XButton2:
+                    break;
+                default:
+                    break;
+            }
+            if (args.Delta > 0)
+                ev = UniversalInputEvents.mouse_wheel;
+            if (ev != UniversalInputEvents.Count)
+                Controller.Event((int) ev);
+            Controller.MouseMove(args.X, args.Y);
         }
 
         private async Task<bool> ProcessControllerWork(ApplicationController.Operations type, object data)
@@ -445,6 +524,7 @@ namespace CADView
                 IsActive = false;
                 await Task.Run(delegate
                 {
+                    Controller.Operation(0);
                     //Controller.procOperation(Session, ActiveDocument.DocumentID, type,
                     //    (object[]) data);
                 });
@@ -472,7 +552,7 @@ namespace CADView
             //rd.Add("OpenHand", t);
             //Application.Current.Resources.MergedDictionaries.Add(rd);
 
-            if (!(obj is ButtonsCommands))
+            if (!(obj is UniversalCommands))
             {
 
             }
@@ -505,96 +585,96 @@ namespace CADView
                     parent.IsExpanded = false;
                 }
 
-                ButtonsCommands buttonCommand = (ButtonsCommands)obj;
+                UniversalCommands buttonCommand = (UniversalCommands)obj;
                 switch (buttonCommand)
                 {
-                    case ButtonsCommands.NewDocument:
+                    case UniversalCommands.NewDocument:
                         CreateDocument();
                         break;
-                    case ButtonsCommands.OpenDocument:
+                    case UniversalCommands.OpenDocument:
                         new OpenFileDialog().ShowDialog();
                         break;
-                    case ButtonsCommands.SaveDocument:
+                    case UniversalCommands.SaveDocument:
                         new SaveFileDialog().ShowDialog();
                         break;
-                    case ButtonsCommands.StepBackward:
+                    case UniversalCommands.StepBackward:
                         break;
-                    case ButtonsCommands.StepForward:
+                    case UniversalCommands.StepForward:
                         break;
-                    case ButtonsCommands.Pen:
+                    case UniversalCommands.Pen:
                         break;
-                    case ButtonsCommands.Line1:
+                    case UniversalCommands.Line1:
                         break;
-                    case ButtonsCommands.Line2:
+                    case UniversalCommands.Line2:
                         break;
-                    case ButtonsCommands.Line3:
+                    case UniversalCommands.Line3:
                         break;
-                    case ButtonsCommands.Line4:
+                    case UniversalCommands.Line4:
                         break;
-                    case ButtonsCommands.Arc1:
+                    case UniversalCommands.Arc1:
                         break;
-                    case ButtonsCommands.Arc2:
+                    case UniversalCommands.Arc2:
                         break;
-                    case ButtonsCommands.Circle1:
+                    case UniversalCommands.Circle1:
                         break;
-                    case ButtonsCommands.Circle2:
+                    case UniversalCommands.Circle2:
                         break;
-                    case ButtonsCommands.BrokenLine:
+                    case UniversalCommands.BrokenLine:
                         break;
-                    case ButtonsCommands.Spline:
+                    case UniversalCommands.Spline:
                         break;
-                    case ButtonsCommands.MoveView:
+                    case UniversalCommands.MoveView:
                         break;
-                    case ButtonsCommands.EnlargeView:
+                    case UniversalCommands.EnlargeView:
                         break;
-                    case ButtonsCommands.DiminishView:
+                    case UniversalCommands.DiminishView:
                         break;
-                    case ButtonsCommands.ShowAll:
+                    case UniversalCommands.ShowAll:
                         break;
-                    case ButtonsCommands.ShowNodes:
+                    case UniversalCommands.ShowNodes:
                         break;
-                    case ButtonsCommands.ShowGrid:
+                    case UniversalCommands.ShowGrid:
                         break;
-                    case ButtonsCommands.SetTheme:
+                    case UniversalCommands.SetTheme:
                         break;
-                    case ButtonsCommands.Eraser:
+                    case UniversalCommands.Eraser:
                         break;
-                    case ButtonsCommands.Trimming:
+                    case UniversalCommands.Trimming:
                         break;
-                    case ButtonsCommands.EnlargeElement:
+                    case UniversalCommands.EnlargeElement:
                         break;
-                    case ButtonsCommands.LinkLines:
+                    case UniversalCommands.LinkLines:
                         break;
-                    case ButtonsCommands.DestroyLine:
+                    case UniversalCommands.DestroyLine:
                         break;
-                    case ButtonsCommands.Correct:
+                    case UniversalCommands.Correct:
                         break;
-                    case ButtonsCommands.CreateNode:
+                    case UniversalCommands.CreateNode:
                         break;
-                    case ButtonsCommands.DeleteNode:
+                    case UniversalCommands.DeleteNode:
                         break;
-                    case ButtonsCommands.Measure:
+                    case UniversalCommands.Measure:
                         break;
-                    case ButtonsCommands.Protractor:
+                    case UniversalCommands.Protractor:
                         break;
-                    case ButtonsCommands.AddLayer:
+                    case UniversalCommands.AddLayer:
                         new LayersAdd { Owner = _owner }.ShowDialog();
                         break;
-                    case ButtonsCommands.DeleteLayer:
+                    case UniversalCommands.DeleteLayer:
                         new LayersDelete { Owner = _owner }.ShowDialog();
                         break;
-                    case ButtonsCommands.LayersManager:
+                    case UniversalCommands.LayersManager:
                         new LayersManager { Owner = _owner }.ShowDialog();
                         break;
-                    case ButtonsCommands.Help:
+                    case UniversalCommands.Help:
                         break;
-                    case ButtonsCommands.Console:
+                    case UniversalCommands.Console:
                         ConsoleVisible = ConsoleVisible == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
                         break;
-                    case ButtonsCommands.Statistics:
+                    case UniversalCommands.Statistics:
                         new Statistics { Owner = _owner }.ShowDialog();
                         break;
-                    case ButtonsCommands.Properties:
+                    case UniversalCommands.Properties:
                         new Dialogs.Properties { Owner = _owner }.ShowDialog();
                         break;
                     default:
@@ -602,6 +682,95 @@ namespace CADView
                 }
             }
         }
+
+        #region View callback functions
+
+        void IViewCallback.DrawGeometry(int color, int thickness, double[] points, int size)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.Background(int color)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.DrawNodes(int color, int thickness)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.DrawMesh(int color, int thickness)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.SetCameraPosition(double[] pos)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.FirstString(string str, int size, bool redColor)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.SecondString(string str, int size, bool redColor)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.ConsoleLog(string str, int size, bool redColor)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.LayersList(int[] ids, int[] size, string[] names)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.VisibleLayers(int[] ids, int[] size)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.SetActiveLayer(int LayerId)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.SetDocName(int docId, string str, int size)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.DocsList(int[] ids, int[] size, string[] names)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.SetDocState(int id, bool status)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.SetDocStatistics(int[] objects, int size)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.SetActiveTheme(int themeId)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IViewCallback.ThemesList(int[] ids, int[] size, string[] names)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
 
         #endregion
 
@@ -633,10 +802,13 @@ namespace CADView
             {
                 return _closeDocumentCommand ?? (_closeDocumentCommand = new RelayCommand(delegate (object i)
                 {
+
                     string name = i as string;
                     if (string.IsNullOrEmpty(name)) return;
 
                     var tab = DocumentViewModelsTabs.ToList().Find(d => d.Title.Equals(name));
+                    CloseDocument((int) tab.DocumentID);
+
                     //var document = _tabsDocuments[tab];
 
                     //if (document == null) return;
