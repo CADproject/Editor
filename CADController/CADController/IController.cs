@@ -54,6 +54,18 @@ namespace CADController
 
     public interface IViewCallback
     {
+        //заметка: все функции должны быть приведены к одному виду, чтобы их можно было передать в виде массива делегатов
+        //таким образом, нам требуется структура вида:
+        /*
+        public struct CallbackValues
+        {
+            public int p1, p2, p3;
+            public string p4;
+            public bool p5;
+            public IntPtr p6, p7, p8, p9, p10; //string[], int[], int[], int[], double[]
+        }
+        */
+
         //==================================================
         // Графика
         //==================================================
