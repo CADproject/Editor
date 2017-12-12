@@ -57,6 +57,7 @@ namespace CADController
         //заметка: все функции должны быть приведены к одному виду, чтобы их можно было передать в виде массива делегатов
         //таким образом, нам требуется структура вида:
         /*
+        [StructLayout(LayoutKind.Sequential)]
         public struct CallbackValues
         {
             public int p1, p2, p3;
