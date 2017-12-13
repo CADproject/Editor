@@ -67,6 +67,15 @@
       <HintPath>..\..\packages\Dragablz.0.0.3.190\lib\net45\Dragablz.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SharpGL, Version=2.4.0.0, Culture=neutral, PublicKeyToken=27fc851303210b27, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\SharpGL.2.4.0.0\lib\net40\SharpGL.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpGL.SceneGraph, Version=2.4.0.0, Culture=neutral, PublicKeyToken=27fc851303210b27, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\SharpGL.2.4.0.0\lib\net40\SharpGL.SceneGraph.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpGL.WPF, Version=2.4.0.0, Culture=neutral, PublicKeyToken=27fc851303210b27, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\SharpGL.WPF.2.4.0.0\lib\net40\SharpGL.WPF.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -135,11 +144,12 @@
     <Compile Include="DocumentModel.cs" />
     <Compile Include="MenuItemClasses.cs" />
     <Compile Include="RelayCommand.cs" />
-    <Compile Include="RenderPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="RenderPanel.cs" />
     <Compile Include="RenderPanel.Designer.cs">
       <DependentUpon>RenderPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WpfRenderPanel.xaml.cs">
+      <DependentUpon>WpfRenderPanel.xaml</DependentUpon>
     </Compile>
     <Page Include="Dialogs\ColorDialog.xaml">
       <SubType>Designer</SubType>
@@ -182,6 +192,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WpfRenderPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

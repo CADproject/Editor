@@ -13,6 +13,7 @@ using CADView.Dialogs;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace CADView
@@ -168,10 +169,10 @@ namespace CADView
             };
             _owner = owner;
             Controller = FakeController.CreateController();
-            RenderPanel.Loaded += RenderPanelOnLoad;
-            RenderPanel.Resized += RenderPanelOnResize;
-            RenderPanel.Rendered += RenderPanelOnRender;
-            RenderPanel.MouseFired += RenderPanelOnMouseFire;
+            WpfRenderPanel.Loaded += RenderPanelOnLoad;
+            WpfRenderPanel.Resized += RenderPanelOnResize;
+            WpfRenderPanel.Rendered += RenderPanelOnRender;
+            WpfRenderPanel.MouseFired += RenderPanelOnMouseFire;
         }
 
         ~MainWindowViewModel()
@@ -203,7 +204,8 @@ namespace CADView
 
         public void Init()
         {
-            Controller.OpenSession();
+            Controller.OpenSession(((IViewCallback) this).ConsoleLog, ((IViewCallback) this).DrawGeometry,
+                ((IViewCallback) this).FirstString, ((IViewCallback) this).SecondString);
             _inited = true;
 
             _timer = new DispatcherTimer(DispatcherPriority.Normal, Application.Current.Dispatcher);
@@ -445,6 +447,9 @@ namespace CADView
         private const double _minConsoleHeight = 25;
         private const double _minDocumentHeight = 152.5;
         private Thickness _documentMargin = new Thickness(0, 0, 0, 8);
+        private string _consoleText = "Test";
+        private string _mainInfoText = "Главное инфо:";
+        private string _additionalInfoText = "Дополнительное инфо";
 
         private uint Session
         {
@@ -462,7 +467,7 @@ namespace CADView
             CreateDocument();
         }
 
-        private void RenderPanelOnLoad(IntPtr hwnd, int w, int h, Document model)
+        private void RenderPanelOnLoad(/*IntPtr hwnd, int w, int h, Document model*/)
         {
             //Controller.SetActiveDocument();
             //var activeDocument = Controller.initDocument(Session, hwnd, model);
@@ -483,16 +488,27 @@ namespace CADView
             //Controller.draw(Session, ActiveDocument.DocumentID);
         }
 
-        private void RenderPanelOnMouseFire(RenderPanel.MouseEventArgsExtended args)
+        private void RenderPanelOnMouseFire(MouseEventArgsExtended args)
         {
             UniversalInputEvents ev = UniversalInputEvents.Count;
+            if (args.LeftButton == MouseButtonState.Pressed)
+                ev = UniversalInputEvents.mouse_left_button_pressed;
+            else if (args.LeftButton == MouseButtonState.Released)
+                ev = UniversalInputEvents.mouse_left_button_released;
+            else if (args.RightButton == MouseButtonState.Released)
+                ev = UniversalInputEvents.mouse_right_button;
+
+            if (ev != UniversalInputEvents.Count)
+                Controller.Event((int)ev);
+
+            /*UniversalInputEvents ev = UniversalInputEvents.Count;
             switch (args.Button)
             {
                 case MouseButtons.Left:
                     ev = args.Clicks > 1
                         ? UniversalInputEvents.mouse_left_button_double_click
                         : UniversalInputEvents.mouse_left_button_pressed;
-                    if (args.State == RenderPanel.MouseEventArgsExtended.PressedState.Released)
+                    if (args.State == MouseEventArgsExtended.PressedState.Released)
                         ev = UniversalInputEvents.mouse_left_button_released;
                     break;
                 case MouseButtons.None:
@@ -514,7 +530,7 @@ namespace CADView
                 ev = UniversalInputEvents.mouse_wheel;
             if (ev != UniversalInputEvents.Count)
                 Controller.Event((int) ev);
-            Controller.MouseMove(args.X, args.Y);
+            Controller.MouseMove(args.X, args.Y);*/
         }
 
         private async Task<bool> ProcessControllerWork(ApplicationController.Operations type, object data)
@@ -547,10 +563,6 @@ namespace CADView
             {
                 element.IsExpanded = false;
             }
-            //ResourceDictionary rd = new ResourceDictionary();
-            //DataTemplate t = new DataTemplate(typeof(MenuExpanderItem));
-            //rd.Add("OpenHand", t);
-            //Application.Current.Resources.MergedDictionaries.Add(rd);
 
             if (!(obj is UniversalCommands))
             {
@@ -685,87 +697,86 @@ namespace CADView
 
         #region View callback functions
 
-        void IViewCallback.DrawGeometry(int color, int thickness, double[] points, int size)
+        void IViewCallback.DrawGeometry(CallbackValues value)
+        {
+        }
+
+        void IViewCallback.Background(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.Background(int color)
+        void IViewCallback.DrawNodes(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.DrawNodes(int color, int thickness)
+        void IViewCallback.DrawMesh(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.DrawMesh(int color, int thickness)
+        void IViewCallback.SetCameraPosition(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.SetCameraPosition(double[] pos)
+        void IViewCallback.FirstString(CallbackValues value)
+        {
+            this.MainInfoText = value.line;
+        }
+
+        void IViewCallback.SecondString(CallbackValues value)
+        {
+            this.AdditionalInfoText = value.line;
+        }
+
+        void IViewCallback.ConsoleLog(CallbackValues value)
+        {
+            ConsoleText += Environment.NewLine + value.line;
+        }
+
+        void IViewCallback.LayersList(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.FirstString(string str, int size, bool redColor)
+        void IViewCallback.VisibleLayers(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.SecondString(string str, int size, bool redColor)
+        void IViewCallback.SetActiveLayer(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.ConsoleLog(string str, int size, bool redColor)
+        void IViewCallback.SetDocName(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.LayersList(int[] ids, int[] size, string[] names)
+        void IViewCallback.DocsList(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.VisibleLayers(int[] ids, int[] size)
+        void IViewCallback.SetDocState(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.SetActiveLayer(int LayerId)
+        void IViewCallback.SetDocStatistics(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.SetDocName(int docId, string str, int size)
+        void IViewCallback.SetActiveTheme(CallbackValues value)
         {
             throw new NotImplementedException();
         }
 
-        void IViewCallback.DocsList(int[] ids, int[] size, string[] names)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IViewCallback.SetDocState(int id, bool status)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IViewCallback.SetDocStatistics(int[] objects, int size)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IViewCallback.SetActiveTheme(int themeId)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IViewCallback.ThemesList(int[] ids, int[] size, string[] names)
+        void IViewCallback.ThemesList(CallbackValues value)
         {
             throw new NotImplementedException();
         }
@@ -930,15 +941,29 @@ namespace CADView
             get { return DocumentViewModelsTabs.Count > 0 ? Visibility.Visible : Visibility.Hidden; }
         }
 
-        public string StatusBarTextFirst => "имя документа";
-        public string StatusBarTextSecond => "Активный слой: имя активного слоя";
+        public string StatusBarTextFirst { get; set; } = "имя документа";
+        public string StatusBarTextSecond { get; set; } = "Активный слой: имя активного слоя";
 
-        public string MainInfoText => "Главное инфо:";
+        public string MainInfoText
+        {
+            get { return _mainInfoText; }
+            set { _mainInfoText = value; }
+        }
 
-        public string AdditionalInfoText => "Дополнительное инфо";
+        public string AdditionalInfoText
+        {
+            get { return _additionalInfoText; }
+            set { _additionalInfoText = value; }
+        }
 
-        public string CoordinatesTextX => "X = 50";
-        public string CoordinatesTextY => "Y = 100";
+        public string ConsoleText
+        {
+            get { return _consoleText; }
+            set { _consoleText = value; }
+        }
+
+        public string CoordinatesTextX { get; set; } = "X = 50";
+        public string CoordinatesTextY { get; set; } = "Y = 100";
 
         #endregion
     }

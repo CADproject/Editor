@@ -7,6 +7,7 @@
         xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
         xmlns:themes="clr-namespace:Xceed.Wpf.Toolkit.Themes;assembly=Xceed.Wpf.Toolkit"
+        xmlns:wpf="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
         mc:Ignorable="d"
         AllowsTransparency="False"
         Title="Editor" BorderThickness="2" Height="500" Width="870" MinHeight="500" MinWidth="570" WindowStartupLocation="CenterScreen"
@@ -298,63 +299,66 @@
                     <dragablz:TabablzControl.ContentTemplate>
                         <DataTemplate DataType="local:DocumentModel">
                             <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1*"></ColumnDefinition>
-                                    <ColumnDefinition Width="1*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
+                                <local:WpfRenderPanel></local:WpfRenderPanel>
+                                <Grid IsEnabled="False" IsHitTestVisible="False">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
 
-                                <Grid Column="0" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}"
-                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="DarkGray">
-                                    <Grid.ContextMenu>
-                                        <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
-                                            <MenuItem Header="Копировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
-                                            <MenuItem Header="Переместить" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
-                                            <MenuItem Header="Повернуть" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
-                                            <MenuItem Header="Отобразить симметрично" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
-                                            <MenuItem Header="Отобразить по кругу" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
-                                            <MenuItem Header="Масштабировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
-                                            <Separator />
-                                            <MenuItem Header="Свойства" CommandParameter="{x:Static local:UniversalCommands.Properties}" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
-                                            <Separator />
-                                            <MenuItem Header="Показать узлы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
-                                                <MenuItem.Icon>
-                                                    <Image Height="40" Source="Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png"/>
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                            <MenuItem Header="Показать сетку" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
-                                                <MenuItem.Icon>
-                                                    <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png"/>
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                            <MenuItem Header="Показать всё" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
-                                                <MenuItem.Icon>
-                                                    <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png"/>
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                        </ContextMenu>
-                                    </Grid.ContextMenu>
-                                </Grid>
-                                <Grid Column="1" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}"
-                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="DarkGray">
-                                    <Grid.ContextMenu>
-                                        <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
-                                            <MenuItem Header="Показать узлы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
-                                                <MenuItem.Icon>
-                                                    <Image Height="40" Source="Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png"/>
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                            <MenuItem Header="Показать сетку" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
-                                                <MenuItem.Icon>
-                                                    <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png"/>
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                            <MenuItem Header="Показать всё" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
-                                                <MenuItem.Icon>
-                                                    <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png"/>
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                        </ContextMenu>
-                                    </Grid.ContextMenu>
+                                    <Grid Column="0" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}"
+                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Transparent">
+                                        <Grid.ContextMenu>
+                                            <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                                <MenuItem Header="Копировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                                <MenuItem Header="Переместить" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                                <MenuItem Header="Повернуть" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                                <MenuItem Header="Отобразить симметрично" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                                <MenuItem Header="Отобразить по кругу" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                                <MenuItem Header="Масштабировать" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                                <Separator />
+                                                <MenuItem Header="Свойства" CommandParameter="{x:Static local:UniversalCommands.Properties}" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}"></MenuItem>
+                                                <Separator />
+                                                <MenuItem Header="Показать узлы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                    <MenuItem.Icon>
+                                                        <Image Height="40" Source="Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem Header="Показать сетку" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                    <MenuItem.Icon>
+                                                        <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem Header="Показать всё" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                    <MenuItem.Icon>
+                                                        <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </ContextMenu>
+                                        </Grid.ContextMenu>
+                                    </Grid>
+                                    <Grid Column="1" Tag="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dragablz:TabablzControl}}"
+                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Transparent">
+                                        <Grid.ContextMenu>
+                                            <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                                <MenuItem Header="Показать узлы" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                    <MenuItem.Icon>
+                                                        <Image Height="40" Source="Icons/Панель ОТОБРАЖЕНИЕ/Узлы.png"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem Header="Показать сетку" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                    <MenuItem.Icon>
+                                                        <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Вспомогательная_сетка.png"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem Header="Показать всё" Command="{Binding Path=DataContext.ControllerDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}">
+                                                    <MenuItem.Icon>
+                                                        <Image Source="Icons/Панель ОТОБРАЖЕНИЕ/Показать_все.png"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </ContextMenu>
+                                        </Grid.ContextMenu>
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </DataTemplate>
@@ -386,7 +390,7 @@
                     <Border Grid.Row="0" BorderThickness="1" BorderBrush="DarkSlateGray">
                         <TextBox Background="DimGray" Foreground="LightGray"
                              VerticalAlignment="Stretch" Margin="0,0,0,-3" 
-                             IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" Text="test console text" >
+                             IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" Text="{Binding ConsoleText}" >
                             <TextBox.Resources>
                                 <Style TargetType="ScrollBar">
                                     <Setter Property="Background" Value="DimGray"></Setter>
