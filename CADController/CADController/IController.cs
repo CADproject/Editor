@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace CADController
 {
@@ -10,14 +11,17 @@ namespace CADController
         Count,
     }
 
+    public delegate void Callback(CallbackValues value);
+
     public interface IController
     {
+
         //==================================================
         // Вспомогательные действия
         //==================================================
 
         //открытие сессии
-        Status OpenSession(params Delegate[] delegates);
+        Status OpenSession(params Callback[] delegates);
 
         //закрытие сессии
         Status CloseSession();
@@ -52,6 +56,15 @@ namespace CADController
         void SendString(string value);
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct CallbackValues
+    {
+        public int color, thickness, size;
+        public string line;
+        public bool red;
+        public IntPtr p6, p7, p8, p9, p10; //string[], int[], int[], int[], double[]
+    }
+
     public interface IViewCallback
     {
         //заметка: все функции должны быть приведены к одному виду, чтобы их можно было передать в виде массива делегатов
@@ -71,68 +84,119 @@ namespace CADController
         // Графика
         //==================================================
 
-        //отрисовка геометрии
-        void DrawGeometry(int color, int thickness, double[] points, int size);
+        /// <summary>
+        /// отрисовка геометрии
+        /// </summary>
+        /// <param name="value">int color, int thickness, double[] points, int size</param>
+        void DrawGeometry(CallbackValues value);
 
-        //задание фона документа
-        void Background(int color);
+        /// <summary>
+        /// задание фона документа
+        /// </summary>
+        /// <param name="value">int color</param>
+        void Background(CallbackValues value);
 
-        //показать / скрыть узлы
-        void DrawNodes(int color, int thickness);
+        /// <summary>
+        /// показать / скрыть узлы
+        /// </summary>
+        /// <param name="value">int color, int thickness</param>
+        void DrawNodes(CallbackValues value);
 
-        //показать / скрыть сетку
-        void DrawMesh(int color, int thickness);
+        /// <summary>
+        /// показать / скрыть сетку
+        /// </summary>
+        /// <param name="value">int color, int thickness</param>
+        void DrawMesh(CallbackValues value);
 
-        //задать положение камеры
-        void SetCameraPosition(double[] pos);
+        /// <summary>
+        /// задать положение камеры
+        /// </summary>
+        /// <param name="value">double[] pos</param>
+        void SetCameraPosition(CallbackValues value);
 
         //==================================================
         // Текст
         //==================================================
 
-        //вывести текст в первую строку
-        void FirstString(string str, int size, bool redColor);
+        /// <summary>
+        /// вывести текст в первую строку
+        /// </summary>
+        /// <param name="value">string str, int size, bool redColor</param>
+        void FirstString(CallbackValues value);
 
-        //вывести текст во вторую строку
-        void SecondString(string str, int size, bool redColor);
+        /// <summary>
+        /// вывести текст во вторую строку
+        /// </summary>
+        /// <param name="value">string str, int size, bool redColor</param>
+        void SecondString(CallbackValues value);
 
-        //вывести текст на консоль
-        void ConsoleLog(string str, int size, bool redColor);
+        /// <summary>
+        /// вывести текст на консоль
+        /// </summary>
+        /// <param name="value">string str, int size, bool redColor</param>
+        void ConsoleLog(CallbackValues value);
 
         //==================================================
         // Слои
         //==================================================
 
-        //отправить список слоев (для отображения в UI)
-        void LayersList(int[] ids, int[] size, string[] names);
+        /// <summary>
+        /// отправить список слоев (для отображения в UI)
+        /// </summary>
+        /// <param name="value">int[] ids, int[] size, string[] names</param>
+        void LayersList(CallbackValues value);
 
-        //отправить список видимых слоев (для отображения в UI)
-        void VisibleLayers(int[] ids, int[] size);
+        /// <summary>
+        /// отправить список видимых слоев (для отображения в UI)
+        /// </summary>
+        /// <param name="value">int[] ids, int[] size</param>
+        void VisibleLayers(CallbackValues value);
 
-        //задать активный слой (для отображения в UI)
-        void SetActiveLayer(int LayerId);
+        /// <summary>
+        /// задать активный слой (для отображения в UI)
+        /// </summary>
+        /// <param name="value">int LayerId</param>
+        void SetActiveLayer(CallbackValues value);
 
         //==================================================
         // Настройки
         //==================================================
 
-        //задать имя документу (для отображения в UI)
-        void SetDocName(int docId, string str, int size);
+        /// <summary>
+        /// задать имя документу (для отображения в UI)
+        /// </summary>
+        /// <param name="value">int docId, string str, int size</param>
+        void SetDocName(CallbackValues value);
 
-        //отправить список документов
-        void DocsList(int[] ids, int[] size, string[] names);
+        /// <summary>
+        /// отправить список документов
+        /// </summary>
+        /// <param name="value">int[] ids, int[] size, string[] names</param>
+        void DocsList(CallbackValues value);
 
-        //вернуть состояние документа (сохраненный или нет)
-        void SetDocState(int id, bool status);
+        /// <summary>
+        /// вернуть состояние документа (сохраненный или нет)
+        /// </summary>
+        /// <param name="value">int id, bool status</param>
+        void SetDocState(CallbackValues value);
 
-        //вернуть количество всех объектов/по типам/слоев
-        void SetDocStatistics(int[] objects, int size);
+        /// <summary>
+        /// вернуть количество всех объектов/по типам/слоев
+        /// </summary>
+        /// <param name="value">int[] objects, int size</param>
+        void SetDocStatistics(CallbackValues value);
 
-        //задать активную тему (для отображения в UI)
-        void SetActiveTheme(int themeId);
+        /// <summary>
+        /// задать активную тему (для отображения в UI)
+        /// </summary>
+        /// <param name="value">int themeId</param>
+        void SetActiveTheme(CallbackValues value);
 
-        //отправить список тем (для отображения в UI)
-        void ThemesList(int[] ids, int[] size, string[] names);
+        /// <summary>
+        /// отправить список тем (для отображения в UI)
+        /// </summary>
+        /// <param name="value">int[] ids, int[] size, string[] names</param>
+        void ThemesList(CallbackValues value);
 
         //==================================================
         //Функции отправляются в ядро через API контроллера
