@@ -4,24 +4,6 @@ using CADController;
 
 namespace CADView
 {
-    public class MouseEventArgsExtended : System.Windows.Input.MouseEventArgs
-    {
-        public enum PressedState
-        {
-            Pressed,
-            Released,
-        }
-
-        public PressedState State { get; private set; }
-
-        public MouseEventArgsExtended(System.Windows.Input.MouseEventArgs args, PressedState state = PressedState.Pressed)
-            : base(args.MouseDevice, args.Timestamp, args.StylusDevice)
-        {
-            State = state;
-        }
-    }
-
-
     public sealed partial class RenderPanel : UserControl
     {
 

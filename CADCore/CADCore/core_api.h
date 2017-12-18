@@ -2,7 +2,8 @@
 #include "headers.h"
 #include "session.h"
 
-#define COREDLL_API __declspec(dllexport)
+#define COREDLL_CALL __stdcall
+#define COREDLL_API  __declspec(dllexport)
 
 //session factory and all methods
 extern "C" COREDLL_API void* sessionFactory(void);
@@ -49,3 +50,25 @@ extern "C" COREDLL_API void** getContourEdges(void* pObject, int& size);
 extern "C" COREDLL_API void* genericFactory(void* primitive, unsigned layer = 0, COLOR color = BLACK, THICKNESS thickness = THREE);
 extern "C" COREDLL_API unsigned getGenericLayer(void* pObject);
 extern "C" COREDLL_API void* getGenericTopology(void* pObject);
+
+#pragma region test
+
+#pragma pack(push, 1)
+struct CallbackValues
+{
+public:
+	double thickness = 0;
+	int size = 0;
+	char* line = nullptr;
+	int flag = 0;
+	char* pString = nullptr;
+	int* pInt = nullptr;
+	double* pDouble = nullptr;
+};
+#pragma pack(pop)
+
+typedef void(COREDLL_CALL *callBackFunction)(CallbackValues);
+
+extern "C" COREDLL_API void TestPInvoke(callBackFunction f);
+
+#pragma endregion test

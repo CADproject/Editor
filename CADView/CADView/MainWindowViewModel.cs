@@ -5,6 +5,7 @@ using CADController;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -18,6 +19,41 @@ using System.Windows.Media;
 
 namespace CADView
 {
+    public class MouseEventArgsExtended
+    {
+        public enum PressedState
+        {
+            Released,
+            Pressed,
+        }
+
+        public enum MouseButtons
+        {
+            Empty,
+            Left,
+            Right,
+            Middle,
+        }
+
+        public PressedState State { get; private set; }
+        public MouseButtons Button { get; private set; }
+        public bool DoubleClick { get; private set; }
+        public double X { get; private set; }
+        public double Y { get; private set; }
+        public double Wheel { get; private set; }
+
+        public MouseEventArgsExtended(MouseButtons button, PressedState state, bool doubleClick, double x, double y, double wheel)
+        /*: base(args.MouseDevice, args.Timestamp, args.StylusDevice)*/
+        {
+            Button = button;
+            State = state;
+            DoubleClick = doubleClick;
+            X = x;
+            Y = y;
+            Wheel = wheel;
+        }
+    }
+
     public enum UniversalInputEvents
     {
         //общие события
@@ -149,6 +185,11 @@ namespace CADView
         }
     }
 
+    public interface IRenderer: IDisposable
+    {
+        void UpdateGeometry(double[] points, int[] color, double size, bool clearPrevious);
+    }
+
     public class MainWindowViewModel : INotifyPropertyChanged, IViewCallback
     {
         #region Public
@@ -169,7 +210,7 @@ namespace CADView
             };
             _owner = owner;
             Controller = FakeController.CreateController();
-            WpfRenderPanel.Loaded += RenderPanelOnLoad;
+            WpfRenderPanel.Created += RenderPanelOnLoad;
             WpfRenderPanel.Resized += RenderPanelOnResize;
             WpfRenderPanel.Rendered += RenderPanelOnRender;
             WpfRenderPanel.MouseFired += RenderPanelOnMouseFire;
@@ -225,20 +266,7 @@ namespace CADView
 
             var model = new DocumentModel(new LayerModel(true)) { DocumentID = (uint)DocumentViewModelsTabs.Count };
             model.Title = "Document #" + model.DocumentID;
-            //var host = new WindowsFormsHost()
-            //{
-            //    Child = new RenderPanel(model),
-            //    VerticalAlignment = VerticalAlignment.Stretch,
-            //    HorizontalAlignment = HorizontalAlignment.Stretch,
-            //};
-
-            //TabItem tab = new TabItem()
-            //{
-            //    Content = host,
-            //    DataContext = model,
-            //};
             DocumentViewModelsTabs.Add(model);
-            //_tabsDocuments[tab] = model;
             _selectedDocumentIndex = DocumentViewModelsTabs.Count - 1;
             OnPropertyChanged(nameof(SelectedDocumentIndex));
             OnPropertyChanged(nameof(InfoVisible));
@@ -301,7 +329,7 @@ namespace CADView
             }
         }
 
-        public Document ActiveDocument
+        public DocumentModel ActiveDocument
         {
             get
             {
@@ -450,6 +478,8 @@ namespace CADView
         private string _consoleText = "Test";
         private string _mainInfoText = "Главное инфо:";
         private string _additionalInfoText = "Дополнительное инфо";
+        private string _coordinatesTextX = "X = 50";
+        private string _coordinatesTextY = "Y = 100";
 
         private uint Session
         {
@@ -467,14 +497,9 @@ namespace CADView
             CreateDocument();
         }
 
-        private void RenderPanelOnLoad(/*IntPtr hwnd, int w, int h, Document model*/)
+        private void RenderPanelOnLoad(IRenderer sender)
         {
-            //Controller.SetActiveDocument();
-            //var activeDocument = Controller.initDocument(Session, hwnd, model);
-            //Controller.activateDocement(Session, activeDocument, w, h);
-            //ActiveDocument.Title = "Document # " + activeDocument;
-            //ActiveDocument.DocumentID = activeDocument;
-            //IsActive = true;
+            this.ActiveDocument.Renderer = sender;
         }
 
         private void RenderPanelOnResize(int w, int h)
@@ -491,46 +516,40 @@ namespace CADView
         private void RenderPanelOnMouseFire(MouseEventArgsExtended args)
         {
             UniversalInputEvents ev = UniversalInputEvents.Count;
-            if (args.LeftButton == MouseButtonState.Pressed)
-                ev = UniversalInputEvents.mouse_left_button_pressed;
-            else if (args.LeftButton == MouseButtonState.Released)
-                ev = UniversalInputEvents.mouse_left_button_released;
-            else if (args.RightButton == MouseButtonState.Released)
-                ev = UniversalInputEvents.mouse_right_button;
+            switch (args.Button)
+            {
+                case MouseEventArgsExtended.MouseButtons.Empty:
+                    break;
+                case MouseEventArgsExtended.MouseButtons.Left:
+                    ev = args.State == MouseEventArgsExtended.PressedState.Pressed
+                        ? UniversalInputEvents.mouse_left_button_pressed
+                        : UniversalInputEvents.mouse_left_button_released;
+                    if (args.DoubleClick)
+                        ev = UniversalInputEvents.mouse_left_button_double_click;
+                    break;
+                case MouseEventArgsExtended.MouseButtons.Right:
+                    if(args.State == MouseEventArgsExtended.PressedState.Released)
+                        ev = UniversalInputEvents.mouse_right_button;
+                    break;
+                case MouseEventArgsExtended.MouseButtons.Middle:
+                    if (args.State == MouseEventArgsExtended.PressedState.Released)
+                        ev = UniversalInputEvents.mouse_middle_button;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            if (args.Wheel > 0)
+                ev = UniversalInputEvents.mouse_wheel;
 
             if (ev != UniversalInputEvents.Count)
                 Controller.Event((int)ev);
 
-            /*UniversalInputEvents ev = UniversalInputEvents.Count;
-            switch (args.Button)
-            {
-                case MouseButtons.Left:
-                    ev = args.Clicks > 1
-                        ? UniversalInputEvents.mouse_left_button_double_click
-                        : UniversalInputEvents.mouse_left_button_pressed;
-                    if (args.State == MouseEventArgsExtended.PressedState.Released)
-                        ev = UniversalInputEvents.mouse_left_button_released;
-                    break;
-                case MouseButtons.None:
-                    break;
-                case MouseButtons.Right:
-                    ev = UniversalInputEvents.mouse_right_button;
-                    break;
-                case MouseButtons.Middle:
-                    ev = UniversalInputEvents.mouse_middle_button;
-                    break;
-                case MouseButtons.XButton1:
-                    break;
-                case MouseButtons.XButton2:
-                    break;
-                default:
-                    break;
-            }
-            if (args.Delta > 0)
-                ev = UniversalInputEvents.mouse_wheel;
-            if (ev != UniversalInputEvents.Count)
-                Controller.Event((int) ev);
-            Controller.MouseMove(args.X, args.Y);*/
+            if (args.Wheel > 0)
+                Controller.SendDouble(args.Wheel);
+
+            Controller.MouseMove(args.X, args.Y);
+            CoordinatesTextX = args.X.ToString("F");
+            CoordinatesTextY = args.Y.ToString("F");
         }
 
         private async Task<bool> ProcessControllerWork(ApplicationController.Operations type, object data)
@@ -697,8 +716,18 @@ namespace CADView
 
         #region View callback functions
 
-        void IViewCallback.DrawGeometry(CallbackValues value)
+        [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false), System.Security.SuppressUnmanagedCodeSecurity]
+        private static extern unsafe void* CopyMemory(void* dest, void* src, ulong count);
+
+        unsafe void IViewCallback.DrawGeometry(CallbackValues value)
         {
+            int* color = (int*) value.pInt.ToPointer();
+            double* points = (double*) value.pDouble.ToPointer();
+            double[] arrayPoints = new double[value.size * 3];
+            fixed (double* p = arrayPoints)
+                CopyMemory(p, points, (ulong) (value.size * 3 * sizeof(double)));
+            ActiveDocument?.Renderer?.UpdateGeometry(arrayPoints, new[] {color[0], color[1], color[2]}, value.thickness,
+                value.flag == 1);
         }
 
         void IViewCallback.Background(CallbackValues value)
@@ -947,23 +976,52 @@ namespace CADView
         public string MainInfoText
         {
             get { return _mainInfoText; }
-            set { _mainInfoText = value; }
+            set
+            {
+                _mainInfoText = value;
+                OnPropertyChanged();
+            }
         }
 
         public string AdditionalInfoText
         {
             get { return _additionalInfoText; }
-            set { _additionalInfoText = value; }
+            set
+            {
+                _additionalInfoText = value;
+                OnPropertyChanged();
+            }
         }
 
         public string ConsoleText
         {
             get { return _consoleText; }
-            set { _consoleText = value; }
+            set
+            {
+                _consoleText = value;
+                OnPropertyChanged();
+            }
         }
 
-        public string CoordinatesTextX { get; set; } = "X = 50";
-        public string CoordinatesTextY { get; set; } = "Y = 100";
+        public string CoordinatesTextX
+        {
+            get { return _coordinatesTextX; }
+            set
+            {
+                _coordinatesTextX = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string CoordinatesTextY
+        {
+            get { return _coordinatesTextY; }
+            set
+            {
+                _coordinatesTextY = value;
+                OnPropertyChanged();
+            }
+        }
 
         #endregion
     }

@@ -59,27 +59,15 @@ namespace CADController
     [StructLayout(LayoutKind.Sequential)]
     public struct CallbackValues
     {
-        public int color, thickness, size;
+        public double thickness;
+        public int size;
         public string line;
-        public bool red;
-        public IntPtr p6, p7, p8, p9, p10; //string[], int[], int[], int[], double[]
+        public int flag;
+        public IntPtr pString, pInt, pDouble;
     }
 
     public interface IViewCallback
     {
-        //заметка: все функции должны быть приведены к одному виду, чтобы их можно было передать в виде массива делегатов
-        //таким образом, нам требуется структура вида:
-        /*
-        [StructLayout(LayoutKind.Sequential)]
-        public struct CallbackValues
-        {
-            public int p1, p2, p3;
-            public string p4;
-            public bool p5;
-            public IntPtr p6, p7, p8, p9, p10; //string[], int[], int[], int[], double[]
-        }
-        */
-
         //==================================================
         // Графика
         //==================================================
@@ -87,7 +75,7 @@ namespace CADController
         /// <summary>
         /// отрисовка геометрии
         /// </summary>
-        /// <param name="value">int color, int thickness, double[] points, int size</param>
+        /// <param name="value">int[] color, int thickness, double[] points, int size</param>
         void DrawGeometry(CallbackValues value);
 
         /// <summary>
@@ -143,13 +131,13 @@ namespace CADController
         /// <summary>
         /// отправить список слоев (для отображения в UI)
         /// </summary>
-        /// <param name="value">int[] ids, int[] size, string[] names</param>
+        /// <param name="value">int[] ids, int size, string[] names</param>
         void LayersList(CallbackValues value);
 
         /// <summary>
         /// отправить список видимых слоев (для отображения в UI)
         /// </summary>
-        /// <param name="value">int[] ids, int[] size</param>
+        /// <param name="value">int[] ids, int size</param>
         void VisibleLayers(CallbackValues value);
 
         /// <summary>
@@ -171,7 +159,7 @@ namespace CADController
         /// <summary>
         /// отправить список документов
         /// </summary>
-        /// <param name="value">int[] ids, int[] size, string[] names</param>
+        /// <param name="value">int[] ids, int size, string[] names</param>
         void DocsList(CallbackValues value);
 
         /// <summary>
@@ -195,7 +183,7 @@ namespace CADController
         /// <summary>
         /// отправить список тем (для отображения в UI)
         /// </summary>
-        /// <param name="value">int[] ids, int[] size, string[] names</param>
+        /// <param name="value">int[] ids, int size, string[] names</param>
         void ThemesList(CallbackValues value);
 
         //==================================================

@@ -54,6 +54,8 @@ namespace CADView
             }
         }
 
+        public IRenderer Renderer { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion

@@ -110,6 +110,14 @@ namespace CADController
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr getGenericTopology(IntPtr pObject);
+
+
+        #region test
+
+        [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr TestPInvoke(Callback function);
+
+        #endregion
     }
 
     public unsafe class UnmanagedArray<T> where T: struct

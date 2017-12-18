@@ -8,7 +8,7 @@ namespace CADController
     public class FakeController: IController
     {
         private static readonly List<FakeController> _controllers = new List<FakeController>();
-        private Callback _logCallback;
+        private Callback _logCallback, _drawCallback;
 
         public static IController CreateController()
         {
@@ -34,8 +34,11 @@ namespace CADController
 
         public Status OpenSession(params Callback[] delegates)
         {
-            if (delegates.Length > 0)
+            if (delegates.Length > 1)
+            {
                 _logCallback = delegates[0];
+                _drawCallback = delegates[1];
+            }
             _logCallback?.Invoke(new CallbackValues {line = GetCurrentMethod()});
             return Status.Success;
         }
@@ -55,12 +58,18 @@ namespace CADController
 
         public void Event(int evId)
         {
-            _logCallback?.Invoke(new CallbackValues { line = $"{GetCurrentMethod()}, {evId}" });
+            _logCallback?.Invoke(new CallbackValues {line = $"{GetCurrentMethod()}, {evId}"});
             Console.WriteLine($"{GetCurrentMethod()}, {evId}");
+
+            if (evId == 6)
+            {
+                CoreWrapper.TestPInvoke(_drawCallback);
+            }
         }
 
         public void MouseMove(double x, double y)
         {
+            return;
             _logCallback?.Invoke(new CallbackValues { line = GetCurrentMethod() });
             Console.WriteLine(GetCurrentMethod());
         }

@@ -365,12 +365,12 @@
                     </dragablz:TabablzControl.ContentTemplate>
                 </dragablz:TabablzControl>
                 <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,40,0,0">
-                    <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" Content="{Binding MainInfoText, Mode= OneWay}"></Label>
-                    <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" Content="{Binding AdditionalInfoText, Mode=OneWay}"></Label>
+                    <Label Foreground="Yellow" IsHitTestVisible="False" Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" Content="{Binding MainInfoText, Mode= OneWay}"></Label>
+                    <Label Foreground="Yellow" IsHitTestVisible="False" Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" Content="{Binding AdditionalInfoText, Mode=OneWay}"></Label>
                 </StackPanel>
-                <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                <Label Foreground="Yellow" IsHitTestVisible="False" Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                        Margin="10,0,0,0" Content="{Binding CoordinatesTextX, Mode=OneWay}"></Label>
-                <Label Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                <Label Foreground="Yellow" IsHitTestVisible="False" Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                        Margin="80,0,0,0" Content="{Binding CoordinatesTextY, Mode=OneWay}"></Label>
             </Grid>
 

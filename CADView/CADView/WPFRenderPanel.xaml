@@ -8,6 +8,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <wpf:OpenGLControl x:Name="Renderer"  OpenGLDraw="GLDraw" OpenGLInitialized="GLInitialized" DrawFPS="True"/>
+        <wpf:OpenGLControl x:Name="Renderer"  OpenGLDraw="GLDraw" OpenGLInitialized="GLInitialized" DrawFPS="false"/>
     </Grid>
 </UserControl>
