@@ -127,7 +127,7 @@ namespace CADView
         AddLayer,                                               //add_layer,
         rename_layer,                                            //rename_layer,
         DeleteLayer,                                            //remove_layer,
-        LayersManager,
+        //LayersManager,
         set_active_layer,                                       //set_active_layer,
         set_visible_layers,                                     //set_visible_layers,
         set_invisible_layers,                                   //set_invisible_layers,
@@ -142,6 +142,9 @@ namespace CADView
         Statistics,
         Properties,
         Console,
+
+        LayersManager,
+
         Count,
     }
 
@@ -209,7 +212,7 @@ namespace CADView
                 ConsoleHeight = ConsoleHeight;
             };
             _owner = owner;
-            Controller = FakeController.CreateController();
+            ApplicationController = ControllerFactory.CreateController();
             WpfRenderPanel.Created += RenderPanelOnLoad;
             WpfRenderPanel.Resized += RenderPanelOnResize;
             WpfRenderPanel.Rendered += RenderPanelOnRender;
@@ -223,15 +226,15 @@ namespace CADView
             {
                 DocumentViewModels[id].Dispose();
             }
-            Controller.Operation((int)UniversalCommands.close_all_docs);
-            Controller.CloseSession();
+            ApplicationController.Operation((int)UniversalCommands.close_all_docs);
+            ApplicationController.CloseSession();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public delegate Task ProcessDataDelegate(object[] o);
 
-        internal IController Controller { get; private set; }
+        internal IApplicationController ApplicationController { get; private set; }
 
         public bool IsActive
         {
@@ -245,7 +248,7 @@ namespace CADView
 
         public void Init()
         {
-            Controller.OpenSession(((IViewCallback) this).ConsoleLog, ((IViewCallback) this).DrawGeometry,
+            ApplicationController.OpenSession(((IViewCallback) this).ConsoleLog, ((IViewCallback) this).DrawGeometry,
                 ((IViewCallback) this).FirstString, ((IViewCallback) this).SecondString);
             _inited = true;
 
@@ -254,14 +257,14 @@ namespace CADView
             _timer.Tick += delegate
             {
                 if (DocumentViewModels.Count == 0) return;
-                //Controller.draw(Session, ActiveDocument.DocumentID);
+                //ApplicationController.draw(Session, ActiveDocument.DocumentID);
             };
             _timer.Start();
         }
 
         public void CreateDocument()
         {
-            Controller.Operation((int)UniversalCommands.NewDocument);
+            ApplicationController.Operation((int)UniversalCommands.NewDocument);
             //Заметка: мы обновляем весь список документов после создания нового по событию?
 
             var model = new DocumentModel(new LayerModel(true)) { DocumentID = (uint)DocumentViewModelsTabs.Count };
@@ -274,8 +277,8 @@ namespace CADView
 
         public void CloseDocument(int id)
         {
-            Controller.Operation((int) UniversalCommands.close_document);
-            Controller.SendInt(id);
+            ApplicationController.Operation((int) UniversalCommands.close_document);
+            ApplicationController.SendInt(id);
             //Заметка: потому что мы можем закрыть и не активный документ
         }
 
@@ -289,7 +292,7 @@ namespace CADView
 
                 if (SelectedDocumentIndex < 0 || SelectedDocumentIndex > DocumentViewModelsTabs.Count) return;
 
-                Controller.SetActiveDocument(DocumentViewModelsTabs[value].DocumentID);
+                ApplicationController.SetActiveDocument(DocumentViewModelsTabs[value].DocumentID);
             }
         }
 
@@ -306,7 +309,7 @@ namespace CADView
         public Dictionary<uint, Document> DocumentViewModels
         {
             get;
-            //get { return Controller.Documents; }
+            //get { return ApplicationController.Documents; }
         } = new Dictionary<uint, Document>();
 
         public double WindowWidth
@@ -457,9 +460,8 @@ namespace CADView
         bool _inited;
         private bool _isActive;
         private RelayCommand _documentWorkCommand;
-        private RelayCommand _controllerWorkCommand;
-        private RelayCommand _controllerDialogCommand;
         private RelayCommand _closeDocumentCommand;
+        private RelayCommand _menuButtonClickCommand;
         private ObservableCollection<DocumentModel> _documentViewModelsTabs = new ObservableCollection<DocumentModel>();
         private int _selectedDocumentIndex = -1;
         private DispatcherTimer _timer;
@@ -504,13 +506,13 @@ namespace CADView
 
         private void RenderPanelOnResize(int w, int h)
         {
-            //Controller.resizeDocument(Session, ActiveDocument.DocumentID, w, h);
+            //ApplicationController.resizeDocument(Session, ActiveDocument.DocumentID, w, h);
         }
 
         private void RenderPanelOnRender()
         {
             if (DocumentViewModels.Count == 0) return;
-            //Controller.draw(Session, ActiveDocument.DocumentID);
+            //ApplicationController.draw(Session, ActiveDocument.DocumentID);
         }
 
         private void RenderPanelOnMouseFire(MouseEventArgsExtended args)
@@ -542,26 +544,53 @@ namespace CADView
                 ev = UniversalInputEvents.mouse_wheel;
 
             if (ev != UniversalInputEvents.Count)
-                Controller.Event((int)ev);
+                ApplicationController.InputEvent((int)ev);
 
             if (args.Wheel > 0)
-                Controller.SendDouble(args.Wheel);
+                ApplicationController.SendDouble(args.Wheel);
 
-            Controller.MouseMove(args.X, args.Y);
+            ApplicationController.MouseMove(args.X, args.Y);
             CoordinatesTextX = args.X.ToString("F");
             CoordinatesTextY = args.Y.ToString("F");
         }
 
-        private async Task<bool> ProcessControllerWork(ApplicationController.Operations type, object data)
+        private async Task<bool> ProcessMenuButtonClick(UniversalCommands command, object data)
         {
+            var button = BaseMenuElement.CreatedUIElements.Find(
+                element => element is MenuButtonItem && ((IButtonOperation)element).Parameter == (object)command);
+            var parent = BaseMenuElement.CreatedUIElements.Find(element =>
+                element is MenuSubItem && ((BaseExpanderItem)element).SubItems
+                    .ToList().Contains(button)) as BaseExpanderItem;
+            if (parent != null)
+            {
+                string tmp;
+                tmp = button.Image;
+                button.Image = parent.Image;
+                parent.Image = tmp;
+
+                tmp = button.HintText;
+                button.HintText = parent.HintText;
+                parent.HintText = tmp;
+
+                tmp = button.Description;
+                button.Description = parent.Description;
+                parent.Description = tmp;
+
+                var brush = button.Color;
+                button.Color = parent.Color;
+                parent.Color = brush;
+
+                parent.IsExpanded = false;
+            }
+
+            ProcessControllerRaiseDialog(command);
             try
             {
                 IsActive = false;
                 await Task.Run(delegate
                 {
-                    Controller.Operation(0);
-                    //Controller.procOperation(Session, ActiveDocument.DocumentID, type,
-                    //    (object[]) data);
+                    if ((int) command < (int) UniversalOperations.Count)
+                        ApplicationController.Operation((int) command);
                 });
                 return true;
             }
@@ -589,33 +618,6 @@ namespace CADView
             }
             else
             {
-                var button = BaseMenuElement.CreatedUIElements.Find(
-                    element => element is MenuButtonItem && ((IButtonOperation)element).Parameter == obj);
-                var parent = BaseMenuElement.CreatedUIElements.Find(element =>
-                    element is MenuSubItem && ((BaseExpanderItem)element).SubItems
-                        .ToList().Contains(button)) as BaseExpanderItem;
-                if (parent != null)
-                {
-                    string tmp;
-                    tmp = button.Image;
-                    button.Image = parent.Image;
-                    parent.Image = tmp;
-
-                    tmp = button.HintText;
-                    button.HintText = parent.HintText;
-                    parent.HintText = tmp;
-
-                    tmp = button.Description;
-                    button.Description = parent.Description;
-                    parent.Description = tmp;
-
-                    var brush = button.Color;
-                    button.Color = parent.Color;
-                    parent.Color = brush;
-
-                    parent.IsExpanded = false;
-                }
-
                 UniversalCommands buttonCommand = (UniversalCommands)obj;
                 switch (buttonCommand)
                 {
@@ -821,14 +823,9 @@ namespace CADView
             get { return _documentWorkCommand ?? (_documentWorkCommand = new RelayCommand(ProcessDocumentWork, o => (DocumentViewModels.Count > 0 && IsActive) || DocumentViewModels.Count == 0)); }
         }
 
-        public RelayCommand ControllerWorkCommand
+        public RelayCommand MenuButtonClickCommand
         {
-            get { return _controllerWorkCommand ?? (_controllerWorkCommand = new RelayCommand(async delegate (object o) { await ProcessControllerWork((ApplicationController.Operations)o, null); })); }
-        }
-
-        public RelayCommand ControllerDialogCommand
-        {
-            get { return _controllerDialogCommand ?? (_controllerDialogCommand = new RelayCommand(ProcessControllerRaiseDialog)); }
+            get { return _menuButtonClickCommand ?? (_menuButtonClickCommand = new RelayCommand(async delegate (object o) { await ProcessMenuButtonClick((UniversalCommands)o, null); })); }
         }
 
         public RelayCommand CloseApplicationCommand
@@ -861,7 +858,7 @@ namespace CADView
                     //host.Child.Dispose();
                     //host.Dispose();
                     tab.Dispose();
-                    //Controller.finalDocument(Session, document.DocumentID);
+                    //ApplicationController.finalDocument(Session, document.DocumentID);
                     SelectedDocumentIndex = SelectedDocumentIndex;
                     IsActive = DocumentViewModels.Count > 0;
                 }));

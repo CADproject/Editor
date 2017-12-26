@@ -71,17 +71,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoreWrapper.cs" />
-    <Compile Include="FakeController.cs" />
-    <Compile Include="IController.cs" />
+    <Compile Include="FakeApplicationController.cs" />
+    <Compile Include="IApplicationController.cs" />
     <Compile Include="Operations.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\CADCore\CADCore\CADCore.vcxproj">
-      <Project>{bba4df5f-0e3d-49d2-a412-12ac53c26486}</Project>
-      <Name>CADCore</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

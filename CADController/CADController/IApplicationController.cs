@@ -15,6 +15,32 @@ namespace CADController
 
     public interface IController
     {
+        //==================================================
+        // Работа с событиями
+        //==================================================
+
+        //отправка события
+        void InputEvent(int evId);
+
+        //движение мыши - обособленное событие
+        void MouseMove(double x, double y);
+
+        //==================================================
+        // Работа с операциями
+        //==================================================
+
+        //отправка данных в операцию
+        void SendInt(int value);
+
+        //отправка данных в операцию
+        void SendDouble(double value);
+
+        //отправка данных в операцию
+        void SendString(string value);
+    }
+
+    public interface IApplicationController: IController
+    {
 
         //==================================================
         // Вспомогательные действия
@@ -30,30 +56,11 @@ namespace CADController
         void SetActiveDocument(uint docId);
 
         //==================================================
-        // Работа с событиями
-        //==================================================
-
-        //отправка события
-        void Event(int evId);
-
-        //движение мыши - обособленное событие
-        void MouseMove(double x, double y);
-
-        //==================================================
         // Работа с операциями
         //==================================================
 
         //запуск операции
         Status Operation(int opId);
-
-        //отправка данных в операцию
-        void SendInt(int value);
-
-        //отправка данных в операцию
-        void SendDouble(double value);
-
-        //отправка данных в операцию
-        void SendString(string value);
     }
 
     [StructLayout(LayoutKind.Sequential)]

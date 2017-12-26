@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
+using SessionId = System.UInt32;
+using DocumentId = System.UInt32;
+using OperationId = System.UInt32;
+using ObjectId = System.UInt32;
+
 namespace CADController
 {
-    using SessionId = System.UInt32;
-    using DocumentId = System.UInt32;
-    using OperationId = System.UInt32;
-    using ObjectId = System.UInt32;
 
     public enum Color
     {

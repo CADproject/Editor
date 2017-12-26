@@ -13,6 +13,66 @@ namespace CADController
     using DocumentId = System.UInt32;
     using ObjectId = System.UInt32;
 
+    public enum UniversalOperations
+    {
+        ////операции с документами
+        NewDocument = 0,                                        //create_document,
+        OpenDocument,                                           //open_document,
+        SaveDocument,                                           //save_document,
+        rename_document,                                        //rename_document,
+        copy_document,                                          //copy_document,
+        close_document,                                         //close_document,
+        close_all_docs,                                         //close_all_docs,
+        StepBackward,                                           //undo,
+        StepForward,                                            //redo,
+                                                                ////геометрические операции
+        Pen,                                                    //draw_curve,
+        Line1,                                                  //draw_line,
+        Line2,                                                  //draw_line_parallel,
+        Line3,                                                  //draw_line_normal,
+        Line4,                                                  //draw_line_at_angle,
+        Arc1,                                                   //draw_arc_center_two_points,
+        Arc2,                                                   //draw_arc_three_points,
+        Circle1,                                                //draw_circle_center_point,
+        Circle2,                                                //draw_circle_three_points,
+        BrokenLine,                                             //draw_polygonal,
+        Spline,                                                 //draw_spline,
+                                                                ////операции с объектами
+        Eraser,                                                 //delete_object,
+        Trimming,                                               //trim_object,
+        EnlargeElement,                                         //lengthen_object,
+        LinkLines,                                              //sew_polygonal,
+        DestroyLine,                                            //destroy_polygonal,
+        Correct,                                                //correct_object,
+        CreateNode,                                             //add_node_to_object,
+        DeleteNode,                                             //remove_node_from_object,
+        Measure,                                                //measure_distance,
+        Protractor,                                             //measure_angle,
+        copy_object,                                            //copy_object,
+        cut_object,                                             //cut_object,
+        paste_object,                                           //paste_object,
+        move_object,                                            //move_object,
+        rotate_object,                                          //rotate_object,
+        display_in_circle_object,                               //display_in_circle_object,      
+        display_symmetyrically_object,                          //display_symmetyrically_object,
+        scale_object,                                           //scale_object,
+                                                                ////операции с видом
+        MoveView,                                               //move_camera_position,
+        EnlargeView,                                            //zoom_in_camera,
+        DiminishView,                                           //zoom_out_camera,
+        ShowAll,                                                //show_all_objects,
+                                                                ////операции со слоями
+        AddLayer,                                               //add_layer,
+        rename_layer,                                            //rename_layer,
+        DeleteLayer,                                            //remove_layer,
+                                                                //LayersManager,
+        set_active_layer,                                       //set_active_layer,
+        set_visible_layers,                                     //set_visible_layers,
+        set_invisible_layers,                                   //set_invisible_layers,
+
+        Count,
+    }
+
     public class Layer
     {
         private int _id;
@@ -138,8 +198,8 @@ namespace CADController
 
         #endregion
     }
-
-    public class ApplicationController
+    
+    /*public class ApplicationController
     {
         //
         // Сводка:
@@ -335,18 +395,6 @@ namespace CADController
 
     }
 
-    class OperationController
-    {
-        public int Layer { get; set; } = 0;
-
-        public List<object> AdditionalData { get; } = new List<object>();
-
-        public virtual void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
-        {
-            Debug.Assert(false, "This method without body");
-        }
-    }
-
     class OpPointCreate : OperationController
     {
         public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
@@ -362,28 +410,6 @@ namespace CADController
             CoreWrapper.commit(curSes, docID);
 
             //return newPointID;
-        }
-    }
-
-    class OpLineCreate : OperationController
-    {
-        public override void operationProcess(IntPtr curSes, DocumentId docID, Object[] data)
-        {
-            double X1 = (double)data[0];
-            double Y1 = (double)data[1];
-            double X2 = (double)data[2];
-            double Y2 = (double)data[3];
-            
-            IntPtr start = CoreWrapper.nodeFactory(X1, Y1);
-            IntPtr end = CoreWrapper.nodeFactory(X2, Y2);
-
-            IntPtr newLine = CoreWrapper.lineFactory(start, end);
-            IntPtr newLineGen = CoreWrapper.genericFactory(newLine, (uint)Layer);
-
-            ObjectId newLineID = CoreWrapper.attachToBase(curSes, docID, newLineGen);
-            CoreWrapper.commit(curSes, docID);
-
-            //return newLineID;
         }
     }
 
@@ -499,5 +525,5 @@ namespace CADController
         {
             CoreWrapper.setBackgroundColor(curSes, docID, (Color)data[0]);
         }
-    }
+    }*/
 }
