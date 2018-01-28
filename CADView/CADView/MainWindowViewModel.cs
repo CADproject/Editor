@@ -540,7 +540,7 @@ namespace CADView
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            if (args.Wheel > 0)
+            if (args.Wheel != 0)
                 ev = UniversalInputEvents.mouse_wheel;
 
             if (ev != UniversalInputEvents.Count)
