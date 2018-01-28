@@ -248,8 +248,14 @@ namespace CADView
 
         public void Init()
         {
-            ApplicationController.OpenSession(((IViewCallback) this).ConsoleLog, ((IViewCallback) this).DrawGeometry,
-                ((IViewCallback) this).FirstString, ((IViewCallback) this).SecondString);
+            ApplicationController.OpenSession(new Dictionary<string, Callback>()
+            {
+                {nameof(IViewCallback.ConsoleLog), ((IViewCallback) this).ConsoleLog},
+                {nameof(IViewCallback.DrawGeometry), ((IViewCallback) this).DrawGeometry},
+                {nameof(IViewCallback.FirstString), ((IViewCallback) this).FirstString},
+                {nameof(IViewCallback.SecondString), ((IViewCallback) this).SecondString},
+            });
+
             _inited = true;
 
             _timer = new DispatcherTimer(DispatcherPriority.Normal, Application.Current.Dispatcher);

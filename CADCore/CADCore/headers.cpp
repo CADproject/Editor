@@ -1,20 +1,4 @@
-#pragma once
-
-#include <iostream>
-#include <cassert>
-
-#include <map>
-#include <list>
-#include <string>
-#include <vector>
-#include <deque>
-
-#include <utility>
-#include <algorithm>
-
-#include "definitions.h"
-#include "geometry.h"
-#include "topology.h"
+#include "headers.h"
 
 #pragma region Callback functions names
 namespace callbacks
@@ -27,31 +11,31 @@ namespace callbacks
 	/// отрисовка геометрии
 	/// </summary>
 	/// <param name="value">int[] color, int thickness, double[] points, int size</param>
-	extern const char* DrawGeometry;
+	const char* DrawGeometry = "DrawGeometry";
 
 	/// <summary>
 	/// задание фона документа
 	/// </summary>
 	/// <param name="value">int color</param>
-	extern const char* Background;
+	const char* Background = "Background";
 
 	/// <summary>
 	/// показать / скрыть узлы
 	/// </summary>
 	/// <param name="value">int color, int thickness</param>
-	extern const char* DrawNodes;
+	const char* DrawNodes = "DrawNodes";
 
 	/// <summary>
 	/// показать / скрыть сетку
 	/// </summary>
 	/// <param name="value">int color, int thickness</param>
-	extern const char* DrawMesh;
+	const char* DrawMesh = "DrawMesh";
 
 	/// <summary>
 	/// задать положение камеры
 	/// </summary>
 	/// <param name="value">double[] pos</param>
-	extern const char* SetCameraPosition;
+	const char* SetCameraPosition = "SetCameraPosition";
 
 	//==================================================
 	// Текст
@@ -61,19 +45,19 @@ namespace callbacks
 	/// вывести текст в первую строку
 	/// </summary>
 	/// <param name="value">string str, int size, bool redColor</param>
-	extern const char* FirstString;
+	const char* FirstString = "FirstString";
 
 	/// <summary>
 	/// вывести текст во вторую строку
 	/// </summary>
 	/// <param name="value">string str, int size, bool redColor</param>
-	extern const char* SecondString;
+	const char* SecondString = "SecondString";
 
 	/// <summary>
 	/// вывести текст на консоль
 	/// </summary>
 	/// <param name="value">string str, int size, bool redColor</param>
-	extern const char* ConsoleLog;
+	const char* ConsoleLog = "ConsoleLog";
 
 	//==================================================
 	// Слои
@@ -83,19 +67,19 @@ namespace callbacks
 	/// отправить список слоев (для отображения в UI)
 	/// </summary>
 	/// <param name="value">int[] ids, int size, string[] names</param>
-	extern const char* LayersList;
+	const char* LayersList = "LayersList";
 
 	/// <summary>
 	/// отправить список видимых слоев (для отображения в UI)
 	/// </summary>
 	/// <param name="value">int[] ids, int size</param>
-	extern const char* VisibleLayers;
+	const char* VisibleLayers = "VisibleLayers";
 
 	/// <summary>
 	/// задать активный слой (для отображения в UI)
 	/// </summary>
 	/// <param name="value">int LayerId</param>
-	extern const char* SetActiveLayer;
+	const char* SetActiveLayer = "SetActiveLayer";
 
 	//==================================================
 	// Настройки
@@ -105,65 +89,49 @@ namespace callbacks
 	/// задать имя документу (для отображения в UI)
 	/// </summary>
 	/// <param name="value">int docId, string str, int size</param>
-	extern const char* SetDocName;
+	const char* SetDocName = "SetDocName";
 
 	/// <summary>
 	/// отправить список документов
 	/// </summary>
 	/// <param name="value">int[] ids, int size, string[] names</param>
-	extern const char* DocsList;
+	const char* DocsList = "DocsList";
 
 	/// <summary>
 	/// вернуть состояние документа (сохраненный или нет)
 	/// </summary>
 	/// <param name="value">int id, bool status</param>
-	extern const char* SetDocState;
+	const char* SetDocState = "SetDocState";
 
 	/// <summary>
 	/// вернуть количество всех объектов/по типам/слоев
 	/// </summary>
 	/// <param name="value">int[] objects, int size</param>
-	extern const char* SetDocStatistics;
+	const char* SetDocStatistics = "SetDocStatistics";
 
 	/// <summary>
 	/// задать активную тему (для отображения в UI)
 	/// </summary>
 	/// <param name="value">int themeId</param>
-	extern const char* SetActiveTheme;
+	const char* SetActiveTheme = "SetActiveTheme";
 
 	/// <summary>
 	/// отправить список тем (для отображения в UI)
 	/// </summary>
 	/// <param name="value">int[] ids, int size, string[] names</param>
-	extern const char* ThemesList;
+	const char* ThemesList = "ThemesList";
 }
 #pragma endregion Callback functions names
 
-#pragma pack(push, 1)
-struct CallbackValues
-{
-public:
-	double thickness = 0;
-	int size = 0;
-	char* line = nullptr;
-	int flag = 0;
-	char* pString = nullptr;
-	int* pInt = nullptr;
-	double* pDouble = nullptr;
-};
-#pragma pack(pop)
-
-typedef void(__stdcall *callBackFunction)(CallbackValues);
-
-template<class Tk, class Tv>
-Tv MapGetValue(std::map<Tk, Tv> map, Tk key)
-{
-	std::map<Tk, Tv>::iterator it = map.find(key);
-	if (it != map.end())
-	{
-		//element found
-		return it->second;
-	}
-	//element not found
-	return nullptr;
-}
+//template<class Tk, class Tv>
+//Tv MapGetValue(std::map<Tk, Tv> map, Tk key)
+//{
+//	std::map<Tk, Tv>::iterator it = map.find(key);
+//	if (it != map.end())
+//	{
+//		//element found
+//		return it->second;
+//	}
+//	//element not found
+//	return nullptr;
+//}

@@ -12,9 +12,11 @@ private:
 	static unsigned _counter;			//documents counter
 	std::map<DocumentId, Document*> _session;	//all open documents
 	DocumentId _activeDocument;
+	std::map<std::string, callBackFunction> _callbacks;
+	Session();
 public:
-	Session() { _activeDocument = 0; }
-	~Session() {}
+	Session(std::map<std::string, callBackFunction> callbacks);
+	~Session();
 
 	DocumentId attachDocument(Document* doc);
 	void* detachDocument(DocumentId docID);
@@ -37,7 +39,6 @@ public:
 	void toScreen(DocumentId docID);
 
 	void SetDocumentActive(DocumentId docID, int w, int h);
-	void ResizeDocument(DocumentId docID, int w, int h);
 private:
 	Document* getDocument(DocumentId docID);
 	Generic* getGeneric(DocumentId docID, ObjectId objID);

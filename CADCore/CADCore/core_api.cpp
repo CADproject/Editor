@@ -1,8 +1,13 @@
 #include "core_api.h"
 
-void* sessionFactory(void)
+void* sessionFactory(callBackFunction *callbacks, char **functionNames, int size)
 {
-	return static_cast<void*>(new Session());
+	std::map<std::string, callBackFunction> callbacksMap;
+	for (size_t i = 0; i < size; i++)
+	{
+		callbacksMap.insert(std::pair<std::string, callBackFunction>(functionNames[i], callbacks[i]));
+	}
+	return static_cast<void*>(new Session(callbacksMap));
 }
 
 DocumentId attachDocument(void* pObject, void* doc)
@@ -109,14 +114,6 @@ void activateDocument(void* pObject, DocumentId docID, int w, int h)
 {
 	Session* ses = static_cast<Session*>(pObject);
 	ses->SetDocumentActive(docID, w, h);
-}
-
-void resizeDocument(void* pObject, DocumentId docID, int w, int h)
-{
-	if (w < 1) w = 1;
-	if (h < 1) h = 1;
-	Session* ses = static_cast<Session*>(pObject);
-	ses->ResizeDocument(docID, w, h);
 }
 
 void* documentFactory(void* hwnd)

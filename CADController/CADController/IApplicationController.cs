@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace CADController
@@ -47,7 +48,7 @@ namespace CADController
         //==================================================
 
         //открытие сессии
-        Status OpenSession(params Callback[] delegates);
+        Status OpenSession(Dictionary<string, Callback> delegates);
 
         //закрытие сессии
         Status CloseSession();

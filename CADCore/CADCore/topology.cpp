@@ -2,9 +2,9 @@
 
 void Point::drawing(void) const
 {
-	glBegin(GL_POINTS);
-	glVertex2f(_node.getX(), _node.getY());
-	glEnd();
+	//glBegin(GL_POINTS);
+	//glVertex2f(_node.getX(), _node.getY());
+	//glEnd();
 
 #ifdef TRACE_DEBUG
 	std::cout << _law.getType();
@@ -17,10 +17,10 @@ void Point::drawing(void) const
 
 void Line::drawing(void) const
 {
-	glBegin(GL_LINES);
-	glVertex2f(_start.getX(), _start.getY());
-	glVertex2f(_end.getX(), _end.getY());
-	glEnd();
+	//glBegin(GL_LINES);
+	//glVertex2f(_start.getX(), _start.getY());
+	//glVertex2f(_end.getX(), _end.getY());
+	//glEnd();
 
 #ifdef TRACE_DEBUG
 	std::cout << _law.getType();
@@ -36,25 +36,25 @@ void Line::drawing(void) const
 
 void DrawCircle(float cx, float cy, float r, int num_segments)
 {
-	glBegin(GL_LINE_LOOP);
-	for (int ii = 0; ii < num_segments; ii++)
-	{
-		float theta = 2.0f * 3.1415926f * float(ii) / float(num_segments);//get the current angle
+	//glBegin(GL_LINE_LOOP);
+	//for (int ii = 0; ii < num_segments; ii++)
+	//{
+	//	float theta = 2.0f * 3.1415926f * float(ii) / float(num_segments);//get the current angle
 
-		float x = r * cosf(theta);//calculate the x component
-		float y = r * sinf(theta);//calculate the y component
+	//	float x = r * cosf(theta);//calculate the x component
+	//	float y = r * sinf(theta);//calculate the y component
 
-		glVertex2f(x + cx, y + cy);//output vertex
+	//	glVertex2f(x + cx, y + cy);//output vertex
 
-	}
-	glEnd();
+	//}
+	//glEnd();
 }
 
 void Circle::drawing(void) const
 {
-	float x = _center.getX() - _side.getX(), y = _center.getY() - _side.getY();
-	float r = sqrt(x*x + y*y);
-	DrawCircle(_center.getX(), _center.getY(), r, 48);
+	//float x = _center.getX() - _side.getX(), y = _center.getY() - _side.getY();
+	//float r = sqrt(x*x + y*y);
+	//DrawCircle(_center.getX(), _center.getY(), r, 48);
 
 #ifdef TRACE_DEBUG
 	std::cout << _law.getType();

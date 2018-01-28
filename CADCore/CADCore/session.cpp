@@ -2,6 +2,21 @@
 
 unsigned Session::_counter;
 
+Session::Session()
+{
+ _activeDocument = 0;
+}
+
+Session::Session(std::map<std::string, callBackFunction> callbacks)
+{
+	_callbacks = callbacks;
+}
+
+Session::~Session()
+{
+
+}
+
 DocumentId Session::attachDocument(Document* doc)
 {
 	++_counter;
@@ -113,26 +128,15 @@ void Session::toScreen(DocumentId docID)
 	std::cout << ". Background color: ";
 	std::cout << getDocument(docID)->getBackgroundColor() << "." << std::endl;
 #endif
-
-	auto doc = getDocument(docID);
-	if (doc != nullptr)
-		doc->RenderDraw();
 }
 
 void Session::SetDocumentActive(DocumentId docID, int w, int h)
 {
 	auto doc = getDocument(_activeDocument);
-	if (doc != nullptr)
-		doc->RenderDeactivateContext();
+	//if (doc != nullptr)
+	//	doc->RenderDeactivateContext();
 	_activeDocument = docID;
 	doc = getDocument(_activeDocument);
-	if (doc != nullptr)
-		doc->RenderActivateContext(w, h);
-}
-
-void Session::ResizeDocument(DocumentId docID, int w, int h)
-{
-	auto doc = getDocument(_activeDocument);
-	if (doc != nullptr)
-		doc->RenderResize(w, h);
+	//if (doc != nullptr)
+	//	doc->RenderActivateContext(w, h);
 }

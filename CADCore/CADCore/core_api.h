@@ -6,7 +6,7 @@
 #define COREDLL_API  __declspec(dllexport)
 
 //session factory and all methods
-extern "C" COREDLL_API void* sessionFactory(void);
+extern "C" COREDLL_API void* sessionFactory(callBackFunction *callbacks, char **functionNames, int size);
 extern "C" COREDLL_API DocumentId attachDocument(void* pObject, void* doc);
 extern "C" COREDLL_API void* detachDocument(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void destroyDocument(void* pObject);
@@ -52,22 +52,6 @@ extern "C" COREDLL_API unsigned getGenericLayer(void* pObject);
 extern "C" COREDLL_API void* getGenericTopology(void* pObject);
 
 #pragma region test
-
-#pragma pack(push, 1)
-struct CallbackValues
-{
-public:
-	double thickness = 0;
-	int size = 0;
-	char* line = nullptr;
-	int flag = 0;
-	char* pString = nullptr;
-	int* pInt = nullptr;
-	double* pDouble = nullptr;
-};
-#pragma pack(pop)
-
-typedef void(COREDLL_CALL *callBackFunction)(CallbackValues);
 
 extern "C" COREDLL_API void TestPInvoke(callBackFunction f);
 

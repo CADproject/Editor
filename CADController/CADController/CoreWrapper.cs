@@ -28,7 +28,7 @@ namespace CADController
         const ObjectId not_from_base = 0;
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr sessionFactory();
+        public static extern IntPtr sessionFactory(Callback[] callbacks, string[] functionNames, int size);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern DocumentId attachDocument(IntPtr pObject, IntPtr doc);

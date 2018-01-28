@@ -32,21 +32,16 @@ private:
 	Buffer _buffer;			//the objects that appear on the screen
 	Base _base;				//user data
 	Settings _settings;		//document settings
-	HWND _hwnd;
-	HGLRC _hrc;
-	HDC _dc;
 	volatile bool _active;
-	Document() { }
+	Document();
+	std::map<std::string, callBackFunction> _callbacks;
 public:
 	double _height;
 
 	Document(void* hwnd);
 	~Document();
 
-	void RenderActivateContext(int w, int h);
-	void RenderDeactivateContext();
-	void RenderResize(int w, int h);
-	void RenderDraw();
+	void InitCallBacks(std::map<std::string, callBackFunction> callbacks);
 
 	ObjectId attachToBase(Generic* object);
 	Generic* detachFromBase(ObjectId objID);

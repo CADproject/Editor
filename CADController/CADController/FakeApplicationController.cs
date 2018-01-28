@@ -132,9 +132,19 @@ namespace CADController
         public IntPtr CurrentSession { get; set; }
         public DocumentId CurrentDocument { get; set; }
 
-        public override Status OpenSession(params Callback[] delegates)
+        public override Status OpenSession(Dictionary<string, Callback> delegates)
         {
-            CurrentSession = CoreWrapper.sessionFactory();
+            int count = delegates.Count;
+            string [] names = new string[count];
+            Callback []functions = new Callback[count];
+            int index = 0;
+            foreach (var pair in delegates)
+            {
+                names[index] = pair.Key;
+                functions[index] = pair.Value;
+                index++;
+            }
+            CurrentSession = CoreWrapper.sessionFactory(functions, names, count);
 
             return base.OpenSession(delegates);
         }
@@ -284,12 +294,9 @@ namespace CADController
     {
         private Callback _drawCallback;
 
-        public override Status OpenSession(params Callback[] delegates)
+        public override Status OpenSession(Dictionary<string, Callback> delegates)
         {
-            if (delegates.Length > 1)
-            {
-                _drawCallback = delegates[1];
-            }
+            delegates.TryGetValue(nameof(IViewCallback.DrawGeometry), out _drawCallback);
             return base.OpenSession(delegates);
         }
 
@@ -320,9 +327,10 @@ namespace CADController
             return method.ReflectedType?.Name + "::" + method.Name;
         }
 
-        public virtual Status OpenSession(params Callback[] delegates)
+        public virtual Status OpenSession(Dictionary<string, Callback> delegates)
         {
-            _logCallback = delegates.FirstOrDefault(callback => callback.Method.Name.ToLower().Contains("log"));
+            if (delegates != null && delegates.ContainsKey(nameof(IViewCallback.ConsoleLog)))
+                _logCallback = delegates[nameof(IViewCallback.ConsoleLog)];
             _logCallback?.Invoke(new CallbackValues {line = GetCurrentMethod()});
             return Status.Success;
         }

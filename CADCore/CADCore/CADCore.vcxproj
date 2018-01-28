@@ -169,6 +169,7 @@
     <ClCompile Include="core_api.cpp" />
     <ClCompile Include="document.cpp" />
     <ClCompile Include="geometry.cpp" />
+    <ClCompile Include="headers.cpp" />
     <ClCompile Include="session.cpp" />
     <ClCompile Include="topology.cpp" />
     <ClCompile Include="history.cpp" />
