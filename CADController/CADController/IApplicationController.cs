@@ -67,6 +67,7 @@ namespace CADController
     [StructLayout(LayoutKind.Sequential)]
     public struct CallbackValues
     {
+        public Int64 id;
         public double thickness;
         public int size;
         public string line;

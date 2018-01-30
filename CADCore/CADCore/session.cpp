@@ -21,6 +21,7 @@ DocumentId Session::attachDocument(Document* doc)
 {
 	++_counter;
 	_session[_counter] = doc;
+	doc->InitCallBacks(_callbacks);
 	return _counter;
 }
 

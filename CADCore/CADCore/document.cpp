@@ -37,14 +37,37 @@ Document::~Document()
 
 ObjectId Document::attachToBase(Generic* object)
 {
-	return _base.attachToBase(object);
 	callBackFunction draw = MapGetValue<std::string, callBackFunction>(_callbacks, callbacks::DrawGeometry);
 	if (draw != nullptr)
-		;
+	{
+		auto nodes = object->getTopology()->GetDrawPoints();
+		CallbackValues values;
+		values.id = object->GetId();
+		values.flag = callbacks::GeometryAction::Update;
+		values.line = "pinvoked!";
+		values.thickness = 1;
+		values.FillbyNodes(nodes);
+		values.pInt = new int[3]{ 255, 20, 255 };
+		values.pString = new char[values.size * 100];
+		memset(values.pString, 0, values.size * 100);
+		draw(values);
+	}
+	return _base.attachToBase(object);
 }
 
 Generic* Document::detachFromBase(ObjectId objID)
 {
+	callBackFunction draw = MapGetValue<std::string, callBackFunction>(_callbacks, callbacks::DrawGeometry);
+	if (draw != nullptr)
+	{
+		auto object = _base.getGeneric(objID);
+		auto nodes = object->getTopology()->GetDrawPoints();
+		CallbackValues values;
+		values.id = object->GetId();
+		values.flag = callbacks::GeometryAction::Remove;
+		draw(values);
+	}
+
 	return _base.detachFromBase(objID);
 }
 
@@ -56,11 +79,37 @@ Generic* Document::getGeneric(ObjectId objID)
 void Document::attachToBuffer(Generic* object)
 {
 	_buffer.attachToBuffer(object);
+
+	callBackFunction draw = MapGetValue<std::string, callBackFunction>(_callbacks, callbacks::DrawGeometry);
+	if (draw != nullptr)
+	{
+		auto nodes = object->getTopology()->GetDrawPoints();
+		CallbackValues values;
+		values.id = object->GetId();
+		values.flag = callbacks::GeometryAction::Update;
+		values.line = "pinvoked!";
+		values.thickness = 1;
+		values.FillbyNodes(nodes);
+		values.pInt = new int[3]{ 255, 20, 255 };
+		values.pString = new char[values.size * 100];
+		memset(values.pString, 0, values.size * 100);
+		draw(values);
+	}
 }
 
 void Document::detachFrombuffer(Generic* object)
 {
 	_buffer.detachFrombuffer(object);
+
+	callBackFunction draw = MapGetValue<std::string, callBackFunction>(_callbacks, callbacks::DrawGeometry);
+	if (draw != nullptr)
+	{
+		auto nodes = object->getTopology()->GetDrawPoints();
+		CallbackValues values;
+		values.id = object->GetId();
+		values.flag = callbacks::GeometryAction::Remove;
+		draw(values);
+	}
 }
 
 Topology* Document::getGenericTopology(ObjectId objID)

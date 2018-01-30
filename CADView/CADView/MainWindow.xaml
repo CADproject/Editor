@@ -388,7 +388,7 @@
                 <Grid x:Name="ConsolePart1" Grid.Row="1"
                   Height="{Binding ConsoleHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True}">
                     <Border Grid.Row="0" BorderThickness="1" BorderBrush="DarkSlateGray">
-                        <TextBox Background="DimGray" Foreground="LightGray"
+                        <TextBox Name="ConsoleTextBox" Background="DimGray" Foreground="LightGray"
                              VerticalAlignment="Stretch" Margin="0,0,0,-3" 
                              IsReadOnly="True" IsReadOnlyCaretVisible="True" VerticalScrollBarVisibility="Visible" Text="{Binding ConsoleText}" >
                             <TextBox.Resources>

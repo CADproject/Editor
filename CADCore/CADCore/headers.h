@@ -23,6 +23,13 @@ namespace callbacks
 	// Графика
 	//==================================================
 
+	enum GeometryAction
+	{
+		Update = 0,
+		ClearAll = 1,
+		Remove = 2
+	};
+
 	/// <summary>
 	/// отрисовка геометрии
 	/// </summary>
@@ -143,6 +150,7 @@ namespace callbacks
 struct CallbackValues
 {
 public:
+	__int64 id = 0;
 	double thickness = 0;
 	int size = 0;
 	char* line = nullptr;
@@ -150,6 +158,39 @@ public:
 	char* pString = nullptr;
 	int* pInt = nullptr;
 	double* pDouble = nullptr;
+
+	void FillbyNodes(std::vector<Node> nodes)
+	{
+		size = nodes.size();
+		pDouble = new double[size * 3];
+		for (int i = 0; i < size; i++)
+		{
+			pDouble[i*3 + 0] = nodes[i].X;
+			pDouble[i*3 + 1] = nodes[i].Y;
+			pDouble[i*3 + 2] = 0;
+		}
+	}
+
+	void Free()
+	{
+		//if (line != nullptr)
+		//	delete line;
+		line = nullptr;
+		if (pString != nullptr)
+			delete pString;
+		pString = nullptr;
+		if (pInt != nullptr)
+			delete pInt;
+		pInt = nullptr;
+		if (pDouble != nullptr)
+			delete pDouble;
+		pDouble = nullptr;
+	}
+
+	~CallbackValues()
+	{
+		Free();
+	}
 };
 #pragma pack(pop)
 

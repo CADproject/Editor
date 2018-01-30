@@ -1,5 +1,7 @@
 #include "base.h"
 
+__int64 Generic::_counter = 0;
+
 void Base::notify(void)
 {
 	_observer->update(_base);

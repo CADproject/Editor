@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-
+using System.Runtime.InteropServices;
 using SessionId = System.UInt32;
 using DocumentId = System.UInt32;
 using OperationId = System.UInt32;
@@ -63,6 +63,13 @@ namespace CADController
                 throw new Exception("Operation did not inited.");
             throw new NotImplementedException();
         }
+
+        public virtual void CancelOperation()
+        {
+            if (!_inited)
+                throw new Exception("Operation did not inited.");
+            throw new NotImplementedException();
+        }
     }
 
     class OpLineCreate : OperationController
@@ -75,6 +82,7 @@ namespace CADController
         public override void InputEvent(int evId)
         {
             base.InputEvent(evId);
+            if(evId != 4) return;
             if (start == IntPtr.Zero)
             {
                 start = CoreWrapper.nodeFactory(X, Y);
@@ -113,6 +121,16 @@ namespace CADController
                 lineId = CoreWrapper.attachToBase(CurrentSession, CurrentDocument, newLineGen);
             }
         }
+
+        public override void SendDouble(double value)
+        {
+        }
+
+        public override void CancelOperation()
+        {
+            if (newLineGen != IntPtr.Zero)
+                CoreWrapper.detachFromBase(CurrentSession, CurrentDocument, lineId);
+        }
     }
 
     public static class ControllerFactory
@@ -132,16 +150,16 @@ namespace CADController
         public IntPtr CurrentSession { get; set; }
         public DocumentId CurrentDocument { get; set; }
 
-        public override Status OpenSession(Dictionary<string, Callback> delegates)
+        public override unsafe Status OpenSession(Dictionary<string, Callback> delegates)
         {
             int count = delegates.Count;
             string [] names = new string[count];
-            Callback []functions = new Callback[count];
+            IntPtr []functions = new IntPtr[count];
             int index = 0;
             foreach (var pair in delegates)
             {
                 names[index] = pair.Key;
-                functions[index] = pair.Value;
+                functions[index] = Marshal.GetFunctionPointerForDelegate(pair.Value);
                 index++;
             }
             CurrentSession = CoreWrapper.sessionFactory(functions, names, count);
@@ -153,7 +171,7 @@ namespace CADController
         {
             if (_currentOperation != null)
             {
-                //_currentOperation.Close();
+                _currentOperation.CancelOperation();
                 //corewrapper.clean(...);
             }
             switch ((UniversalOperations)opId)
@@ -293,9 +311,11 @@ namespace CADController
     internal class FakeApplicationController : BaseApplicationController
     {
         private Callback _drawCallback;
+        private Dictionary<string, Callback> testArray;
 
         public override Status OpenSession(Dictionary<string, Callback> delegates)
         {
+            testArray = delegates;
             delegates.TryGetValue(nameof(IViewCallback.DrawGeometry), out _drawCallback);
             return base.OpenSession(delegates);
         }
@@ -305,7 +325,15 @@ namespace CADController
             base.InputEvent(evId);
             if (evId == 6)
             {
-                CoreWrapper.TestPInvoke(_drawCallback);
+                IntPtr[] functions = new IntPtr[testArray.Count];
+                int index = 0;
+                foreach (var pair in testArray)
+                {
+                    functions[index] = Marshal.GetFunctionPointerForDelegate(pair.Value);
+                    index++;
+                }
+
+                CoreWrapper.TestPInvoke(_drawCallback, functions);
             }
         }
     }
@@ -313,6 +341,10 @@ namespace CADController
     internal abstract class BaseApplicationController: IApplicationController
     {
         protected Callback _logCallback;
+        /// <summary>
+        /// to save delegates from garbage collector.
+        /// </summary>
+        private Dictionary<string, Callback> _delegates;
 
         protected BaseApplicationController()
         {
@@ -329,9 +361,15 @@ namespace CADController
 
         public virtual Status OpenSession(Dictionary<string, Callback> delegates)
         {
+            if (delegates == null) throw new ArgumentNullException(nameof(delegates));
+            _delegates = delegates;
             if (delegates != null && delegates.ContainsKey(nameof(IViewCallback.ConsoleLog)))
                 _logCallback = delegates[nameof(IViewCallback.ConsoleLog)];
             _logCallback?.Invoke(new CallbackValues {line = GetCurrentMethod()});
+            _logCallback?.Invoke(new CallbackValues
+            {
+                line = delegates.Aggregate("", (s1, s2) => s1 + "/" + s2.Key)
+            });
             return Status.Success;
         }
 

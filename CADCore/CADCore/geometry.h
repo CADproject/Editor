@@ -5,9 +5,10 @@
 
 class Node	//additional node
 {
-private:
+protected:
 	double _coord_X;
 	double _coord_Y;
+
 public:
 	Node(): _coord_X(0), _coord_Y(0) {}
 	
@@ -16,11 +17,34 @@ public:
 		_coord_X = x;
 		_coord_Y = y;
 	}
-
+	
 	double getX(void) const { return _coord_X; }
 	double getY(void) const { return _coord_Y; }
 	void setX(double x) { _coord_X = x; }
 	void setY(double y) { _coord_Y = y; }
+
+	double __declspec(property(get = getX, put = setX)) X;
+	double __declspec(property(get = getY, put = setY)) Y;
+
+	Node operator*(const double b)
+	{
+		return Node(X *b, Y *b);
+	}
+
+	Node operator+(const Node& b)
+	{
+		return Node(X + b.X, Y + b.Y);
+	}
+
+	Node operator-(const Node& b)
+	{
+		return Node(X - b.X, Y - b.Y);
+	}
+
+	double Length()
+	{
+		return sqrt(X*X + Y*Y);
+	}
 };
 
 class Math	//use Singleton in Future?

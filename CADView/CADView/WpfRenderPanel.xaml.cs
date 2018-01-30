@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using SharpGL;
-using SharpGL.Enumerations;
 using SharpGL.SceneGraph;
 using SharpGL.SceneGraph.Core;
 using SharpGL.SceneGraph.Primitives;
@@ -17,12 +17,14 @@ namespace CADView
     {
         private struct Geometry
         {
+            public long Id { get; private set; }
             public double[] Points { get; private set; }
             public int[] Color { get; private set; }
             public double Size { get; private set; }
 
-            public Geometry(double[] points, int[] color, double size)
+            public Geometry(long id, double[] points, int[] color, double size)
             {
+                Id = id;
                 Points = points;
                 Color = color;
                 Size = size;
@@ -41,43 +43,63 @@ namespace CADView
         private static int _counter = 0;
         private int _index = 0;
         private bool _disposed = false;
-        private readonly List<Geometry> _objects = new List<Geometry>();
+        private readonly Dictionary<long, Geometry> _objects = new Dictionary<long, Geometry>();
         private readonly object _lock = new object();
+        private OpenGL _gl;
+        private double _viewHeight = -60;
+        private Point _mouse = default(Point);
+        private Point? _screenPoint = null;
+
+        static double Dot(double[] a, double[] b)
+        {
+            return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+        }
 
         private void GLDraw(object sender, OpenGLEventArgs args)
         {
             if (!IsVisible || !IsEnabled) return;
-
+            
             //  Get the OpenGL instance that's been passed to us.
-            OpenGL gl = args.OpenGL;
+            _gl = args.OpenGL;
+
+            if (_screenPoint.HasValue)
+            {
+                double[] coordsA = _gl.UnProject(_screenPoint.Value.X, _screenPoint.Value.Y, 0);
+                double[] coordsB = _gl.UnProject(_screenPoint.Value.X, _screenPoint.Value.Y, 1);
+                double[] r = new double[3]{coordsB[0]-coordsA[0], coordsB[1] - coordsA[1] , coordsB[2] - coordsA[2] };
+                //T = -dot(a - b, n) / dot(v, n)
+                double t = -Dot(coordsA, new double[3] {0, 0, 1}) / Dot(r, new double[3] {0, 0, 1});
+                //P = a + v * T
+                _mouse = new Point(coordsA[0] + r[0]*t, -(coordsA[1] + r[1] * t));
+            }
 
             //  Clear the color and depth buffers.
-            gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
+            _gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
 
             //  Reset the modelview matrix.
-            gl.LoadIdentity();
+            _gl.LoadIdentity();
 
             //  Move the geometry into a fairly central position.
-            gl.Translate(0f, 0.0f, -6.0f);
+            _gl.Translate(0f, 0.0f, _viewHeight);
 
-            _axies.Render(gl, RenderMode.Design);
+            _axies.Render(_gl, RenderMode.Design);
 
             lock (_lock)
             {
-                foreach (Geometry o in _objects)
+                foreach (Geometry o in _objects.Values)
                 {
-                    gl.LineWidth((float)o.Size);
-                    gl.Color(o.Color[0] / 255f, o.Color[1] / 255f, o.Color[2] / 255f);
+                    _gl.LineWidth((float)o.Size);
+                    _gl.Color(o.Color[0] / 255f, o.Color[1] / 255f, o.Color[2] / 255f);
 
-                    gl.EnableClientState(OpenGL.GL_VERTEX_ARRAY);
-                    gl.VertexPointer(3, 0, o.Points);
-                    gl.DrawArrays(OpenGL.GL_LINE_STRIP, 0, 2);
-                    gl.DisableClientState(OpenGL.GL_VERTEX_ARRAY);
+                    _gl.EnableClientState(OpenGL.GL_VERTEX_ARRAY);
+                    _gl.VertexPointer(3, 0, o.Points);
+                    _gl.DrawArrays(OpenGL.GL_LINE_STRIP, 0, 2);
+                    _gl.DisableClientState(OpenGL.GL_VERTEX_ARRAY);
                 }
             }
 
             //  Flush OpenGL.
-            gl.Flush();
+            _gl.Flush();
         }
 
         private void GLInitialized(object sender, OpenGLEventArgs args)
@@ -98,6 +120,9 @@ namespace CADView
             Renderer.MouseUp += RenderOnUp;
             Renderer.MouseDoubleClick += RenderOnDoubleClick;
             Renderer.MouseMove += RenderOnMouseMove;
+            Renderer.KeyUp += RendererKeyUp;
+            Renderer.Focusable = true;
+            Renderer.Focus();
         }
 
         private void ReleaseEvents()
@@ -109,17 +134,25 @@ namespace CADView
             Renderer.MouseUp -= RenderOnUp;
             Renderer.MouseDoubleClick -= RenderOnDoubleClick;
             Renderer.MouseMove -= RenderOnMouseMove;
+            Renderer.KeyUp -= RendererKeyUp;
+        }
+
+        Point GetMouse(MouseEventArgs args)
+        {
+            Renderer.Focus();
+            _screenPoint = args.MouseDevice.GetPosition(this);
+            return _mouse;
         }
 
         private void RenderOnMouseMove(object sender, MouseEventArgs args)
         {
-            var p = args.MouseDevice.GetPosition(this);
+            Point p = GetMouse(args);
             MouseFired?.Invoke(new MouseEventArgsExtended(MouseEventArgsExtended.MouseButtons.Empty, MouseEventArgsExtended.PressedState.Released, false, p.X, p.Y, 0));
         }
 
         private void RenderOnDoubleClick(object sender, MouseEventArgs args)
         {
-            var p = args.MouseDevice.GetPosition(this);
+            Point p = GetMouse(args);
             MouseEventArgsExtended.MouseButtons b = MouseEventArgsExtended.MouseButtons.Empty;
             if(((MouseButtonEventArgs)args).ChangedButton == MouseButton.Left)
                 b = MouseEventArgsExtended.MouseButtons.Left;
@@ -128,7 +161,7 @@ namespace CADView
 
         private void RenderOnUp(object sender, MouseEventArgs args)
         {
-            var p = args.MouseDevice.GetPosition(this);
+            Point p = GetMouse(args);
             MouseEventArgsExtended.MouseButtons b = MouseEventArgsExtended.MouseButtons.Empty;
             switch (((MouseButtonEventArgs)args).ChangedButton)
             {
@@ -153,7 +186,7 @@ namespace CADView
 
         private void RenderOnDown(object sender, MouseEventArgs args)
         {
-            var p = args.MouseDevice.GetPosition(this);
+            Point p = GetMouse(args);
             MouseEventArgsExtended.MouseButtons b = MouseEventArgsExtended.MouseButtons.Empty;
             switch (((MouseButtonEventArgs)args).ChangedButton)
             {
@@ -178,20 +211,26 @@ namespace CADView
 
         private void RenderOnClick(object sender, MouseEventArgs args)
         {
-            var p = args.MouseDevice.GetPosition(this);
+            Point p = GetMouse(args);
             MouseFired?.Invoke(new MouseEventArgsExtended(MouseEventArgsExtended.MouseButtons.Empty, MouseEventArgsExtended.PressedState.Released, false, p.X, p.Y, 0));
         }
 
         private void RenderOnWheel(object sender, MouseEventArgs args)
         {
             var delta = ((MouseWheelEventArgs) args).Delta;
-            var p = args.MouseDevice.GetPosition(this);
+            _viewHeight += Math.Sign(delta) * 1;
+            Point p = GetMouse(args);
             MouseFired?.Invoke(new MouseEventArgsExtended(MouseEventArgsExtended.MouseButtons.Empty, MouseEventArgsExtended.PressedState.Released, false, p.X, p.Y, delta));
+        }
+
+        private void RendererKeyUp(object sender, KeyEventArgs e)
+        {
+            KeyboardFired?.Invoke(e);
         }
 
         private void RenderOnChanged(object sender, EventArgs args)
         {
-            Resized?.Invoke((int)Renderer.Width, (int)Renderer.Height);
+            Resized?.Invoke((int)Renderer.ActualHeight, (int)Renderer.ActualHeight);
         }
 
         private void RenderOnCreated(object sender, EventArgs args)
@@ -211,6 +250,9 @@ namespace CADView
         public delegate void MouseEventDelegate(MouseEventArgsExtended args);
         public static event MouseEventDelegate MouseFired;
 
+        public delegate void KeyboardEventDelegate(KeyEventArgs args);
+        public static event KeyboardEventDelegate KeyboardFired;
+
         #endregion
 
         #region Public
@@ -224,13 +266,26 @@ namespace CADView
             GC.SuppressFinalize(this);
         }
 
-        public void UpdateGeometry(double[] points, int[] color, double size, bool clearPrevious)
+        public void UpdateGeometry(long id, double[] points, int[] color, double size, GeometryAction action)
         {
             lock (_lock)
             {
-                if (clearPrevious)
-                    _objects.Clear();
-                _objects.Add(new Geometry(points, color, size));
+                switch (action)
+                {
+                    case GeometryAction.Update:
+                        _objects[id] = new Geometry(id, points, color, size);
+                        break;
+                    case GeometryAction.ClearAll:
+                        _objects.Clear();
+                        _objects[id] = new Geometry(id, points, color, size);
+                        break;
+                    case GeometryAction.Remove:
+                        if (_objects.ContainsKey(id))
+                            _objects.Remove(id);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(action), action, null);
+                }
             }
         }
 

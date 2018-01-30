@@ -188,24 +188,33 @@ namespace CADView
         }
     }
 
+    public enum GeometryAction
+    {
+        Update = 0,
+        ClearAll = 1,
+        Remove = 2
+    }
+
     public interface IRenderer: IDisposable
     {
-        void UpdateGeometry(double[] points, int[] color, double size, bool clearPrevious);
+        void UpdateGeometry(long id, double[] points, int[] color, double size, GeometryAction action);
     }
 
     public class MainWindowViewModel : INotifyPropertyChanged, IViewCallback
     {
         #region Public
 
-        Grid _helperSpace;
+        private readonly Grid _helperSpace;
+        private readonly System.Windows.Controls.TextBox _helperConsoleText;
 
-        public MainWindowViewModel() : this(null, null)
+        public MainWindowViewModel() : this(null, null, null)
         {
 
         }
 
-        public MainWindowViewModel(Window owner, Grid space)
+        public MainWindowViewModel(Window owner, Grid space, System.Windows.Controls.TextBox consoleText)
         {
+            _helperConsoleText = consoleText;
             _helperSpace = space;
             _helperSpace.SizeChanged += delegate
             {
@@ -552,7 +561,7 @@ namespace CADView
             if (ev != UniversalInputEvents.Count)
                 ApplicationController.InputEvent((int)ev);
 
-            if (args.Wheel > 0)
+            if (args.Wheel != 0)
                 ApplicationController.SendDouble(args.Wheel);
 
             ApplicationController.MouseMove(args.X, args.Y);
@@ -729,13 +738,23 @@ namespace CADView
 
         unsafe void IViewCallback.DrawGeometry(CallbackValues value)
         {
-            int* color = (int*) value.pInt.ToPointer();
-            double* points = (double*) value.pDouble.ToPointer();
+            int[] colorArray;
+            if (value.pInt != IntPtr.Zero)
+            {
+                int* color = (int*) value.pInt.ToPointer();
+                colorArray = new[] {color[0], color[1], color[2]};
+            }
+            else
+                colorArray = new[] {0, 0, 0};
             double[] arrayPoints = new double[value.size * 3];
-            fixed (double* p = arrayPoints)
-                CopyMemory(p, points, (ulong) (value.size * 3 * sizeof(double)));
-            ActiveDocument?.Renderer?.UpdateGeometry(arrayPoints, new[] {color[0], color[1], color[2]}, value.thickness,
-                value.flag == 1);
+            if (value.size > 0)
+            {
+                double* points = (double*) value.pDouble.ToPointer();
+                fixed (double* p = arrayPoints)
+                    CopyMemory(p, points, (ulong) (value.size * 3 * sizeof(double)));
+            }
+            ActiveDocument?.Renderer?.UpdateGeometry(value.id, arrayPoints, colorArray,
+                value.thickness, (GeometryAction) value.flag);
         }
 
         void IViewCallback.Background(CallbackValues value)
@@ -1003,6 +1022,15 @@ namespace CADView
             {
                 _consoleText = value;
                 OnPropertyChanged();
+                Application.Current?.Dispatcher?.BeginInvoke(DispatcherPriority.Background,
+                    new Action(delegate
+                    {
+                        if (_helperConsoleText.Text != null)
+                        {
+                            _helperConsoleText.CaretIndex = _helperConsoleText.Text.Length;
+                            _helperConsoleText.ScrollToEnd();
+                        }
+                    }));
             }
         }
 

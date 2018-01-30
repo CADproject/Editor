@@ -17,7 +17,6 @@ extern "C" COREDLL_API void* getGenTopology(void* pObject, DocumentId docID, Obj
 extern "C" COREDLL_API unsigned getGenLayer(void* pObject, DocumentId docID, ObjectId objID);
 extern "C" COREDLL_API void setLayers(void* pObject, DocumentId docID, void* pNewLayers, unsigned size);
 extern "C" COREDLL_API void setBackgroundColor(void* pObject, DocumentId docID, COLOR color);
-extern "C" COREDLL_API void toScreen(void* pObject, DocumentId docID);	//(?)
 extern "C" COREDLL_API void commit(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void undo(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void redo(void* pObject, DocumentId docID);
@@ -25,7 +24,6 @@ extern "C" COREDLL_API void redo(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void wheel(void* pObject, DocumentId docID, int val);
 extern "C" COREDLL_API void draw(void* pObject, DocumentId docID);
 extern "C" COREDLL_API void activateDocument(void* pObject, DocumentId docID, int w, int h);
-extern "C" COREDLL_API void resizeDocument(void* pObject, DocumentId docID, int w, int h);
 
 //document factory method
 extern "C" COREDLL_API void* documentFactory(void* hwnd);
@@ -53,6 +51,6 @@ extern "C" COREDLL_API void* getGenericTopology(void* pObject);
 
 #pragma region test
 
-extern "C" COREDLL_API void TestPInvoke(callBackFunction f);
+extern "C" COREDLL_API void TestPInvoke(callBackFunction f, callBackFunction *callbacks);
 
 #pragma endregion test

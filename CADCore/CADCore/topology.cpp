@@ -15,6 +15,11 @@ void Point::drawing(void) const
 #endif
 }
 
+std::vector<Node> Point::GetDrawPoints(void)
+{
+	return std::vector<Node>({ _node });
+}
+
 void Line::drawing(void) const
 {
 	//glBegin(GL_LINES);
@@ -34,20 +39,25 @@ void Line::drawing(void) const
 #endif
 }
 
-void DrawCircle(float cx, float cy, float r, int num_segments)
+std::vector<Node> Line::GetDrawPoints(void)
 {
-	//glBegin(GL_LINE_LOOP);
-	//for (int ii = 0; ii < num_segments; ii++)
-	//{
-	//	float theta = 2.0f * 3.1415926f * float(ii) / float(num_segments);//get the current angle
+	return std::vector<Node>({ this->_start, this->_end });
+}
 
-	//	float x = r * cosf(theta);//calculate the x component
-	//	float y = r * sinf(theta);//calculate the y component
+std::vector<Node> DrawCircle(Node center, Node point, int num_segments)
+{
+	std::vector<Node> result;
+	double r = (point - center).Length();
+	for (int i = 0; i < num_segments; i++)
+	{
+		float theta = 2.0f * 3.1415926f * float(i) / float(num_segments);//get the current angle
 
-	//	glVertex2f(x + cx, y + cy);//output vertex
+		float x = r * cosf(theta);//calculate the x component
+		float y = r * sinf(theta);//calculate the y component
 
-	//}
-	//glEnd();
+		result.push_back(center + Node(x, y));//output vertex
+	}
+	return result;
 }
 
 void Circle::drawing(void) const
@@ -68,6 +78,11 @@ void Circle::drawing(void) const
 #endif
 }
 
+std::vector<Node> Circle::GetDrawPoints(void)
+{
+	return std::vector<Node>(DrawCircle(_center, _side, 12));
+}
+
 void Contour::drawing(void) const
 {
 #ifdef TRACE_DEBUG
@@ -82,4 +97,15 @@ void Contour::drawing(void) const
 #endif
 		curEdge->drawing();
 	});
+}
+
+std::vector<Node> Contour::GetDrawPoints(void)
+{
+	std::vector<Node> result;
+	for (int i = 0; i < this->_edges.size(); i++)
+	{
+		auto nodes = this->_edges[i]->GetDrawPoints();
+		result.insert(result.begin(), nodes.begin(), nodes.end());
+	}
+	return result;
 }

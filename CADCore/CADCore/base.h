@@ -12,13 +12,19 @@ private:
 	COLOR _color;			//the color of the primitive
 	THICKNESS _thickness;	//the thickness of the primitive
 	Topology* _primitive;	//the type of the primitive
+	__int64 _id;
+	static __int64 _counter;
 
+	void Init()
+	{
+		_id = _counter++;
+	}
 public:
-	Generic(): _layer(0), _color(BLACK), _thickness(THREE), _primitive(nullptr) {}
-	Generic(Topology* primitive): _layer(0), _color(BLACK), _thickness(THREE), _primitive(primitive) {}
-	Generic(unsigned layer, Topology* primitive): _layer(layer), _color(BLACK), _thickness(THREE), _primitive(primitive) {}
-	Generic(unsigned layer, COLOR color, THICKNESS thickness, Topology* primitive):
-		_layer(layer), _color(color), _thickness(thickness), _primitive(primitive) {}
+	Generic() : _layer(0), _color(BLACK), _thickness(THREE), _primitive(nullptr) { Init(); }
+	Generic(Topology* primitive) : _layer(0), _color(BLACK), _thickness(THREE), _primitive(primitive) { Init(); }
+	Generic(unsigned layer, Topology* primitive) : _layer(layer), _color(BLACK), _thickness(THREE), _primitive(primitive) { Init(); }
+	Generic(unsigned layer, COLOR color, THICKNESS thickness, Topology* primitive) :
+		_layer(layer), _color(color), _thickness(thickness), _primitive(primitive) { Init(); }
 
 	unsigned getLayer(void) { return _layer; }
 	COLOR getColor(void) { return _color; }
@@ -29,6 +35,7 @@ public:
 	void setColor(COLOR newColor) { _color = newColor; }
 	void setThickness(THICKNESS newThickness) { _thickness = newThickness; }
 	void setTopology(Topology* newPrimitive) { _primitive = newPrimitive; }
+	__int64 GetId() { return _id; }
 };
 
 class History

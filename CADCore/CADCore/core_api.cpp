@@ -3,7 +3,7 @@
 void* sessionFactory(callBackFunction *callbacks, char **functionNames, int size)
 {
 	std::map<std::string, callBackFunction> callbacksMap;
-	for (size_t i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		callbacksMap.insert(std::pair<std::string, callBackFunction>(functionNames[i], callbacks[i]));
 	}
@@ -123,6 +123,7 @@ void* documentFactory(void* hwnd)
 
 void* nodeFactory(double x, double y)
 {
+#pragma message ("утечки памяти, кто будет собирать её?")
 	return static_cast<void*>(new Node(x, y));
 }
 
@@ -204,7 +205,7 @@ void* getGenericTopology(void* pObject)
 
 static double __position = 0;
 
-void TestPInvoke(callBackFunction f)
+void TestPInvoke(callBackFunction f, callBackFunction *callbacks)
 {
 	CallbackValues cv;
 	cv.flag = 1;
@@ -216,9 +217,8 @@ void TestPInvoke(callBackFunction f)
 	cv.pString = new char[cv.size * 100];
 	memset(cv.pString, 0, cv.size * 100);
 	f(cv);
-	delete cv.pDouble;
-	delete cv.pInt;
-	delete cv.pString;
+	callbacks[1](cv);
+	cv.Free();
 	//память освобождается в ядре. можно перенести в деструктор освобождение, но не уверен, что это хорошая идея ибо эта структура маршаллится из шарпов
 	//не помню, добавление кода и функций не по умолчанию - не меняет ли распределение памяти в объекте структуры.
 	__position++;

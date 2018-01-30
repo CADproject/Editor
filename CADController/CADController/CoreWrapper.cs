@@ -28,7 +28,7 @@ namespace CADController
         const ObjectId not_from_base = 0;
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr sessionFactory(Callback[] callbacks, string[] functionNames, int size);
+        public static extern IntPtr sessionFactory(IntPtr[] callbacks, string[] functionNames, int size);
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern DocumentId attachDocument(IntPtr pObject, IntPtr doc);
@@ -116,7 +116,7 @@ namespace CADController
         #region test
 
         [DllImport(dllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr TestPInvoke(Callback function);
+        public static extern IntPtr TestPInvoke(Callback function, IntPtr[] callbacks);
 
         #endregion
     }

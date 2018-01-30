@@ -122,16 +122,3 @@ namespace callbacks
 	const char* ThemesList = "ThemesList";
 }
 #pragma endregion Callback functions names
-
-//template<class Tk, class Tv>
-//Tv MapGetValue(std::map<Tk, Tv> map, Tk key)
-//{
-//	std::map<Tk, Tv>::iterator it = map.find(key);
-//	if (it != map.end())
-//	{
-//		//element found
-//		return it->second;
-//	}
-//	//element not found
-//	return nullptr;
-//}
