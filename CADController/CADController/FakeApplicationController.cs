@@ -12,14 +12,20 @@ using ObjectId = System.UInt32;
 
 namespace CADController
 {
-    abstract class OperationController: IController
+    abstract class OperationController : IController
     {
         private bool _inited = false;
+        protected Dictionary<string, Callback> Delegates { get; private set; }
         protected Action FinilizeOperation { get; private set; }
         public IntPtr CurrentSession { get; set; } = IntPtr.Zero;
         public DocumentId CurrentDocument { get; set; } = 0;
         public double X { get; set; }
         public double Y { get; set; }
+
+        public OperationController(Dictionary<string, Callback> delegates)
+        {
+            Delegates = delegates;
+        }
 
         public virtual void Init(Action finilizeOperation, IntPtr currentSession, DocumentId currentDocument)
         {
@@ -31,7 +37,7 @@ namespace CADController
 
         public virtual void InputEvent(int evId)
         {
-            if(!_inited)
+            if (!_inited)
                 throw new Exception("Operation did not inited.");
         }
 
@@ -68,21 +74,40 @@ namespace CADController
         {
             if (!_inited)
                 throw new Exception("Operation did not inited.");
-            throw new NotImplementedException();
+            ShowInfo(1, "");
+            ShowInfo(2, "");
+        }
+
+        protected void ShowInfo(int level, string message)
+        {
+            Callback cb = null;
+            if (level == 1)
+                Delegates.TryGetValue(nameof(IViewCallback.FirstString), out cb);
+            if (level == 2)
+                Delegates.TryGetValue(nameof(IViewCallback.SecondString), out cb);
+
+            cb?.Invoke(new CallbackValues {line = message});
         }
     }
 
     class OpLineCreate : OperationController
     {
-        IntPtr start = IntPtr.Zero;
-        IntPtr end = IntPtr.Zero;
-        ObjectId lineId;
-        IntPtr newLineGen;
+        private IntPtr start = IntPtr.Zero;
+        private IntPtr end = IntPtr.Zero;
+        private ObjectId lineId;
+        private IntPtr newLineGen;
+
+        public OpLineCreate(Dictionary<string, Callback> delegates):base(delegates)
+        {
+            ShowInfo(1, "Построение линии");
+            ShowInfo(2, "Отметьте начало линии");
+        }
 
         public override void InputEvent(int evId)
         {
             base.InputEvent(evId);
             if(evId != 4) return;
+            ShowInfo(2, "Отметьте конец линии");
             if (start == IntPtr.Zero)
             {
                 start = CoreWrapper.nodeFactory(X, Y);
@@ -128,6 +153,7 @@ namespace CADController
 
         public override void CancelOperation()
         {
+            base.CancelOperation();
             if (newLineGen != IntPtr.Zero)
                 CoreWrapper.detachFromBase(CurrentSession, CurrentDocument, lineId);
         }
@@ -135,15 +161,22 @@ namespace CADController
 
     class OpCircleCreate : OperationController
     {
-        IntPtr center = IntPtr.Zero;
-        IntPtr point = IntPtr.Zero;
-        ObjectId lineId;
-        IntPtr newLineGen;
+        private IntPtr center = IntPtr.Zero;
+        private IntPtr point = IntPtr.Zero;
+        private ObjectId lineId;
+        private IntPtr newLineGen;
+
+        public OpCircleCreate(Dictionary<string, Callback> delegates):base(delegates)
+        {
+            ShowInfo(1, "Построение окружности");
+            ShowInfo(2, "Отметьте центр окружности");
+        }
 
         public override void InputEvent(int evId)
         {
             base.InputEvent(evId);
             if (evId != 4) return;
+            ShowInfo(2, "Отметьте точку на окружности");
             if (center == IntPtr.Zero)
             {
                 center = CoreWrapper.nodeFactory(X, Y);
@@ -189,6 +222,7 @@ namespace CADController
 
         public override void CancelOperation()
         {
+            base.CancelOperation();
             if (newLineGen != IntPtr.Zero)
                 CoreWrapper.detachFromBase(CurrentSession, CurrentDocument, lineId);
         }
@@ -262,7 +296,7 @@ namespace CADController
                 case UniversalOperations.Pen:
                     break;
                 case UniversalOperations.Line1:
-                    _currentOperation = new OpLineCreate();
+                    _currentOperation = new OpLineCreate(this._delegates);
                     break;
                 case UniversalOperations.Line2:
                     break;
@@ -275,7 +309,7 @@ namespace CADController
                 case UniversalOperations.Arc2:
                     break;
                 case UniversalOperations.Circle1:
-                    _currentOperation = new OpCircleCreate();
+                    _currentOperation = new OpCircleCreate(this._delegates);
                     break;
                 case UniversalOperations.Circle2:
                     break;
@@ -344,10 +378,12 @@ namespace CADController
                 default:
                     throw new ArgumentOutOfRangeException(nameof(opId), opId, null);
             }
-            if (_currentOperation != null)
+            _currentOperation?.Init(() =>
             {
-                _currentOperation.Init(() => _currentOperation = null, CurrentSession, CurrentDocument);
-            }
+                _currentOperation = null;
+                ShowInfo(1, "");
+                ShowInfo(2, "");
+            }, CurrentSession, CurrentDocument);
             return base.Operation(opId);
         }
 
@@ -406,7 +442,7 @@ namespace CADController
         /// <summary>
         /// to save delegates from garbage collector.
         /// </summary>
-        private Dictionary<string, Callback> _delegates;
+        protected Dictionary<string, Callback> _delegates;
 
         protected BaseApplicationController()
         {
@@ -484,6 +520,17 @@ namespace CADController
         {
             _logCallback?.Invoke(new CallbackValues { line = $"{GetCurrentMethod()}, {value}" });
             Console.WriteLine($"{GetCurrentMethod()}, {value}");
+        }
+
+        protected void ShowInfo(int level, string message)
+        {
+            Callback cb = null;
+            if (level == 1)
+                _delegates.TryGetValue(nameof(IViewCallback.FirstString), out cb);
+            if (level == 2)
+                _delegates.TryGetValue(nameof(IViewCallback.SecondString), out cb);
+
+            cb?.Invoke(new CallbackValues { line = message });
         }
     }
 }
