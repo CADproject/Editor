@@ -57,6 +57,7 @@ std::vector<Node> DrawCircle(Node center, Node point, int num_segments)
 
 		result.push_back(center + Node(x, y));//output vertex
 	}
+	result.push_back(result[0]);
 	return result;
 }
 
@@ -80,7 +81,7 @@ void Circle::drawing(void) const
 
 std::vector<Node> Circle::GetDrawPoints(void)
 {
-	return std::vector<Node>(DrawCircle(_center, _side, 12));
+	return std::vector<Node>(DrawCircle(_center, _side, 48));
 }
 
 void Contour::drawing(void) const

@@ -133,6 +133,67 @@ namespace CADController
         }
     }
 
+    class OpCircleCreate : OperationController
+    {
+        IntPtr center = IntPtr.Zero;
+        IntPtr point = IntPtr.Zero;
+        ObjectId lineId;
+        IntPtr newLineGen;
+
+        public override void InputEvent(int evId)
+        {
+            base.InputEvent(evId);
+            if (evId != 4) return;
+            if (center == IntPtr.Zero)
+            {
+                center = CoreWrapper.nodeFactory(X, Y);
+            }
+            if (point == IntPtr.Zero)
+            {
+                point = CoreWrapper.nodeFactory(X, Y);
+            }
+            else
+            {
+                point = CoreWrapper.nodeFactory(X, Y);
+
+                if (newLineGen != IntPtr.Zero)
+                    CoreWrapper.detachFromBase(CurrentSession, CurrentDocument, lineId);
+
+                newLineGen = CoreWrapper.genericFactory(CoreWrapper.circleFactory(center, point), (uint)0);
+                lineId = CoreWrapper.attachToBase(CurrentSession, CurrentDocument, newLineGen);
+
+                CoreWrapper.commit(CurrentSession, CurrentDocument);
+                FinilizeOperation();
+            }
+        }
+
+        public override void MouseMove(double x, double y)
+        {
+            base.MouseMove(x, y);
+            if (center != IntPtr.Zero)
+            {
+                //CoreWrapper.Destroy(end)
+                point = CoreWrapper.nodeFactory(X, Y);
+
+                if (newLineGen != IntPtr.Zero)
+                    CoreWrapper.detachFromBase(CurrentSession, CurrentDocument, lineId);
+
+                newLineGen = CoreWrapper.genericFactory(CoreWrapper.circleFactory(center, point), (uint)0);
+                lineId = CoreWrapper.attachToBase(CurrentSession, CurrentDocument, newLineGen);
+            }
+        }
+
+        public override void SendDouble(double value)
+        {
+        }
+
+        public override void CancelOperation()
+        {
+            if (newLineGen != IntPtr.Zero)
+                CoreWrapper.detachFromBase(CurrentSession, CurrentDocument, lineId);
+        }
+    }
+
     public static class ControllerFactory
     {
         public static IApplicationController CreateController()
@@ -214,6 +275,7 @@ namespace CADController
                 case UniversalOperations.Arc2:
                     break;
                 case UniversalOperations.Circle1:
+                    _currentOperation = new OpCircleCreate();
                     break;
                 case UniversalOperations.Circle2:
                     break;
