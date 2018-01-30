@@ -93,7 +93,7 @@ namespace CADView
 
                     _gl.EnableClientState(OpenGL.GL_VERTEX_ARRAY);
                     _gl.VertexPointer(3, 0, o.Points);
-                    _gl.DrawArrays(OpenGL.GL_LINE_STRIP, 0, 2);
+                    _gl.DrawArrays(OpenGL.GL_LINE_STRIP, 0, o.Points.Length / 3);
                     _gl.DisableClientState(OpenGL.GL_VERTEX_ARRAY);
                 }
             }
