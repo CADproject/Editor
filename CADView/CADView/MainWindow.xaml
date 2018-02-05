@@ -268,7 +268,7 @@
                 <dragablz:TabablzControl VerticalAlignment="Stretch" ItemsSource="{Binding DocumentViewModelsTabs, Mode=TwoWay}"
                                      SelectedIndex="{Binding SelectedDocumentIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                      ConsolidateOrphanedItems="True" Margin="8,8,8,0" ShowDefaultCloseButton="True"
-                                     ItemContainerStyle="{StaticResource TrapezoidDragableTabItemStyle}" AdjacentHeaderItemOffset="-15">
+                                     ItemContainerStyle="{StaticResource TrapezoidDragableTabItemStyle}" AdjacentHeaderItemOffset="-15" ClosingItemCallback="{Binding CloseDocumentCommand2}">
                     <dragablz:TabablzControl.Resources>
                         <!--не сработало-->
                         <Style TargetType="{x:Type dragablz:Trapezoid}">
@@ -371,7 +371,7 @@
                 <Label Foreground="Yellow" IsHitTestVisible="False" Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
                        Margin="10,0,0,0" Content="{Binding CoordinatesTextX, Mode=OneWay}"></Label>
                 <Label Foreground="Yellow" IsHitTestVisible="False" Style="{StaticResource BigFontStyle}" Visibility="{Binding InfoVisible}" VerticalAlignment="Bottom" HorizontalAlignment="Left"
-                       Margin="80,0,0,0" Content="{Binding CoordinatesTextY, Mode=OneWay}"></Label>
+                       Margin="105,0,0,0" Content="{Binding CoordinatesTextY, Mode=OneWay}"></Label>
             </Grid>
 
             <Grid Grid.Row="1"

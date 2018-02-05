@@ -8,13 +8,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Threading;
 using CADView.Dialogs;
-using Application = System.Windows.Application;
-using MessageBox = System.Windows.MessageBox;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using System.Windows.Media;
 
 namespace CADView
@@ -204,9 +200,6 @@ namespace CADView
     {
         #region Public
 
-        private readonly Grid _helperSpace;
-        private readonly System.Windows.Controls.TextBox _helperConsoleText;
-
         public MainWindowViewModel() : this(null, null, null)
         {
 
@@ -224,16 +217,14 @@ namespace CADView
             ApplicationController = ControllerFactory.CreateController();
             WpfRenderPanel.Created += RenderPanelOnLoad;
             WpfRenderPanel.Resized += RenderPanelOnResize;
-            WpfRenderPanel.Rendered += RenderPanelOnRender;
             WpfRenderPanel.MouseFired += RenderPanelOnMouseFire;
         }
 
         ~MainWindowViewModel()
         {
-            var ids = DocumentViewModels.Select(d => d.Key).ToList();
-            foreach (var id in ids)
+            foreach (var document in DocumentViewModelsTabs)
             {
-                DocumentViewModels[id].Dispose();
+                document.Dispose();
             }
             ApplicationController.Operation((int)UniversalCommands.close_all_docs);
             ApplicationController.CloseSession();
@@ -266,15 +257,6 @@ namespace CADView
             });
 
             _inited = true;
-
-            _timer = new DispatcherTimer(DispatcherPriority.Normal, Application.Current.Dispatcher);
-            _timer.Interval = new TimeSpan(0, 0, 0, 0, 33);
-            _timer.Tick += delegate
-            {
-                if (DocumentViewModels.Count == 0) return;
-                //ApplicationController.draw(Session, ActiveDocument.DocumentID);
-            };
-            _timer.Start();
         }
 
         public void CreateDocument()
@@ -321,12 +303,6 @@ namespace CADView
             }
         }
 
-        public Dictionary<uint, Document> DocumentViewModels
-        {
-            get;
-            //get { return ApplicationController.Documents; }
-        } = new Dictionary<uint, Document>();
-
         public double WindowWidth
         {
             get { return _windowWidth; }
@@ -360,9 +336,6 @@ namespace CADView
                     DocumentViewModelsTabs.IndexOf(DocumentViewModelsTabs.FirstOrDefault(i => i.DocumentID == value.DocumentID));
             }
         }
-
-        public ObservableCollection<string> TabMenuCollection { get; set; } =
-            new ObservableCollection<string>(new[] { "123", "456" });
 
         #region UI Buttons
 
@@ -471,32 +444,31 @@ namespace CADView
         #region Private
 
         private readonly Window _owner;
-        private uint _session;
-        bool _inited;
+        private readonly Grid _helperSpace;
+        private readonly TextBox _helperConsoleText;
+        private bool _inited;
         private bool _isActive;
+        private uint _session;
         private RelayCommand _documentWorkCommand;
         private RelayCommand _closeDocumentCommand;
         private RelayCommand _menuButtonClickCommand;
         private ObservableCollection<DocumentModel> _documentViewModelsTabs = new ObservableCollection<DocumentModel>();
         private int _selectedDocumentIndex = -1;
-        private DispatcherTimer _timer;
         private double _windowWidth;
         private double _windowHeight;
-        private readonly List<DocumentModel> _documentViewModels = new List<DocumentModel>();
         private RelayCommand _closeApplicationCommand;
         private RelayCommand _changeThemeCommand;
-        private readonly Dictionary<TabItem, Document> _tabsDocuments = new Dictionary<TabItem, Document>();
         private Visibility _consoleVisible = Visibility.Collapsed;
         private double _consoleHeight = 8;
         private double _lastConsoleHeight = 150;
         private const double _minConsoleHeight = 25;
         private const double _minDocumentHeight = 152.5;
         private Thickness _documentMargin = new Thickness(0, 0, 0, 8);
-        private string _consoleText = "Test";
-        private string _mainInfoText = "Главное инфо:";
-        private string _additionalInfoText = "Дополнительное инфо";
-        private string _coordinatesTextX = "X = 50";
-        private string _coordinatesTextY = "Y = 100";
+        private string _consoleText;
+        private string _mainInfoText;
+        private string _additionalInfoText;
+        private string _coordinatesTextX;
+        private string _coordinatesTextY;
 
         private uint Session
         {
@@ -524,12 +496,6 @@ namespace CADView
             //ApplicationController.resizeDocument(Session, ActiveDocument.DocumentID, w, h);
         }
 
-        private void RenderPanelOnRender()
-        {
-            if (DocumentViewModels.Count == 0) return;
-            //ApplicationController.draw(Session, ActiveDocument.DocumentID);
-        }
-
         private void RenderPanelOnMouseFire(MouseEventArgsExtended args)
         {
             UniversalInputEvents ev = UniversalInputEvents.Count;
@@ -545,7 +511,7 @@ namespace CADView
                         ev = UniversalInputEvents.mouse_left_button_double_click;
                     break;
                 case MouseEventArgsExtended.MouseButtons.Right:
-                    if(args.State == MouseEventArgsExtended.PressedState.Released)
+                    if (args.State == MouseEventArgsExtended.PressedState.Released)
                         ev = UniversalInputEvents.mouse_right_button;
                     break;
                 case MouseEventArgsExtended.MouseButtons.Middle:
@@ -559,14 +525,14 @@ namespace CADView
                 ev = UniversalInputEvents.mouse_wheel;
 
             if (ev != UniversalInputEvents.Count)
-                ApplicationController.InputEvent((int)ev);
+                ApplicationController.InputEvent((int) ev);
 
             if (args.Wheel != 0)
                 ApplicationController.SendDouble(args.Wheel);
 
             ApplicationController.MouseMove(args.X, args.Y);
-            CoordinatesTextX = args.X.ToString("F");
-            CoordinatesTextY = args.Y.ToString("F");
+            CoordinatesTextX = "X = " + args.X.ToString("F");
+            CoordinatesTextY = "Y = " + args.Y.ToString("F");
         }
 
         private async Task<bool> ProcessMenuButtonClick(UniversalCommands command, object data)
@@ -640,10 +606,10 @@ namespace CADView
                         CreateDocument();
                         break;
                     case UniversalCommands.OpenDocument:
-                        new OpenFileDialog().ShowDialog();
+                        new Microsoft.Win32.OpenFileDialog().ShowDialog();
                         break;
                     case UniversalCommands.SaveDocument:
-                        new SaveFileDialog().ShowDialog();
+                        new Microsoft.Win32.SaveFileDialog().ShowDialog();
                         break;
                     case UniversalCommands.StepBackward:
                         break;
@@ -845,7 +811,7 @@ namespace CADView
 
         public RelayCommand DocumentWorkCommand
         {
-            get { return _documentWorkCommand ?? (_documentWorkCommand = new RelayCommand(ProcessDocumentWork, o => (DocumentViewModels.Count > 0 && IsActive) || DocumentViewModels.Count == 0)); }
+            get { return _documentWorkCommand ?? (_documentWorkCommand = new RelayCommand(ProcessDocumentWork, o => (DocumentViewModelsTabs.Count > 0 && IsActive) || DocumentViewModelsTabs.Count == 0)); }
         }
 
         public RelayCommand MenuButtonClickCommand
@@ -858,34 +824,45 @@ namespace CADView
             get { return _closeApplicationCommand ?? (_closeApplicationCommand = new RelayCommand(o => Application.Current.Shutdown())); }
         }
 
+        public Dragablz.ItemActionCallback CloseDocumentCommand2
+        {
+            get
+            {
+                return
+                    delegate(Dragablz.ItemActionCallbackArgs<Dragablz.TabablzControl> args)
+                    {
+                        args.Cancel();
+
+                        DocumentModel tab = args.DragablzItem.DataContext as DocumentModel;
+                        if (tab == null)
+                            throw new ArgumentException("Trying to close unexisting document.");
+                        CloseDocument((int) tab.DocumentID);
+
+                        DocumentViewModelsTabs.Remove(tab);
+                        tab.Dispose();
+                        SelectedDocumentIndex = SelectedDocumentIndex;
+                        IsActive = DocumentViewModelsTabs.Count > 0;
+
+                    };
+            }
+        }
+
         public RelayCommand CloseDocumentCommand
         {
             get
             {
                 return _closeDocumentCommand ?? (_closeDocumentCommand = new RelayCommand(delegate (object i)
                 {
-
                     string name = i as string;
                     if (string.IsNullOrEmpty(name)) return;
 
-                    var tab = DocumentViewModelsTabs.ToList().Find(d => d.Title.Equals(name));
+                    DocumentModel tab = DocumentViewModelsTabs.ToList().Find(d => d.Title.Equals(name));
                     CloseDocument((int) tab.DocumentID);
 
-                    //var document = _tabsDocuments[tab];
-
-                    //if (document == null) return;
-
-                    //var host = (WindowsFormsHost) tab.Content;
-                    //tab.Content = null;
-                    //tab.DataContext = null;
                     DocumentViewModelsTabs.Remove(tab);
-                    //_tabsDocuments.Remove(tab);
-                    //host.Child.Dispose();
-                    //host.Dispose();
                     tab.Dispose();
-                    //ApplicationController.finalDocument(Session, document.DocumentID);
                     SelectedDocumentIndex = SelectedDocumentIndex;
-                    IsActive = DocumentViewModels.Count > 0;
+                    IsActive = DocumentViewModelsTabs.Count > 0;
                 }));
             }
         }
@@ -900,7 +877,6 @@ namespace CADView
                                ResourceDictionary resources;
                                ResourceDictionary second;
                                List<ResourceDictionary> resourcesToChange = new List<ResourceDictionary>();
-                               resources = this._owner.Resources;
                                resources = App.Instance.Resources;
                                second = resources.MergedDictionaries[1];
                                resourcesToChange.Add(second);
@@ -976,13 +952,11 @@ namespace CADView
                     _lastConsoleHeight = ConsoleHeight.Value;
                     ConsoleHeight = new GridLength(8, GridUnitType.Pixel);
                     DocumentMargin = new Thickness(0, 0, 0, 8);
-                    //DocumentsHeight = new GridLength(1, GridUnitType.Star);
                 }
                 else
                 {
                     ConsoleHeight = new GridLength(_lastConsoleHeight, GridUnitType.Star);
                     DocumentMargin = new Thickness(0);
-                    //DocumentsHeight = new GridLength(1, GridUnitType.Pixel);
                 }
             }
         }
