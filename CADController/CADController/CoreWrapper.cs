@@ -127,29 +127,57 @@ namespace CADController
 
         public UnmanagedArray(IEnumerable<T> array)
         {
-            if(array == null)
+            if (array == null)
                 throw new ArgumentException("Empty array.");
             IEnumerable<T> enumerable = array as T[] ?? array.ToArray();
             _size = enumerable.Count();
-            Pointer = Marshal.AllocHGlobal(_size * sizeof (IntPtr));
-            if (typeof (T) == typeof (int))
+            if (typeof(T) == typeof(int))
+            {
+                Pointer = Marshal.AllocHGlobal(_size * sizeof(int));
                 Marshal.Copy(enumerable.Cast<int>().ToArray(), 0, Pointer, _size);
-            else if (typeof (T) == typeof (byte))
+            }
+            else if (typeof(T) == typeof(byte))
+            {
+                Pointer = Marshal.AllocHGlobal(_size * sizeof(byte));
                 Marshal.Copy(enumerable.Cast<byte>().ToArray(), 0, Pointer, _size);
-            else if (typeof (T) == typeof (float))
+            }
+            else if (typeof(T) == typeof(float))
+            {
+                Pointer = Marshal.AllocHGlobal(_size * sizeof(float));
                 Marshal.Copy(enumerable.Cast<float>().ToArray(), 0, Pointer, _size);
-            else if (typeof (T) == typeof (IntPtr))
+            }
+            else if (typeof(T) == typeof(IntPtr))
+            {
+                Pointer = Marshal.AllocHGlobal(_size * sizeof(IntPtr));
                 Marshal.Copy(enumerable.Cast<IntPtr>().ToArray(), 0, Pointer, _size);
-            else if (typeof (T) == typeof (long))
+            }
+            else if (typeof(T) == typeof(long))
+            {
+                Pointer = Marshal.AllocHGlobal(_size * sizeof(long));
                 Marshal.Copy(enumerable.Cast<long>().ToArray(), 0, Pointer, _size);
-            else if (typeof (T) == typeof (short))
+            }
+            else if (typeof(T) == typeof(short))
+            {
+                Pointer = Marshal.AllocHGlobal(_size * sizeof(short));
                 Marshal.Copy(enumerable.Cast<short>().ToArray(), 0, Pointer, _size);
-            else if (typeof (T) == typeof (char))
+            }
+            else if (typeof(T) == typeof(char))
+            {
+                Pointer = Marshal.AllocHGlobal(_size * sizeof(char));
                 Marshal.Copy(enumerable.Cast<char>().ToArray(), 0, Pointer, _size);
-            else if (typeof (T) == typeof (double))
+            }
+            else if (typeof(T) == typeof(double))
+            {
+                Pointer = Marshal.AllocHGlobal(_size * sizeof(double));
                 Marshal.Copy(enumerable.Cast<double>().ToArray(), 0, Pointer, _size);
+            }
+            else if (typeof(T) == typeof(bool))
+            {
+                Pointer = Marshal.AllocHGlobal(_size * sizeof(int));
+                Marshal.Copy(enumerable.Cast<int>().ToArray(), 0, Pointer, _size);
+            }
             else
-                throw new ArgumentException("Wrong type of array.", typeof (T).FullName);
+                throw new ArgumentException($"Unsupported type '{typeof(T).FullName}' of array.", $"IEnumerable<T> {nameof(array)}");
         }
 
         ~UnmanagedArray()
