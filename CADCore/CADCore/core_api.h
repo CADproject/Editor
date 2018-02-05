@@ -48,9 +48,3 @@ extern "C" COREDLL_API void** getContourEdges(void* pObject, int& size);
 extern "C" COREDLL_API void* genericFactory(void* primitive, unsigned layer = 0, COLOR color = BLACK, THICKNESS thickness = THREE);
 extern "C" COREDLL_API unsigned getGenericLayer(void* pObject);
 extern "C" COREDLL_API void* getGenericTopology(void* pObject);
-
-#pragma region test
-
-extern "C" COREDLL_API void TestPInvoke(callBackFunction f, callBackFunction *callbacks);
-
-#pragma endregion test

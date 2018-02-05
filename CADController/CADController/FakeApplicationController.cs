@@ -238,7 +238,7 @@ namespace CADController
         }
     }
 
-    internal class ApplicationController: FakeApplicationController
+    internal class ApplicationController: BaseApplicationController
     {
         private OperationController _currentOperation;
 
@@ -403,36 +403,6 @@ namespace CADController
         {
             base.SendDouble(value);
             _currentOperation?.SendDouble(value);
-        }
-    }
-
-    internal class FakeApplicationController : BaseApplicationController
-    {
-        private Callback _drawCallback;
-        private Dictionary<string, Callback> testArray;
-
-        public override Status OpenSession(Dictionary<string, Callback> delegates)
-        {
-            testArray = delegates;
-            delegates.TryGetValue(nameof(IViewCallback.DrawGeometry), out _drawCallback);
-            return base.OpenSession(delegates);
-        }
-
-        public override void InputEvent(int evId)
-        {
-            base.InputEvent(evId);
-            if (evId == 6)
-            {
-                IntPtr[] functions = new IntPtr[testArray.Count];
-                int index = 0;
-                foreach (var pair in testArray)
-                {
-                    functions[index] = Marshal.GetFunctionPointerForDelegate(pair.Value);
-                    index++;
-                }
-
-                CoreWrapper.TestPInvoke(_drawCallback, functions);
-            }
         }
     }
 

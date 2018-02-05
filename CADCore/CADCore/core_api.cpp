@@ -199,29 +199,3 @@ void* getGenericTopology(void* pObject)
 	Generic* gen = static_cast<Generic*>(pObject);
 	return static_cast<void*>(gen->getTopology());
 }
-
-
-#pragma region test
-
-static double __position = 0;
-
-void TestPInvoke(callBackFunction f, callBackFunction *callbacks)
-{
-	CallbackValues cv;
-	cv.flag = 1;
-	cv.line = "pinvoked!";
-	cv.thickness = 1;
-	cv.size = 2;
-	cv.pDouble = new double[cv.size * 3]{ -10 + (double)__position, -10, 0, 10 + (double)__position, 10, 0 };
-	cv.pInt = new int[3]{ 255, 20, 255 };
-	cv.pString = new char[cv.size * 100];
-	memset(cv.pString, 0, cv.size * 100);
-	f(cv);
-	callbacks[1](cv);
-	cv.Free();
-	//память освобождается в ядре. можно перенести в деструктор освобождение, но не уверен, что это хорошая идея ибо эта структура маршаллится из шарпов
-	//не помню, добавление кода и функций не по умолчанию - не меняет ли распределение памяти в объекте структуры.
-	__position++;
-}
-
-#pragma endregion test
