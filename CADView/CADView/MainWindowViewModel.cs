@@ -450,7 +450,6 @@ namespace CADView
         private bool _isActive;
         private uint _session;
         private RelayCommand _documentWorkCommand;
-        private RelayCommand _closeDocumentCommand;
         private RelayCommand _menuButtonClickCommand;
         private ObservableCollection<DocumentModel> _documentViewModelsTabs = new ObservableCollection<DocumentModel>();
         private int _selectedDocumentIndex = -1;
@@ -458,6 +457,7 @@ namespace CADView
         private double _windowHeight;
         private RelayCommand _closeApplicationCommand;
         private RelayCommand _changeThemeCommand;
+        private Dragablz.ItemActionCallback _closeDocumentCommand;
         private Visibility _consoleVisible = Visibility.Collapsed;
         private double _consoleHeight = 8;
         private double _lastConsoleHeight = 150;
@@ -824,46 +824,26 @@ namespace CADView
             get { return _closeApplicationCommand ?? (_closeApplicationCommand = new RelayCommand(o => Application.Current.Shutdown())); }
         }
 
-        public Dragablz.ItemActionCallback CloseDocumentCommand2
+        public Dragablz.ItemActionCallback CloseDocumentCommand
         {
             get
             {
-                return
-                    delegate(Dragablz.ItemActionCallbackArgs<Dragablz.TabablzControl> args)
-                    {
-                        args.Cancel();
+                return _closeDocumentCommand ?? (_closeDocumentCommand =
+                           delegate(Dragablz.ItemActionCallbackArgs<Dragablz.TabablzControl> args)
+                           {
+                               args.Cancel();
 
-                        DocumentModel tab = args.DragablzItem.DataContext as DocumentModel;
-                        if (tab == null)
-                            throw new ArgumentException("Trying to close unexisting document.");
-                        CloseDocument((int) tab.DocumentID);
+                               DocumentModel tab = args.DragablzItem.DataContext as DocumentModel;
+                               if (tab == null)
+                                   throw new ArgumentException("Trying to close unexisting document.");
+                               CloseDocument((int) tab.DocumentID);
 
-                        DocumentViewModelsTabs.Remove(tab);
-                        tab.Dispose();
-                        SelectedDocumentIndex = SelectedDocumentIndex;
-                        IsActive = DocumentViewModelsTabs.Count > 0;
+                               DocumentViewModelsTabs.Remove(tab);
+                               tab.Dispose();
+                               SelectedDocumentIndex = SelectedDocumentIndex;
+                               IsActive = DocumentViewModelsTabs.Count > 0;
 
-                    };
-            }
-        }
-
-        public RelayCommand CloseDocumentCommand
-        {
-            get
-            {
-                return _closeDocumentCommand ?? (_closeDocumentCommand = new RelayCommand(delegate (object i)
-                {
-                    string name = i as string;
-                    if (string.IsNullOrEmpty(name)) return;
-
-                    DocumentModel tab = DocumentViewModelsTabs.ToList().Find(d => d.Title.Equals(name));
-                    CloseDocument((int) tab.DocumentID);
-
-                    DocumentViewModelsTabs.Remove(tab);
-                    tab.Dispose();
-                    SelectedDocumentIndex = SelectedDocumentIndex;
-                    IsActive = DocumentViewModelsTabs.Count > 0;
-                }));
+                           });
             }
         }
 
